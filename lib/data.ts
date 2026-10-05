@@ -27,9 +27,9 @@ export type Design = {
 };
 
 const v = (id: string) => [
-  { key: 'front' as const, label: 'Front', file: `${id}-front-cutout.png` },
-  { key: 'back' as const, label: 'Back', file: `${id}-back-cutout.png` },
-  { key: 'side' as const, label: 'Side', file: `${id}-side-cutout.png` },
+  { key: 'front' as const, label: 'Front', file: `${id}-front-model.png` },
+  { key: 'back' as const, label: 'Back', file: `${id}-back-model.png` },
+  { key: 'side' as const, label: 'Side', file: `${id}-side-model.png` },
 ];
 
 export const DESIGNS: Design[] = [
