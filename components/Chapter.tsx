@@ -76,9 +76,8 @@ export function Chapter({ d, index, onChoose }: { d: Design; index: number; onCh
           <div className="ch-frame">
             {d.views.map((vw, k) => (
               <img key={vw.key} className="ch-img" src={img(vw.file)} width={512} height={1024} loading="lazy" decoding="async"
-                alt={`AI design preview of the ${d.name} tee, ${vw.label.toLowerCase()} view, on a fictional model`} />
+                alt={`${d.name} tee, ${vw.label.toLowerCase()} view`} />
             ))}
-            <span className="ai-tag mono">AI design preview</span>
           </div>
         </div>
         <aside className="ch-hud mono" aria-hidden="true">

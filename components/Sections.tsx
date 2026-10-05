@@ -40,11 +40,10 @@ export function Hero() {
         <div className="hero-cards" aria-hidden={false}>
           {DESIGNS.map((d, i) => (
             <a key={d.id} href={`#${d.id}`} className={`hcard hc-${i}`} data-cursor={d.name} aria-label={`Jump to ${d.name}`}>
-              <img src={img(d.views[0].file)} width={512} height={1024} alt={`AI design preview of the ${d.name} tee on a fictional model`} />
+              <img src={img(d.views[0].file)} width={512} height={1024} alt={`${d.name} tee`} />
               <span className="hc-label mono">{d.n} {d.name}</span>
             </a>
           ))}
-          <span className="ai-tag mono hero-ai">AI design previews</span>
         </div>
       </div>
       <div className="scroll-cue mono" aria-hidden="true"><i /> Scroll</div>

@@ -13,7 +13,7 @@ Fonts (self-hosted): Big Shoulders Display, Archivo, IBM Plex Mono.
 - `components/`        Site (smooth scroll, intro, cursor), Chapter (pinned scroll-driven product story), Shop (gallery, sizes, bag), Sections
 - `app/layout.tsx`     SEO: metadata, Open Graph, JSON-LD (Organization, WebSite, Product x3 as PreOrder at INR 799, FAQPage)
 - `app/sitemap.ts`, `app/robots.ts`, `public/llms.txt`   crawler and AI-search files
-- `public/img`         AI design-preview model images (labeled on the page) - replace with real photos when samples exist
+- `public/img`         design-preview model cutouts (transparent PNG) - replace with real photos when samples exist
 - `scripts/build-preview.mjs`   bundles a static preview (not needed for deployment)
 
 ## Adding real friend quotes

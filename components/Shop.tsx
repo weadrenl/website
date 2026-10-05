@@ -61,9 +61,8 @@ export function Shop({ sel, setSel, onAdd }: { sel: number; setSel: (i: number) 
               aria-label={`Enlarge ${d.name}, ${d.views[angle].label.toLowerCase()} view. Use left and right arrows to change angle.`}>
               {d.views.map((vw, i) => (
                 <img key={vw.key} className={angle === i ? 'on' : ''} src={img(vw.file)} width={512} height={1024}
-                  alt={angle === i ? `AI design preview of the ${d.name} tee, ${vw.label.toLowerCase()} view, on a fictional model` : ''} />
+                  alt={angle === i ? `${d.name} tee, ${vw.label.toLowerCase()} view` : ''} />
               ))}
-              <span className="ai-tag mono">AI design preview</span>
               <span className="gal-hint mono">&larr; &rarr; angles / click to zoom</span>
             </button>
           </div>
@@ -98,11 +97,10 @@ export function Shop({ sel, setSel, onAdd }: { sel: number; setSel: (i: number) 
       <Modal open={zoom} onClose={() => setZoom(false)} label={`${d.name} enlarged`}>
         <button className="x" onClick={() => setZoom(false)} aria-label="Close">Close &times;</button>
         <div className="zoom">
-          <img src={img(d.views[angle].file)} alt={`AI design preview of the ${d.name} tee, ${d.views[angle].label.toLowerCase()} view`} />
+          <img src={img(d.views[angle].file)} alt={`${d.name} tee, ${d.views[angle].label.toLowerCase()} view`} />
           <div className="zoom-nav">
             {d.views.map((vw, i) => <button key={vw.key} className={angle === i ? 'on' : ''} onClick={() => setAngle(i)}>{vw.label}</button>)}
           </div>
-          <p className="mono">AI design preview. Not a photograph of a real tee.</p>
         </div>
       </Modal>
       <Modal open={guide} onClose={() => setGuide(false)} label="Fit guide">

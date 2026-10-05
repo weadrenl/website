@@ -140,7 +140,6 @@ export default function Site() {
       <div className="loader" aria-hidden="true"><Mark className="ld-mark" /><span className="ld-num mono">000</span></div>
       <div className="progress" aria-hidden="true"><i /></div>
       <div className="cursor" aria-hidden="true"><span className="mono" /></div>
-      <div className="notice mono">Design preview / Model pictures are AI concept visuals, not photos of real tees</div>
       <header className="nav">
         <a href="#top" className="brand" aria-label="ADRENL home"><Mark className="brand-mark" title="" /><span>ADRENL</span></a>
         <nav aria-label="Main">
