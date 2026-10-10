@@ -3,7 +3,7 @@ import { useEffect, useRef, type ReactNode } from 'react';
 
 declare global { interface Window { __lenis?: { stop: () => void; start: () => void } } }
 
-export function Modal({ open, onClose, label, side = false, children }: { open: boolean; onClose: () => void; label: string; side?: boolean; children: ReactNode }) {
+export function Modal({ open, onClose, label, side = false, wide = false, children }: { open: boolean; onClose: () => void; label: string; side?: boolean; wide?: boolean; children: ReactNode }) {
   const ref = useRef<HTMLDivElement>(null);
   useEffect(() => {
     if (!open) return;
@@ -31,7 +31,7 @@ export function Modal({ open, onClose, label, side = false, children }: { open: 
     };
   }, [open, onClose]);
   return (
-    <div className={`modal ${side ? 'is-side' : ''} ${open ? 'is-open' : ''}`} aria-hidden={!open} onMouseDown={(e) => { if (e.target === e.currentTarget) onClose(); }}>
+    <div className={`modal ${side ? 'is-side' : ''} ${wide ? 'is-wide' : ''} ${open ? 'is-open' : ''}`} aria-hidden={!open} onMouseDown={(e) => { if (e.target === e.currentTarget) onClose(); }}>
       <div className="modal-panel" role="dialog" aria-modal="true" aria-label={label} ref={ref}>
         {open && children}
       </div>
