@@ -5,59 +5,65 @@ import { Dawn } from './Dawn';
 import { RidgeEdge } from './Engrave';
 import { Chars } from './Split';
 
-const KEY = 'adrenl-film';
-
-/** Next film for this visitor: the one after the last they saw, or a random one on a first visit. */
-function nextFilm(): number {
-  const n = HERO_FILMS.length;
-  let last: number | null = null;
-  try { const v = window.localStorage.getItem(KEY); if (v !== null) last = Number(v); } catch { /* storage blocked */ }
-  const i = last === null || Number.isNaN(last) ? Math.floor(Math.random() * n) : (last + 1) % n;
-  try { window.localStorage.setItem(KEY, String(i)); } catch { /* storage blocked */ }
-  return i;
+/**
+ * The visit's film is chosen by a tiny script in <head> (see app/layout.tsx) before the first paint and written to
+ * <html data-film>. CSS then shows that film's still straight away, so the hero is never black. The film itself
+ * fades in on top only once it is actually playing; if a phone blocks autoplay, the still simply stays.
+ */
+function filmIndex(): number {
+  const v = Number(document.documentElement.dataset.film);
+  return Number.isInteger(v) && v >= 0 && v < HERO_FILMS.length ? v : 0;
 }
 
-/** Full-bleed film. Portrait cut on phones, landscape elsewhere; reduced motion shows the poster only. */
 function Film({ f }: { f: FilmT }) {
   const ref = useRef<HTMLVideoElement>(null);
   const [phone, setPhone] = useState<boolean | null>(null);
+  const [lite, setLite] = useState(true);
+  const [playing, setPlaying] = useState(false);
+
   useEffect(() => {
     const m = window.matchMedia('(max-width: 760px)');
-    const pick = () => setPhone(m.matches);
+    const pick = () => { setPhone(m.matches); setPlaying(false); };
     pick(); m.addEventListener('change', pick);
+    // Data-saver, very slow connections and reduced motion keep the still and never download the film.
+    const c = (navigator as Navigator & { connection?: { saveData?: boolean; effectiveType?: string } }).connection;
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    setLite(Boolean(reduced || c?.saveData || (c?.effectiveType && /(^|-)2g$/.test(c.effectiveType))));
     return () => m.removeEventListener('change', pick);
   }, []);
-  // Data-saver or a very slow connection: show the still poster, do not download the film.
-  const [lite, setLite] = useState(false);
-  useEffect(() => {
-    const c = (navigator as Navigator & { connection?: { saveData?: boolean; effectiveType?: string } }).connection;
-    setLite(Boolean(c?.saveData || (c?.effectiveType && /(^|-)2g$/.test(c.effectiveType))));
-  }, []);
+
   useEffect(() => {
     const v = ref.current;
-    if (!v || phone === null) return;
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) { v.pause(); return; }
-    v.play().catch(() => {});
+    if (!v) return;
+    v.muted = true;
+    v.play().catch(() => { /* autoplay blocked: the still stays, no play button is ever shown */ });
   }, [phone, lite]);
-  if (phone === null) return null;
-  if (lite) return <img className="film" src={phone ? f.posterMobile : f.posterDesktop} alt="" aria-hidden="true" />;
+
+  if (phone === null || lite) return null;
+  const c = phone ? f.port : f.land;
   return (
-    <video ref={ref} key={phone ? 'p' : 'l'} className="film" src={phone ? f.mobile : f.desktop} poster={phone ? f.posterMobile : f.posterDesktop}
-      muted loop playsInline autoPlay preload="auto" aria-hidden="true" />
+    <video ref={ref} key={phone ? 'p' : 'l'} className={`film ${playing ? 'on' : ''}`} muted loop playsInline autoPlay preload="auto"
+      disablePictureInPicture disableRemotePlayback aria-hidden="true" tabIndex={-1} onPlaying={() => setPlaying(true)} src={c.video} />
   );
 }
 
 export function Hero() {
   const hasFilms = HERO_FILMS.length > 0;
   const [film, setFilm] = useState<number | null>(null);
-  useEffect(() => { if (hasFilms) setFilm(nextFilm()); }, [hasFilms]);
+  useEffect(() => { if (hasFilms) setFilm(filmIndex()); }, [hasFilms]);
   const f = film === null ? null : HERO_FILMS[film];
   const d = f ? DESIGNS[f.route] : null;
 
   return (
     <section className="hero" id="top" aria-labelledby="hero-t">
       <div className="hero-media">
-        {hasFilms ? (f && <Film f={f} />) : <Dawn />}
+        {hasFilms
+          ? HERO_FILMS.map((x, i) => (
+            <i key={i} className={`still still-${i}`} aria-hidden="true"
+              style={{ ['--still-l' as string]: `url(${x.land.still})`, ['--still-p' as string]: `url(${x.port.still})` }} />
+          ))
+          : <Dawn />}
+        {f && <Film f={f} />}
         <i className="hero-shade" aria-hidden="true" />
       </div>
       <div className="wrap hero-inner">
@@ -75,7 +81,7 @@ export function Hero() {
         </div>
       </div>
       {d && (
-        <a className="hero-tag" href="#routes" data-hero>
+        <a className="hero-tag" href="#routes">
           <span>{d.roman}<i className="sep">·</i>{d.field}</span><b>{d.name}</b>
         </a>
       )}

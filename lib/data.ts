@@ -1,6 +1,6 @@
 export const SITE = {
   name: 'ADRENL',
-  url: 'https://adrenl.com',
+  url: 'https://www.adrenl.com', // the address the site is served from (adrenl.com redirects here)
   dropISO: '2026-10-31T00:00:00+05:30',
   dropLabel: '31 October 2026',
   dropShort: '31 Oct',
@@ -15,13 +15,15 @@ export const SITE = {
  * `mobile` is a portrait (9:16) cut for phones, `desktop` a landscape (16:9) cut. Make new ones with
  * scripts/prep-film.sh. Leave the list empty and the hero shows the drawn dawn-ridge scene instead.
  */
-/** `credit` is for our records only; Pexels does not require attribution, so it is not shown on the site. */
-export type Film = { route: number; desktop: string; mobile: string; posterDesktop: string; posterMobile: string; credit: string };
-const film = (id: string, route: number, credit: string): Film => ({
-  route, credit,
-  desktop: `/video/${id}-16x9.mp4`, mobile: `/video/${id}-9x16.mp4`,
-  posterDesktop: `/video/${id}-16x9.jpg`, posterMobile: `/video/${id}-9x16.jpg`,
-});
+/**
+ * Each film has a landscape (16:9) and a portrait (9:16) cut (H.264, plays everywhere), plus a WebP still of its
+ * first frame that shows from the very first paint.
+ * `credit` is for our records only; Pexels does not require attribution, so it is not shown on the site.
+ */
+export type Cut = { video: string; still: string };
+export type Film = { route: number; land: Cut; port: Cut; credit: string };
+const cut = (name: string): Cut => ({ video: `/video/${name}.mp4`, still: `/video/${name}.webp` });
+const film = (id: string, route: number, credit: string): Film => ({ route, credit, land: cut(`${id}-16x9`), port: cut(`${id}-9x16`) });
 export const HERO_FILMS: Film[] = [
   film('ridge', 0, 'Vijay Kothare on Pexels'),
   film('garud', 1, 'Sanjiv Joshi on Pexels'),
@@ -75,7 +77,7 @@ export const COPY = {
 };
 
 export type ViewKey = 'back' | 'front' | 'side';
-export type Shot = { key: ViewKey; label: string; photo: string; cut: string; png: string };
+export type Shot = { key: ViewKey; label: string; cut: string; png: string };
 
 export type Design = {
   id: 'ridge' | 'garud' | 'marcos';
@@ -100,7 +102,7 @@ export type Design = {
 
 const shots = (id: string): Shot[] =>
   (['back', 'front', 'side'] as ViewKey[]).map((k) => ({
-    key: k, label: k[0].toUpperCase() + k.slice(1), photo: `${id}-${k}-photo.webp`, cut: `${id}-${k}-model.webp`, png: `${id}-${k}-model.png`,
+    key: k, label: k[0].toUpperCase() + k.slice(1), cut: `${id}-${k}-model.webp`, png: `${id}-${k}-model.png`,
   }));
 
 export const DESIGNS: Design[] = [
@@ -112,7 +114,7 @@ export const DESIGNS: Design[] = [
     coords: '32.2396° N, 77.1887° E', alt: '3,450 m',
     paper: '#f2eee6', tint: '#1a1713',
     shots: shots('ridge'), flat: 'ridge-flat.jpg',
-    art: { file: 'ridge-art.png', ink: 'ridge-art-ink.png', w: 600, h: 230 },
+    art: { file: 'ridge-art.webp', ink: 'ridge-art-ink.webp', w: 600, h: 230 },
   },
   {
     id: 'garud', roman: 'II', name: 'GARUD', field: 'Open sky', colour: 'Black', swatch: '#1d1d1d',
@@ -122,7 +124,7 @@ export const DESIGNS: Design[] = [
     coords: '34.1526° N, 77.5771° E', alt: '3,500 m',
     paper: '#f1e9de', tint: '#a4472a',
     shots: shots('garud'), flat: 'garud-flat.jpg',
-    art: { file: 'garud-art.png', ink: 'garud-art-ink.png', w: 560, h: 490 },
+    art: { file: 'garud-art.webp', ink: 'garud-art-ink.webp', w: 560, h: 490 },
   },
   {
     id: 'marcos', roman: 'III', name: 'MARCOS', field: 'Coast and current', colour: 'Deep navy', swatch: '#1c2846',
@@ -132,7 +134,7 @@ export const DESIGNS: Design[] = [
     coords: '15.2993° N, 74.1240° E', alt: 'Sea level',
     paper: '#e8ebec', tint: '#1f3a63',
     shots: shots('marcos'), flat: 'marcos-flat.jpg',
-    art: { file: 'marcos-art.png', ink: 'marcos-art-ink.png', w: 580, h: 360 },
+    art: { file: 'marcos-art.webp', ink: 'marcos-art-ink.webp', w: 580, h: 360 },
   },
 ];
 

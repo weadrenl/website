@@ -17,15 +17,6 @@ async function webpFor(name) {
   console.log('webp', name);
 }
 
-// ---------- 1b. Studio photos (with backgrounds), edges trimmed ----------
-// Some source photos carry a few bright pixel columns at the left or right edge; trim them off.
-async function photoFor(name) {
-  const src = `${IN}/${name}.jpg`, m = await sharp(src).metadata();
-  await sharp(src).extract({ left: 10, top: 4, width: m.width - 20, height: m.height - 8 })
-    .webp({ quality: 90, effort: 5 }).toFile(`${OUT}/${name}-photo.webp`);
-  console.log('photo', name);
-}
-
 // ---------- 2. Artwork plates from the flat lays ----------
 // Crop boxes (x, y, w, h) around the printed graphic on the 1100x1375 flat lays.
 const plates = {
@@ -66,11 +57,11 @@ async function plateFor(d) {
     ink[i * 4 + 2] = Math.round(INK[2] + (RUST[2] - INK[2]) * warm);
     ink[i * 4 + 3] = Math.round(a * 255);
   }
-  await sharp(col, { raw: { width: W, height: H, channels: 4 } }).png({ compressionLevel: 9 }).toFile(`${OUT}/${d}-art.png`);
-  await sharp(ink, { raw: { width: W, height: H, channels: 4 } }).png({ compressionLevel: 9 }).toFile(`${OUT}/${d}-art-ink.png`);
+  await sharp(col, { raw: { width: W, height: H, channels: 4 } }).webp({ quality: 82, alphaQuality: 90, effort: 6 }).toFile(`${OUT}/${d}-art.webp`);
+  await sharp(ink, { raw: { width: W, height: H, channels: 4 } }).webp({ quality: 82, alphaQuality: 90, effort: 6 }).toFile(`${OUT}/${d}-art-ink.webp`);
   console.log('plate', d, 'fabric', fr, fg, fb);
 }
 
-if (!process.argv.includes('--plates')) for (const d of designs) for (const v of views) { await webpFor(`${d}-${v}`); await photoFor(`${d}-${v}`); }
+if (!process.argv.includes('--plates')) for (const d of designs) for (const v of views) await webpFor(`${d}-${v}`);
 for (const d of designs) await plateFor(d);
 console.log('done');

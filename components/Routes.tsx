@@ -33,7 +33,7 @@ export function Routes({ onChoose }: { onChoose: (i: number) => void }) {
         <div className="rt-grid">
           <div className="rt-blocks">
             {DESIGNS.map((x, i) => (
-              <article key={x.id} className={`rt-block ${active === i ? 'on' : ''}`} data-i={i}>
+              <article key={x.id} id={x.id} className={`rt-block ${active === i ? 'on' : ''}`} data-i={i}>
                 <p className="eyebrow">{x.roman} <i className="sep">·</i> {x.field}</p>
                 <h3 className="rt-name">{x.name}</h3>
                 <p className="rt-line">{x.line}</p>

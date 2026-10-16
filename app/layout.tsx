@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from 'next';
 import './globals.css';
-import { DESIGNS, FAQ, SITE } from '@/lib/data';
+import { DESIGNS, FAQ, HERO_FILMS, SITE, SIZES } from '@/lib/data';
 
 const title = 'ADRENL | Graphic tees for the long way. Batch 01 from Rs 799';
 const description = 'ADRENL Batch 01: three heavyweight graphic tees - RIDGE, GARUD and MARCOS - made for people who take the long route. Batch 01 price Rs 799, drops 31 October 2026.';
@@ -21,7 +21,7 @@ export const viewport: Viewport = { themeColor: '#0d0e10', width: 'device-width'
 const jsonLd = {
   '@context': 'https://schema.org',
   '@graph': [
-    { '@type': 'Organization', '@id': `${SITE.url}/#org`, name: 'ADRENL', url: SITE.url, logo: `${SITE.url}/logo.svg` },
+    { '@type': 'Organization', '@id': `${SITE.url}/#org`, name: 'ADRENL', url: SITE.url, logo: `${SITE.url}/logo.svg`, description: 'Indian clothing brand making graphic tees for people who take the long way.', areaServed: 'IN', address: { '@type': 'PostalAddress', addressCountry: 'IN' } },
     { '@type': 'WebSite', '@id': `${SITE.url}/#site`, url: SITE.url, name: 'ADRENL', publisher: { '@id': `${SITE.url}/#org` }, inLanguage: 'en-IN' },
     ...DESIGNS.map((d) => ({
       '@type': 'Product',
@@ -30,12 +30,16 @@ const jsonLd = {
       brand: { '@type': 'Brand', name: 'ADRENL' },
       color: d.colour,
       category: 'T-shirts',
+      sku: `ADRENL-B01-${d.name}`,
+      material: 'Cotton',
+      size: SIZES,
+      countryOfOrigin: 'IN',
       image: d.shots.map((v) => `${SITE.url}/img/${v.png}`),
       url: `${SITE.url}/#${d.id}`,
       offers: {
         '@type': 'Offer', price: String(SITE.price), priceCurrency: SITE.currency,
-        availability: 'https://schema.org/PreOrder', itemCondition: 'https://schema.org/NewCondition',
-        url: `${SITE.url}/#select`, seller: { '@id': `${SITE.url}/#org` },
+        availability: 'https://schema.org/PreOrder', availabilityStarts: SITE.dropISO, itemCondition: 'https://schema.org/NewCondition',
+        url: `${SITE.url}/#shop`, seller: { '@id': `${SITE.url}/#org` },
       },
     })),
     { '@type': 'FAQPage', mainEntity: FAQ.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })) },
@@ -46,7 +50,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en-IN" suppressHydrationWarning>
       <head>
-        <script dangerouslySetInnerHTML={{ __html: "if(!matchMedia('(prefers-reduced-motion: reduce)').matches)document.documentElement.classList.add('intro')" }} />
+        <script dangerouslySetInnerHTML={{ __html: "if(!matchMedia('(prefers-reduced-motion: reduce)').matches)document.documentElement.classList.add('intro');" + `(function(n,k,d){if(!n)return;var i;try{var l=localStorage.getItem(k);i=l===null||isNaN(+l)?Math.floor(Math.random()*n):(+l+1)%n;localStorage.setItem(k,i)}catch(e){i=0}d.dataset.film=i})(${HERO_FILMS.length},'adrenl-film',document.documentElement)` }} />
         <link rel="preload" href="/fonts/fraunces.woff2" as="font" type="font/woff2" crossOrigin="anonymous" />
         <link rel="preload" href="/fonts/schibsted.woff2" as="font" type="font/woff2" crossOrigin="anonymous" />
       </head>

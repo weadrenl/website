@@ -37,7 +37,7 @@ function Gallery({ sel }: { sel: number }) {
           </figure>
         ))}
         <figure className="gal-frame gal-print" style={{ background: d.swatch }}>
-          <img src={img(d.art.file)} width={d.art.w} height={d.art.h} alt={`${d.name} back print close-up: ${d.print}`} decoding="async" />
+          <img src={img(d.art.file)} width={d.art.w} height={d.art.h} alt={`${d.name} back print close-up: ${d.print}`} loading="lazy" decoding="async" />
           <figcaption>Print</figcaption>
         </figure>
       </div>

@@ -23,19 +23,25 @@ One story, each design introduced once and chosen once. No 3D, no faked depth on
 7. FAQ, footer. Phones also get a sticky Preorder bar between the hero and the shop.
 
 ## Hero films
-Three films, one per route; each visit plays the next one (remembered in the browser), and a small tag in the
-corner names the route and links to it. Phones get a portrait cut, everything else a landscape cut.
-All three are free Pexels clips (Pexels licence: free for commercial use, no attribution required; we credit anyway).
+Three films, one per route; each visit plays the next one. A tiny script in `<head>` (app/layout.tsx) picks it before
+the first paint, so that film's still is on screen from the very first frame (never a black hero). The film fades in
+over the still only once it is actually playing; if a phone blocks autoplay (Low Power Mode, data saver), the still
+simply stays and no play button ever shows. Reduced-motion, data-saver and 2G visitors get the still only.
+
+Each film is an 8-second seamless loop (the last second cross-fades into the first frame) at 24 fps, in two cuts
+(1440 x 810 landscape, 720 x 1280 portrait for phones), H.264 capped at 1 Mbps so it plays on every device.
+A visitor downloads one cut: about 0.5-1.1 MB plus a 25-120 KB still.
+All three are free Pexels clips (Pexels licence: free for commercial use, no attribution required).
 
 | Route  | Source clip | Creator | Cut |
 |--------|-------------|---------|-----|
-| RIDGE  | https://www.pexels.com/video/scenic-himalayan-river-through-misty-mountains-30152883/ | Vijay Kothare | 4.6-13.9 s (skips a construction site), phone crop at 0.55 |
-| GARUD  | https://www.pexels.com/video/scenic-drive-through-zanskar-valley-mountains-39802770/ | Sanjiv Joshi | 0-11 s, phone crop at 0.44 |
-| MARCOS | https://www.pexels.com/video/dramatic-drone-view-of-north-sea-cliffs-36505810/ | Mike Art | 0-12 s, phone crop at 0.42, CRF=30 |
+| RIDGE  | https://www.pexels.com/video/scenic-himalayan-river-through-misty-mountains-30152883/ | Vijay Kothare | from 4.6 s (skips a construction site), phone crop at 0.55 |
+| GARUD  | https://www.pexels.com/video/scenic-drive-through-zanskar-valley-mountains-39802770/ | Sanjiv Joshi | from 0 s, phone crop at 0.44 |
+| MARCOS | https://www.pexels.com/video/dramatic-drone-view-of-north-sea-cliffs-36505810/ | Mike Art | from 0 s, phone crop at 0.42 |
 
-To rebuild or add one (needs ffmpeg):
-    scripts/prep-film.sh <raw.mp4> garud-16x9 0 11 land
-    scripts/prep-film.sh <raw.mp4> garud-9x16 0 11 crop:0.44
+To rebuild or add one (needs ffmpeg with libx264 and libwebp):
+    scripts/prep-film.sh <raw.mp4> garud-16x9 0 8 land
+    scripts/prep-film.sh <raw.mp4> garud-9x16 0 8 crop:0.44
 Then list it in `HERO_FILMS` in `lib/data.ts`. Empty the list to fall back to the drawn dawn scene.
 Best upgrade later: your own footage of the finished tees on the road, shot in 4K landscape so one clip gives both cuts.
 
@@ -46,8 +52,8 @@ Best upgrade later: your own footage of the finished tees on the road, shot in 4
 - `components/Engrave.tsx`   SVG: contours, ridge edge, compass rose, route line, tee drawing, icons
 - `components/Site.tsx`      shell: smooth scroll, intro, nav, phone menu, buy bar, global reveals
 - `app/layout.tsx`           SEO: metadata, Open Graph, JSON-LD (Organization, WebSite, Product x3 as PreOrder, FAQPage)
-- `public/img`               source photos (`*-front.jpg` etc.), cut-outs (`*-model.png`), flat lays, generated files
-- `scripts/prep-images.mjs`  trims and converts the photos to WebP, extracts the back prints as plates
+- `public/img`               cut-outs (`*-model.png` source, `*-model.webp` served), flat lays, print plates (`*-art*.webp`)
+- `scripts/prep-images.mjs`  converts the cut-outs to WebP and extracts the back prints as WebP plates
 - `scripts/prep-film.sh`     prepares hero films (needs ffmpeg)
 - `scripts/build-og.mjs`     renders `public/og.jpg` with the local Chrome
 
