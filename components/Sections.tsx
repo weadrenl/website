@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import { COPY, FAQ, QUOTES, SITE } from '@/lib/data';
 import { Mark } from './Mark';
+import { BusinessInfo, PolicyLinks } from './Business';
 import { Contours, RoutePath, TeeDrawing } from './Engrave';
 import { pad, rupee, useCountdown } from './hooks';
 
@@ -133,12 +134,13 @@ export function Footer() {
           <a className="btn btn-paper" href="#shop">Pick your route</a>
         </div>
         <div className="foot-cols">
-          <div><p className="eyebrow">The drop</p><p>Opens {SITE.dropLabel}.<br />{rupee(SITE.price)} first run, {rupee(SITE.nextPrice)} after.</p></div>
-          <div><p className="eyebrow">Made</p><p>Designed in India.<br />Made in {SITE.made}.</p></div>
+          <div><p className="eyebrow">The drop</p><p>Opens {SITE.dropLabel}.<br />{rupee(SITE.price)} first run, {rupee(SITE.nextPrice)} after.<br />Made in {SITE.made}.</p></div>
           <div><p className="eyebrow">Explore</p><p className="foot-links"><a href="#story">Story</a><a href="#routes">Routes</a><a href="#build">The tee</a><a href="#faq">FAQ</a></p></div>
+          <div><p className="eyebrow">Policies</p><PolicyLinks /></div>
+          <div><p className="eyebrow">Contact</p><BusinessInfo /></div>
         </div>
         <div className="foot-brand" aria-hidden="true"><Mark className="foot-mark" /><span className="foot-word">ADRENL</span></div>
-        <div className="foot-row"><span>&copy; 2026 ADRENL</span><span>Adrenaline, worn.</span><a href="#top">Back to top</a></div>
+        <div className="foot-row"><span>&copy; 2026 NINETY4 VENTURES</span><span>Adrenaline, worn.</span><a href="#top">Back to top</a></div>
       </div>
     </footer>
   );

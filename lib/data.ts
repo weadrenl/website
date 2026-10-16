@@ -10,6 +10,22 @@ export const SITE = {
   made: 'Tiruppur, India',
 };
 
+/** The business behind the brand. Must match the legal documents (PAN, GST, Zoho Payments profile). */
+export const BUSINESS = {
+  legalName: 'NINETY4 VENTURES',
+  type: 'Partnership firm',
+  street: 'Anandi Bhavan, Dixit Colony, Kosa Nagar',
+  city: 'Bhilai',
+  district: 'Durg',
+  state: 'Chhattisgarh',
+  pin: '490020',
+  phone: '+91 70249 96969',
+  tel: '+917024996969',
+};
+export const POLICIES: [string, string][] = [
+  ['/privacy', 'Privacy policy'], ['/terms', 'Terms of service'], ['/refunds', 'Refunds and cancellation'], ['/shipping', 'Shipping and delivery'],
+];
+
 /**
  * Hero films, one per route. Each visit plays the next one in turn (the choice is remembered in the browser).
  * `mobile` is a portrait (9:16) cut for phones, `desktop` a landscape (16:9) cut. Make new ones with

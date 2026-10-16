@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from 'next';
 import './globals.css';
-import { DESIGNS, FAQ, HERO_FILMS, SITE, SIZES } from '@/lib/data';
+import { BUSINESS, DESIGNS, FAQ, HERO_FILMS, SITE, SIZES } from '@/lib/data';
 
 const title = 'ADRENL | Graphic tees for the long way. Batch 01 from Rs 799';
 const description = 'ADRENL Batch 01: three heavyweight graphic tees - RIDGE, GARUD and MARCOS - made for people who take the long route. Batch 01 price Rs 799, drops 31 October 2026.';
@@ -21,7 +21,10 @@ export const viewport: Viewport = { themeColor: '#0d0e10', width: 'device-width'
 const jsonLd = {
   '@context': 'https://schema.org',
   '@graph': [
-    { '@type': 'Organization', '@id': `${SITE.url}/#org`, name: 'ADRENL', url: SITE.url, logo: `${SITE.url}/logo.svg`, description: 'Indian clothing brand making graphic tees for people who take the long way.', areaServed: 'IN', address: { '@type': 'PostalAddress', addressCountry: 'IN' } },
+    { '@type': 'Organization', '@id': `${SITE.url}/#org`, name: 'ADRENL', url: SITE.url, logo: `${SITE.url}/logo.svg`, description: 'Indian clothing brand making graphic tees for people who take the long way.', areaServed: 'IN',
+      legalName: BUSINESS.legalName, telephone: BUSINESS.tel,
+      address: { '@type': 'PostalAddress', streetAddress: BUSINESS.street, addressLocality: BUSINESS.city, addressRegion: BUSINESS.state, postalCode: BUSINESS.pin, addressCountry: 'IN' },
+      contactPoint: { '@type': 'ContactPoint', contactType: 'customer support', telephone: BUSINESS.tel, areaServed: 'IN', availableLanguage: ['en', 'hi'] } },
     { '@type': 'WebSite', '@id': `${SITE.url}/#site`, url: SITE.url, name: 'ADRENL', publisher: { '@id': `${SITE.url}/#org` }, inLanguage: 'en-IN' },
     ...DESIGNS.map((d) => ({
       '@type': 'Product',
