@@ -15,6 +15,8 @@ const STATES = ['Andaman and Nicobar Islands', 'Andhra Pradesh', 'Arunachal Prad
 
 const digits = (s: string, n: number) => s.replace(/\D/g, '').slice(0, n);
 const fmtPhone = (p: string) => `+91 ${p.slice(0, 5)} ${p.slice(5)}`;
+/** What people paste or autofill: '+91 98765 43210', '098765 43210', '9876543210' all become the 10 digits. */
+const national = (v: string) => { const d = v.replace(/\D/g, ''); return (d.length > 10 ? d.replace(/^(91|0)/, '') : d).slice(0, 10); };
 
 function Field({ label, error, hint, children }: { label: string; error?: string; hint?: string; children: ReactNode }) {
   return (
@@ -92,7 +94,7 @@ export function Login({ onDone, intro }: { onDone: (u: User) => void; intro?: st
         <span className="tel">
           <span className="tel-cc" aria-hidden="true">+91</span>
           <input type="tel" inputMode="numeric" autoComplete="tel-national" placeholder="10-digit number" value={phone} aria-label="Mobile number, +91"
-            onChange={(e) => { setPhone(digits(e.target.value.replace(/^\+?91(?=\d{10})/, ''), 10)); setErr(''); }} autoFocus />
+            onChange={(e) => { setPhone(national(e.target.value)); setErr(''); }} autoFocus />
         </span>
         {err && <span className="field-e" role="alert">{err}</span>}
       </label>
