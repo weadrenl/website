@@ -1,6 +1,6 @@
 'use client';
-import { useEffect, useRef, useState, type FormEvent, type ReactNode } from 'react';
-import type { Address, Order, User } from '@/lib/catalog';
+import { useEffect, useRef, useState, type FormEvent, type ReactNode, type RefObject } from 'react';
+import type { Address, Order, SavedAddress, User } from '@/lib/catalog';
 import { SITE } from '@/lib/data';
 import { img } from '@/lib/assets';
 import { api, ApiError } from '@/lib/api';
@@ -23,6 +23,27 @@ function Field({ label, error, hint, children }: { label: string; error?: string
       {children}
       {error ? <span className="field-e" role="alert">{error}</span> : hint ? <span className="field-h">{hint}</span> : null}
     </label>
+  );
+}
+
+/**
+ * Four boxes, one real input laid over them. The input keeps paste and SMS autofill (one-time-code) working; the
+ * boxes show the digits and a caret in the box being typed into, so nothing drifts out of line.
+ */
+function OtpBoxes({ value, onChange, inputRef }: { value: string; onChange: (v: string) => void; inputRef: RefObject<HTMLInputElement | null> }) {
+  const [focus, setFocus] = useState(false);
+  const at = Math.min(value.length, 3);
+  return (
+    <div className="otp">
+      <input ref={inputRef} className="otp-in" type="text" inputMode="numeric" autoComplete="one-time-code" pattern="[0-9]*" maxLength={4}
+        aria-label="4-digit code" value={value} onChange={(e) => onChange(digits(e.target.value, 4))}
+        onFocus={() => setFocus(true)} onBlur={() => setFocus(false)} />
+      {[0, 1, 2, 3].map((i) => (
+        <span key={i} aria-hidden="true" className={`otp-box ${value[i] ? 'full' : ''} ${focus && i === at ? 'on' : ''}`}>
+          {value[i] ?? (focus && i === at ? <i className="caret" /> : null)}
+        </span>
+      ))}
+    </div>
   );
 }
 
@@ -50,38 +71,42 @@ export function Login({ onDone, intro }: { onDone: (u: User) => void; intro?: st
       setIsNew(r.newUser); setTest(r.testMode); setStep('code'); setCode('');
     } catch (x) { setErr((x as Error).message); } finally { setBusy(false); }
   };
-  const verify = async (e: FormEvent) => {
-    e.preventDefault();
-    if (code.length < 4) return setErr('Enter the 4-digit code.');
+  const verify = async (c = code) => {
+    if (c.length < 4) return setErr('Enter the 4-digit code.');
     if (isNew && name.trim().length < 2) return setErr('Tell us your name.');
     setBusy(true); setErr('');
     try {
-      const r = await api<{ user: User }>('/auth/verify', { phone, code, name: name.trim() });
+      const r = await api<{ user: User }>('/auth/verify', { phone, code: c, name: name.trim() });
       setUser(r.user); onDone(r.user);
-    } catch (x) { setErr((x as Error).message); setBusy(false); }
+    } catch (x) { setErr((x as Error).message); setCode(''); codeRef.current?.focus(); setBusy(false); }
   };
+  // A returning customer is signed in as soon as the fourth digit lands.
+  const onCode = (v: string) => { setCode(v); setErr(''); if (v.length === 4 && !isNew && !busy) verify(v); };
 
   return step === 'phone' ? (
     <form className="form" onSubmit={start} noValidate>
       <h3 className="form-t">Sign in</h3>
       <p className="form-p">{intro || 'Use your mobile number. No password to remember.'}</p>
-      <Field label="Mobile number" error={err}>
-        <span className="field-pre"><i>+91</i>
-          <input type="tel" inputMode="numeric" autoComplete="tel-national" placeholder="98765 43210" value={phone}
+      <label className={`field ${err ? 'bad' : ''}`}>
+        <span className="field-l">Mobile number</span>
+        <span className="tel">
+          <span className="tel-cc" aria-hidden="true">+91</span>
+          <input type="tel" inputMode="numeric" autoComplete="tel-national" placeholder="10-digit number" value={phone} aria-label="Mobile number, +91"
             onChange={(e) => { setPhone(digits(e.target.value.replace(/^\+?91(?=\d{10})/, ''), 10)); setErr(''); }} autoFocus />
         </span>
-      </Field>
+        {err && <span className="field-e" role="alert">{err}</span>}
+      </label>
       <button className="btn btn-wide" disabled={busy} aria-busy={busy}>{busy ? 'Sending…' : 'Send code'}</button>
     </form>
   ) : (
-    <form className="form" onSubmit={verify} noValidate>
+    <form className="form" onSubmit={(e) => { e.preventDefault(); verify(); }} noValidate>
       <h3 className="form-t">Enter the code</h3>
-      <p className="form-p">Sent to {fmtPhone(phone)}. <button type="button" className="tlink" onClick={() => { setStep('phone'); setErr(''); }}>Change</button></p>
+      <p className="form-p">Sent to {fmtPhone(phone)} <i className="sep">·</i> <button type="button" className="tlink" onClick={() => { setStep('phone'); setErr(''); }}>Change number</button></p>
       {test && <p className="note">Test mode: the code is <b>1234</b>.</p>}
-      <Field label="4-digit code">
-        <input ref={codeRef} className="otp" type="text" inputMode="numeric" autoComplete="one-time-code" maxLength={4} placeholder="····" value={code}
-          onChange={(e) => { setCode(digits(e.target.value, 4)); setErr(''); }} />
-      </Field>
+      <div className="field">
+        <span className="field-l">4-digit code</span>
+        <OtpBoxes value={code} onChange={onCode} inputRef={codeRef} />
+      </div>
       {isNew && (
         <Field label="Your name">
           <input type="text" autoComplete="name" value={name} onChange={(e) => { setName(e.target.value); setErr(''); }} maxLength={80} />
@@ -93,59 +118,14 @@ export function Login({ onDone, intro }: { onDone: (u: User) => void; intro?: st
   );
 }
 
-type Form = { name: string; email: string } & Address;
+const EMPTY: Address = { name: '', line1: '', line2: '', city: '', state: '', pin: '' };
+type Errs = Partial<Record<keyof Address | 'email', string>>;
 
-/** Delivery details and the pay button. On success the browser leaves for Zoho's secure payment page. */
-function Details({ onBack, onPaying, onSignedOut }: { onBack: () => void; onPaying: () => void; onSignedOut: () => void }) {
-  const { user, bag, cat } = useStore();
-  const a = user?.address;
-  const [f, setF] = useState<Form>({
-    name: user?.name ?? '', email: user?.email ?? '',
-    line1: a?.line1 ?? '', line2: a?.line2 ?? '', city: a?.city ?? '', state: a?.state ?? '', pin: a?.pin ?? '',
-  });
-  const [errs, setErrs] = useState<Partial<Record<keyof Form, string>>>({});
-  const [err, setErr] = useState('');
-  const [busy, setBusy] = useState(false);
-  const set = (k: keyof Form) => (e: { target: { value: string } }) => {
-    setF((x) => ({ ...x, [k]: k === 'pin' ? digits(e.target.value, 6) : e.target.value }));
-    setErrs((x) => ({ ...x, [k]: undefined })); setErr('');
-  };
-  const subtotal = bag.reduce((s, i) => s + i.price, 0), total = subtotal + cat.shipping;
-
-  const pay = async (e: FormEvent) => {
-    e.preventDefault();
-    const v: typeof errs = {};
-    if (f.name.trim().length < 2) v.name = 'Add the name for delivery.';
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(f.email.trim())) v.email = 'Add a valid email. Your receipt goes here.';
-    if (f.line1.trim().length < 5) v.line1 = 'Add the house number and street.';
-    if (f.city.trim().length < 2) v.city = 'Add the city.';
-    if (!f.state) v.state = 'Pick the state.';
-    if (!/^[1-9]\d{5}$/.test(f.pin)) v.pin = 'Add the 6-digit PIN code.';
-    setErrs(v);
-    if (Object.keys(v).length) {
-      (document.querySelector(`.form [name="${Object.keys(v)[0]}"]`) as HTMLElement | null)?.focus();
-      return;
-    }
-    setBusy(true); setErr('');
-    try {
-      const r = await api<{ order: string; url: string }>('/checkout', {
-        items: bag.map((i) => ({ id: i.id, size: i.size })), name: f.name, email: f.email,
-        address: { line1: f.line1, line2: f.line2, city: f.city, state: f.state, pin: f.pin },
-      });
-      onPaying();
-      window.location.assign(r.url);
-    } catch (x) {
-      if (x instanceof ApiError && x.status === 401) return onSignedOut();
-      setErr((x as Error).message); setBusy(false);
-    }
-  };
-
+/** The address fields, for a first or an extra delivery address. */
+function AddressForm({ f, set, errs }: { f: Address; set: (k: keyof Address) => (e: { target: { value: string } }) => void; errs: Errs }) {
   return (
-    <form className="form" onSubmit={pay} noValidate>
-      <div className="form-head"><h3 className="form-t">Delivery</h3><button type="button" className="tlink" onClick={onBack}>Back to bag</button></div>
-      <p className="form-p">Signed in as {user && fmtPhone(user.phone)}</p>
+    <div className="addr-form">
       <Field label="Full name" error={errs.name}><input name="name" autoComplete="name" value={f.name} onChange={set('name')} maxLength={80} /></Field>
-      <Field label="Email" error={errs.email} hint="For the receipt and dispatch updates."><input name="email" type="email" inputMode="email" autoComplete="email" value={f.email} onChange={set('email')} maxLength={120} /></Field>
       <Field label="House, building, street" error={errs.line1}><input name="line1" autoComplete="address-line1" value={f.line1} onChange={set('line1')} maxLength={160} /></Field>
       <Field label="Area, landmark (optional)"><input name="line2" autoComplete="address-line2" value={f.line2} onChange={set('line2')} maxLength={160} /></Field>
       <div className="field-row">
@@ -158,6 +138,91 @@ function Details({ onBack, onPaying, onSignedOut }: { onBack: () => void; onPayi
           {STATES.map((s) => <option key={s}>{s}</option>)}
         </select>
       </Field>
+    </div>
+  );
+}
+
+/**
+ * Where it goes and the pay button. Saved addresses are offered first (the last one used is picked); with none
+ * saved, the address form opens straight away. A new address is saved when the order is placed.
+ */
+function Details({ onBack, onPaying, onSignedOut }: { onBack: () => void; onPaying: () => void; onSignedOut: () => void }) {
+  const { user, bag, cat } = useStore();
+  const saved = user?.addresses ?? [];
+  const [sel, setSel] = useState<string>(saved[0]?.id ?? 'new');
+  const [f, setF] = useState<Address>({ ...EMPTY, name: user?.name ?? '' });
+  const [email, setEmail] = useState(user?.email ?? '');
+  const [editEmail, setEditEmail] = useState(!user?.email);
+  const [errs, setErrs] = useState<Errs>({});
+  const [err, setErr] = useState('');
+  const [busy, setBusy] = useState(false);
+  const set = (k: keyof Address) => (e: { target: { value: string } }) => {
+    setF((x) => ({ ...x, [k]: k === 'pin' ? digits(e.target.value, 6) : e.target.value }));
+    setErrs((x) => ({ ...x, [k]: undefined })); setErr('');
+  };
+  const pick = (id: string) => { setSel(id); setErrs({}); setErr(''); };
+  const subtotal = bag.reduce((s, i) => s + i.price, 0), total = subtotal + cat.shipping;
+  const isNew = sel === 'new' || !saved.some((a) => a.id === sel);
+
+  const pay = async (e: FormEvent) => {
+    e.preventDefault();
+    const v: Errs = {};
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email.trim())) { v.email = 'Add a valid email. Your receipt goes here.'; setEditEmail(true); }
+    if (isNew) {
+      if (f.name.trim().length < 2) v.name = 'Add the name for delivery.';
+      if (f.line1.trim().length < 5) v.line1 = 'Add the house number and street.';
+      if (f.city.trim().length < 2) v.city = 'Add the city.';
+      if (!f.state) v.state = 'Pick the state.';
+      if (!/^[1-9]\d{5}$/.test(f.pin)) v.pin = 'Add the 6-digit PIN code.';
+    }
+    setErrs(v);
+    if (Object.keys(v).length) {
+      setTimeout(() => (document.querySelector(`.form [name="${Object.keys(v).find((k) => k !== 'email') ?? 'email'}"]`) as HTMLElement | null)?.focus(), 0);
+      return;
+    }
+    setBusy(true); setErr('');
+    try {
+      const r = await api<{ order: string; url: string }>('/checkout', {
+        items: bag.map((i) => ({ id: i.id, size: i.size })), email: email.trim(),
+        ...(isNew ? { address: f } : { addressId: sel }),
+      });
+      onPaying();
+      window.location.assign(r.url);
+    } catch (x) {
+      if (x instanceof ApiError && x.status === 401) return onSignedOut();
+      setErr((x as Error).message); setBusy(false);
+    }
+  };
+
+  return (
+    <form className="form" onSubmit={pay} noValidate>
+      <div className="form-head"><h3 className="form-t">{saved.length ? 'Deliver to' : 'Delivery address'}</h3><button type="button" className="tlink" onClick={onBack}>Back to bag</button></div>
+      <p className="form-p">Signed in as {user && fmtPhone(user.phone)}</p>
+      {saved.length > 0 && (
+        <div className="addrs" role="radiogroup" aria-label="Delivery address">
+          {saved.map((a) => (
+            <label key={a.id} className={`addr ${sel === a.id ? 'on' : ''}`}>
+              <input type="radio" name="addr" checked={sel === a.id} onChange={() => pick(a.id)} />
+              <span className="addr-dot" aria-hidden="true" />
+              <span className="addr-t"><b>{a.name}</b><span>{a.line1}{a.line2 ? `, ${a.line2}` : ''}</span><span>{a.city}, {a.state} {a.pin}</span></span>
+            </label>
+          ))}
+          <label className={`addr addr-new ${isNew ? 'on' : ''}`}>
+            <input type="radio" name="addr" checked={isNew} onChange={() => pick('new')} />
+            <span className="addr-dot" aria-hidden="true" />
+            <span className="addr-t"><b>Add a new address</b></span>
+          </label>
+        </div>
+      )}
+      {isNew && <AddressForm f={f} set={set} errs={errs} />}
+      {editEmail ? (
+        <Field label="Email" error={errs.email} hint="For the receipt and dispatch updates.">
+          <input name="email" type="email" inputMode="email" autoComplete="email" value={email} maxLength={120}
+            onChange={(e) => { setEmail(e.target.value); setErrs((x) => ({ ...x, email: undefined })); setErr(''); }} />
+        </Field>
+      ) : (
+        <p className="contact"><span className="field-l">Receipt to</span><span className="contact-v">{email}</span><button type="button" className="tlink" onClick={() => setEditEmail(true)}>Change</button></p>
+      )}
 
       <dl className="sum">
         <div><dt>{bag.length} {bag.length === 1 ? 'tee' : 'tees'}</dt><dd>{rupee(subtotal)}</dd></div>
@@ -244,7 +309,8 @@ export function BagDrawer({ open, onClose }: { open: boolean; onClose: () => voi
   );
 }
 
-export const STATUS: Record<Order['status'], string> = { pending: 'Confirming', paid: 'Confirmed', failed: 'Not paid', amount_mismatch: 'Under review' };
+export const STATUS: Record<Order['status'], string> = { pending: 'Confirming', paid: 'Confirmed', failed: 'Not paid', expired: 'Not completed', amount_mismatch: 'Under review' };
+export const statusOf = (o: Order) => (o.status === 'pending' && o.stage === 'awaiting' ? 'Awaiting payment' : STATUS[o.status]);
 const date = (s: string) => new Date(s).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
 
 /** Sign in, or see your orders and sign out. */
@@ -262,6 +328,10 @@ export function Account({ open, onClose }: { open: boolean; onClose: () => void 
   }, [open, user, setUser]);
 
   const out = async () => { await api('/auth/logout', {}).catch(() => {}); setUser(null); };
+  const remove = async (id: string) => {
+    try { const r = await api<{ addresses: SavedAddress[] }>('/addresses/remove', { id }); if (user) setUser({ ...user, addresses: r.addresses }); }
+    catch (x) { setErr((x as Error).message); }
+  };
 
   return (
     <Modal open={open} onClose={onClose} label="Your account" side>
@@ -280,13 +350,26 @@ export function Account({ open, onClose }: { open: boolean; onClose: () => void 
                 {orders.map((o) => (
                   <li key={o.id}>
                     <a href={`/order?id=${o.id}`}>
-                      <span className="o-top"><b>{o.id}</b><i className={`badge s-${o.status}`}>{STATUS[o.status]}</i></span>
+                      <span className="o-top"><b>{o.id}</b><i className={`badge s-${o.status}`}>{statusOf(o)}</i></span>
                       <span>{o.items.map((i) => `${i.name} ${i.size}`).join(', ')}</span>
                       <span className="o-meta">{date(o.created)} <i className="sep">·</i> {rupee(o.amount)}</span>
                     </a>
                   </li>
                 ))}
               </ul>
+            )}
+            {user.addresses.length > 0 && (
+              <div className="acct-sec">
+                <p className="eyebrow">Saved addresses</p>
+                <ul className="saved">
+                  {user.addresses.map((a) => (
+                    <li key={a.id}>
+                      <span className="addr-t"><b>{a.name}</b><span>{a.line1}{a.line2 ? `, ${a.line2}` : ''}</span><span>{a.city}, {a.state} {a.pin}</span></span>
+                      <button className="tlink" onClick={() => remove(a.id)} aria-label={`Remove address: ${a.line1}`}>Remove</button>
+                    </li>
+                  ))}
+                </ul>
+              </div>
             )}
             <button className="tlink back" onClick={out}>Sign out</button>
           </div>

@@ -5,6 +5,8 @@ import { BUSINESS } from '@/lib/data';
 import { api, ApiError } from '@/lib/api';
 import { useStore } from './Store';
 import { Login, STATUS } from './Checkout';
+
+const time = (s: string) => new Date(s).toLocaleTimeString('en-IN', { hour: 'numeric', minute: '2-digit' });
 import { rupee } from './hooks';
 
 const POLL_MS = 2500, PATIENCE_MS = 90000;
@@ -39,13 +41,13 @@ export function OrderView() {
 
   useEffect(() => { if (id && user) { started.current = Date.now(); load(); } }, [id, user, load]);
 
-  // Still confirming: keep asking, calmly.
+  // Still pending: keep asking, calmly (slower while nobody has tried to pay yet).
   useEffect(() => {
     if (order?.status !== 'pending') return;
     const t = setTimeout(() => {
-      if (Date.now() - started.current > PATIENCE_MS) setSlow(true);
+      if (order.stage === 'confirming' && Date.now() - started.current > PATIENCE_MS) setSlow(true);
       load();
-    }, slow ? POLL_MS * 4 : POLL_MS);
+    }, order.stage === 'awaiting' ? POLL_MS * 4 : slow ? POLL_MS * 4 : POLL_MS);
     return () => clearTimeout(t);
   }, [order, slow, load]);
 
@@ -56,6 +58,19 @@ export function OrderView() {
     body = <div className="ord-login"><Login onDone={() => setErr('')} intro="Sign in with the number you ordered with to see this order." /></div>;
   } else if (err && !order) {
     body = <Msg t="We could not load your order." p={err} retry={load} />;
+  } else if (order?.status === 'pending' && order.stage === 'awaiting') {
+    body = (
+      <div className="ord-done">
+        <p className="eyebrow">Order {order.id} <i className="sep">·</i> Awaiting payment</p>
+        <h1>This order is not paid yet.</h1>
+        <p className="ord-lead">Nothing has been charged. You can finish paying on the secure Zoho page{order.expires ? ` until ${time(order.expires)}` : ''}; after that the link closes and the order is dropped.</p>
+        <Summary o={order} />
+        <div className="ord-actions">
+          {order.payUrl && <a className="btn" href={order.payUrl}>Continue to payment</a>}
+          <a className="tlink" href="/?bag=open">Back to bag</a>
+        </div>
+      </div>
+    );
   } else if (!order || order.status === 'pending') {
     body = (
       <div className="ord-wait" role="status" aria-live="polite">
@@ -86,14 +101,16 @@ export function OrderView() {
       </div>
     );
   } else {
-    const review = order.status === 'amount_mismatch';
+    const review = order.status === 'amount_mismatch', never = order.status === 'expired';
     body = (
       <div className="ord-done">
         <p className="eyebrow">Order {order.id} <i className="sep">·</i> {STATUS[order.status]}</p>
-        <h1>{review ? 'We need to check this payment.' : 'The payment did not go through.'}</h1>
+        <h1>{review ? 'We need to check this payment.' : never ? 'This payment was not completed.' : 'The payment did not go through.'}</h1>
         <p className="ord-lead">{review
           ? `Something about this payment does not match the order. We will call you on ${order.phone} to sort it out.`
-          : 'No order was placed and your bag is still saved. If money left your account, your bank returns it automatically; if it does not, call us with this order number.'}</p>
+          : never
+            ? 'The payment page was opened but nothing was paid, so no order was placed and nothing was charged. Your bag is still saved.'
+            : 'No order was placed and your bag is still saved. If money left your account, your bank returns it automatically; if it does not, call us with this order number.'}</p>
         <Summary o={order} />
         <div className="ord-actions">
           {!review && <a className="btn" href="/?bag=open">Try again</a>}

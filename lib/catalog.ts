@@ -10,12 +10,15 @@ export type Catalog = {
   shipping: number;
   products: Product[];
 };
-export type User = { name: string; phone: string; email: string | null; address: Address | null };
-export type Address = { line1: string; line2: string; city: string; state: string; pin: string };
+export type Address = { name: string; line1: string; line2: string; city: string; state: string; pin: string };
+export type SavedAddress = Address & { id: string };
+export type User = { name: string; phone: string; email: string | null; addresses: SavedAddress[] };
 export type OrderItem = { id: string; name: string; colour: string; size: string; price: number };
 export type Order = {
-  id: string; status: 'pending' | 'paid' | 'failed' | 'amount_mismatch'; amount: number; shipping: number; items: OrderItem[];
+  id: string; status: 'pending' | 'paid' | 'failed' | 'expired' | 'amount_mismatch'; amount: number; shipping: number; items: OrderItem[];
   name: string; phone: string; email: string; address: Address; created: string; paid: string | null;
+  /** Pending only: 'awaiting' = not paid yet and the payment link still works (payUrl, until expires); 'confirming' = with the bank. */
+  stage?: 'awaiting' | 'confirming'; payUrl?: string; expires?: string;
 };
 
 export const API = process.env.NEXT_PUBLIC_API_URL || 'https://pay.adrenl.com';
