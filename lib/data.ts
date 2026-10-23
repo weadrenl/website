@@ -37,9 +37,9 @@ export const POLICIES: [string, string][] = [
  * `credit` is for our records only; Pexels does not require attribution, so it is not shown on the site.
  */
 export type Cut = { video: string; still: string };
-export type Film = { route: number; land: Cut; port: Cut; credit: string };
+export type Film = { id: string; route: number; land: Cut; port: Cut; credit: string };
 const cut = (name: string): Cut => ({ video: `/video/${name}.mp4`, still: `/video/${name}.webp` });
-const film = (id: string, route: number, credit: string): Film => ({ route, credit, land: cut(`${id}-16x9`), port: cut(`${id}-9x16`) });
+const film = (id: string, route: number, credit: string): Film => ({ id, route, credit, land: cut(`${id}-16x9`), port: cut(`${id}-9x16`) });
 export const HERO_FILMS: Film[] = [
   film('ridge', 0, 'Vijay Kothare on Pexels'),
   film('garud', 1, 'Sanjiv Joshi on Pexels'),
@@ -68,6 +68,14 @@ export const COPY = {
   shop: {
     eyebrow: 'Preorder · Opens 31 October 2026',
     title: 'Pick your route.',
+  },
+  /** Lines that change once checkout opens (CHECKOUT_OPEN=true in the shop backend). */
+  live: {
+    hero: 'Batch 01 · Preorder open',
+    shop: 'Preorder · Open now',
+    badge: 'Preorder open',
+    trust: 'Secure UPI and card payment',
+    fine: 'Batch 01 is made to order. We confirm the dispatch date after you order.',
   },
   build: {
     eyebrow: 'The tee',
@@ -165,13 +173,14 @@ export const DETAILS = [
   { k: 'Exchange', v: 'One free size exchange within 7 days of delivery.' },
 ];
 
-export const FAQ = [
+export const FAQ: { q: string; a: string; aOpen?: string }[] = [
   { q: 'What does preorder mean here?', a: 'Batch 01 is made after the drop opens, not pulled from a warehouse. We say so up front instead of pretending stock exists. Dispatch dates are confirmed before the drop.' },
   { q: 'What is the price, and what happens next batch?', a: 'Batch 01 is Rs 799. The next batch is planned at Rs 999. Nothing is crossed out and no fake discount is shown: Rs 799 is simply the price for the first run.' },
   { q: 'What if the size is wrong?', a: 'One free size exchange within 7 days of delivery. Exchange details are confirmed before the drop.' },
   { q: 'Are those the real tees?', a: 'Not yet. The pictures are design previews that show the intended fit, colours and graphics. Photos of the finished tees replace them once the sample is made.' },
   { q: 'How thick is the fabric?', a: 'The target is 240 GSM, which is on the heavy side for a tee. We confirm the number on the final sample and publish it here.' },
-  { q: 'How do I pay?', a: 'Checkout opens with the drop on 31 October 2026. Payment options are confirmed then. This preview takes no orders and no money.' },
+  { q: 'How do I pay?', a: 'Checkout opens with the drop on 31 October 2026. Payment options are confirmed then. This preview takes no orders and no money.',
+    aOpen: 'Add your tees to the bag, sign in with your mobile number and add a delivery address. You then pay on Zoho Payments\' secure page with UPI, a card or another listed option. Your order shows up under Your orders the moment the payment is confirmed.' },
 ];
 
 export type Quote = { text: string; name: string; context?: string };

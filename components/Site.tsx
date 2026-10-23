@@ -2,22 +2,30 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import Lenis from 'lenis';
 import { setupGsap } from '@/lib/gsap';
-import { SITE } from '@/lib/data';
+import { COPY, SITE } from '@/lib/data';
+import { fromPrice, type Catalog } from '@/lib/catalog';
 import { Mark } from './Mark';
 import { Hero } from './Hero';
 import { Story } from './Story';
 import { Routes } from './Routes';
-import { Shop, BagDrawer, type BagItem } from './Shop';
+import { Shop } from './Shop';
+import { Account, BagDrawer } from './Checkout';
+import { StoreProvider, useStore, type BagItem } from './Store';
 import { Build, Drop, Voices, Faq, Footer } from './Sections';
 import { rupee } from './hooks';
 
 const LINKS: [string, string][] = [['#story', 'Story'], ['#routes', 'Routes'], ['#build', 'The tee'], ['#faq', 'FAQ']];
 
-export default function Site() {
+export default function Site({ catalog }: { catalog: Catalog }) {
+  return <StoreProvider initial={catalog}><Page /></StoreProvider>;
+}
+
+function Page() {
   const root = useRef<HTMLDivElement>(null);
+  const { cat, bag, addItem, user } = useStore();
   const [sel, setSel] = useState(0);
-  const [bag, setBag] = useState<BagItem[]>([]);
   const [drawer, setDrawer] = useState(false);
+  const [account, setAccount] = useState(false);
   const [menu, setMenu] = useState(false);
   const [toast, setToast] = useState('');
   const [loaded, setLoaded] = useState(false);
@@ -32,10 +40,18 @@ export default function Site() {
   const choose = useCallback((i: number) => { setSel(i); scrollTo('shop'); }, [scrollTo]);
 
   const add = useCallback((b: BagItem) => {
-    setBag((x) => [...x, b]);
+    addItem(b);
     setToast(`${b.name}, size ${b.size}, is in your bag`);
     clearTimeout(toastT.current);
     toastT.current = setTimeout(() => setToast(''), 2600);
+  }, [addItem]);
+
+  // "Try again" from the order page lands on /?bag=open: open the bag (still saved) and tidy the address bar.
+  useEffect(() => {
+    const q = new URLSearchParams(window.location.search);
+    if (q.get('bag') !== 'open') return;
+    setDrawer(true);
+    history.replaceState(null, '', window.location.pathname + window.location.hash);
   }, []);
 
   // Nav and phone buy bar react to where the reader is: light over the hero, solid after, bar hidden in the shop.
@@ -143,6 +159,7 @@ export default function Site() {
         <nav className="nav-links" aria-label="Main">{LINKS.map(([h, t]) => <a key={h} href={h}>{t}</a>)}</nav>
         <div className="nav-right">
           <a className="btn btn-sm nav-cta" href="#shop">Preorder</a>
+          <button className="acct-btn" onClick={() => setAccount(true)}>{user ? 'Orders' : 'Sign in'}</button>
           <button className="bag-btn" onClick={() => setDrawer(true)} aria-label={`Bag, ${bag.length} ${bag.length === 1 ? 'item' : 'items'}`}>
             Bag{bag.length > 0 && <span className="bag-n" aria-hidden="true">{bag.length}</span>}
           </button>
@@ -153,8 +170,9 @@ export default function Site() {
         <nav aria-label="Main, mobile">
           {LINKS.map(([h, t]) => <a key={h} href={h} tabIndex={menu ? 0 : -1}>{t}</a>)}
           <a href="#shop" tabIndex={menu ? 0 : -1}><em>Preorder</em></a>
+          <button tabIndex={menu ? 0 : -1} onClick={() => { setMenu(false); setAccount(true); }}>{user ? 'Your orders' : 'Sign in'}</button>
         </nav>
-        <p className="eyebrow">Batch 01 <i className="sep">·</i> Opens {SITE.dropLabel}</p>
+        <p className="eyebrow">Batch 01 <i className="sep">·</i> {cat.open ? COPY.live.badge : `Opens ${SITE.dropLabel}`}</p>
       </div>
 
       <main id="main">
@@ -170,10 +188,11 @@ export default function Site() {
       <Footer />
 
       <div className="buybar" aria-hidden="false">
-        <p><b>{rupee(SITE.price)}</b><span>Batch 01 <i className="sep">·</i> Opens {SITE.dropShort}</span></p>
+        <p><b>{rupee(fromPrice(cat))}</b><span>Batch 01 <i className="sep">·</i> {cat.open ? COPY.live.badge : `Opens ${SITE.dropShort}`}</span></p>
         <a className="btn btn-sm" href="#shop">Preorder</a>
       </div>
-      <BagDrawer open={drawer} onClose={() => setDrawer(false)} items={bag} remove={(id) => setBag((x) => x.filter((i) => i.id !== id))} />
+      <BagDrawer open={drawer} onClose={() => setDrawer(false)} />
+      <Account open={account} onClose={() => setAccount(false)} />
       <div className={`toast ${toast ? 'show' : ''}`} role="status" aria-live="polite">{toast}</div>
     </div>
   );

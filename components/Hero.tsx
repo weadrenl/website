@@ -1,6 +1,7 @@
 'use client';
 import { useEffect, useRef, useState } from 'react';
-import { COPY, DESIGNS, HERO_FILMS, type Film as FilmT } from '@/lib/data';
+import { COPY, HERO_FILMS, type Film as FilmT } from '@/lib/data';
+import { useStore } from './Store';
 import { Dawn } from './Dawn';
 import { RidgeEdge } from './Engrave';
 import { Chars } from './Split';
@@ -48,11 +49,12 @@ function Film({ f }: { f: FilmT }) {
 }
 
 export function Hero() {
+  const { cat } = useStore();
   const hasFilms = HERO_FILMS.length > 0;
   const [film, setFilm] = useState<number | null>(null);
   useEffect(() => { if (hasFilms) setFilm(filmIndex()); }, [hasFilms]);
   const f = film === null ? null : HERO_FILMS[film];
-  const d = f ? DESIGNS[f.route] : null;
+  const d = f ? cat.products.find((p) => p.id === f.id) : null;
 
   return (
     <section className="hero" id="top" aria-labelledby="hero-t">
@@ -67,7 +69,7 @@ export function Hero() {
         <i className="hero-shade" aria-hidden="true" />
       </div>
       <div className="wrap hero-inner">
-        <p className="eyebrow hero-eyebrow" data-hero>{COPY.hero.eyebrow}</p>
+        <p className="eyebrow hero-eyebrow" data-hero>{cat.open ? COPY.live.hero : COPY.hero.eyebrow}</p>
         <h1 id="hero-t" className="hero-title">
           <span className="line"><Chars text="Take the" /></span>
           <span className="line"><em><Chars text="long" /></em> <Chars text="way." /></span>

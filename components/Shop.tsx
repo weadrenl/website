@@ -1,16 +1,15 @@
 'use client';
 import { useEffect, useRef, useState } from 'react';
-import { COPY, DESIGNS, DETAILS, SIZES, SITE } from '@/lib/data';
+import { COPY, DETAILS, SITE } from '@/lib/data';
 import { img } from '@/lib/assets';
 import { rupee } from './hooks';
 import { Modal } from './Modal';
 import { ArrowIcon, CheckIcon } from './Engrave';
-
-export type BagItem = { id: string; name: string; size: string; colour: string };
+import { useStore, type BagItem } from './Store';
 
 /** Photographs plus a close-up of the print. Swipe on phones, two-up with arrows on desktop. */
 function Gallery({ sel }: { sel: number }) {
-  const d = DESIGNS[sel];
+  const d = useStore().cat.products[sel];
   const track = useRef<HTMLDivElement>(null);
   const [at, setAt] = useState(0);
   const frames = [...d.shots.map((s) => ({ key: s.key, label: s.label })), { key: 'print', label: 'Print' }];
@@ -57,7 +56,8 @@ function Gallery({ sel }: { sel: number }) {
 }
 
 export function Shop({ sel, setSel, onAdd }: { sel: number; setSel: (i: number) => void; onAdd: (b: BagItem) => void }) {
-  const d = DESIGNS[sel];
+  const { cat } = useStore();
+  const d = cat.products[sel] ?? cat.products[0];
   const [size, setSize] = useState<string | null>(null);
   const [warn, setWarn] = useState(false);
   const [guide, setGuide] = useState(false);
@@ -65,19 +65,21 @@ export function Shop({ sel, setSel, onAdd }: { sel: number; setSel: (i: number) 
   const add = () => {
     if (!size) { setWarn(true); return; }
     setWarn(false);
-    onAdd({ id: `${d.id}-${size}-${Date.now()}`, name: d.name, size, colour: d.colour });
+    onAdd({ key: `${d.id}-${size}-${Date.now()}`, id: d.id, name: d.name, size, colour: d.colour, price: d.price });
   };
+  // A size picked for one design may not exist for the next.
+  useEffect(() => { if (size && !d.sizes.includes(size)) setSize(null); }, [d, size]);
 
   return (
     <section className="shop" id="shop" aria-labelledby="shop-t">
       <div className="wrap shop-grid">
         <Gallery sel={sel} />
         <div className="shop-panel">
-          <p className="eyebrow">{COPY.shop.eyebrow}</p>
+          <p className="eyebrow">{cat.open ? COPY.live.shop : COPY.shop.eyebrow}</p>
           <h2 id="shop-t">{COPY.shop.title}</h2>
 
           <div className="picker" role="radiogroup" aria-label="Design">
-            {DESIGNS.map((x, i) => (
+            {cat.products.map((x, i) => (
               <button key={x.id} role="radio" aria-checked={sel === i} className={sel === i ? 'on' : ''} onClick={() => setSel(i)}>
                 <img src={img(x.shots[0].cut)} width={512} height={1024} alt="" loading="lazy" decoding="async" />
                 <span><b>{x.name}</b><small>{x.colour}</small></span>
@@ -87,21 +89,21 @@ export function Shop({ sel, setSel, onAdd }: { sel: number; setSel: (i: number) 
           <p className="pick-line">{d.line}</p>
 
           <div className="price-row">
-            <b>{rupee(SITE.price)}</b>
-            <span>First-run price. {rupee(SITE.nextPrice)} from the next batch.</span>
+            <b>{rupee(d.price)}</b>
+            <span>First-run price.{d.nextPrice ? ` ${rupee(d.nextPrice)} from the next batch.` : ''}</span>
           </div>
 
           <div className="size-top"><span className="eyebrow">Size{size ? ` · ${size}` : ''}</span><button className="tlink" onClick={() => setGuide(true)}>Fit guide</button></div>
           <div className="sizes" role="radiogroup" aria-label="Size">
-            {SIZES.map((s) => (
+            {d.sizes.map((s) => (
               <button key={s} role="radio" aria-checked={size === s} className={size === s ? 'on' : ''} onClick={() => { setSize(s); setWarn(false); }}>{s}</button>
             ))}
           </div>
           <p className={`warn ${warn ? 'show' : ''}`} role="alert">{warn ? 'Pick a size first.' : ''}</p>
-          <button className="btn btn-wide" onClick={add}>Add to bag <i className="sep">·</i> {rupee(SITE.price)}</button>
+          <button className="btn btn-wide" onClick={add}>Add to bag <i className="sep">·</i> {rupee(d.price)}</button>
 
           <ul className="trust">
-            <li><CheckIcon />Checkout opens {SITE.dropShort}</li>
+            <li><CheckIcon />{cat.open ? COPY.live.trust : `Checkout opens ${SITE.dropShort}`}</li>
             <li><CheckIcon />Free size exchange</li>
             <li><CheckIcon />Made in India</li>
           </ul>
@@ -110,7 +112,7 @@ export function Shop({ sel, setSel, onAdd }: { sel: number; setSel: (i: number) 
             <summary>Details<i aria-hidden="true" /></summary>
             <dl>{DETAILS.map((x) => <div key={x.k}><dt>{x.k}</dt><dd>{x.v}</dd></div>)}</dl>
           </details>
-          <p className="fine">This is a preview. Nothing is charged and no order is placed until the drop opens.</p>
+          <p className="fine">{cat.open ? COPY.live.fine : 'This is a preview. Nothing is charged and no order is placed until the drop opens.'}</p>
         </div>
       </div>
 
@@ -129,38 +131,5 @@ export function Shop({ sel, setSel, onAdd }: { sel: number; setSel: (i: number) 
         </div>
       </Modal>
     </section>
-  );
-}
-
-export function BagDrawer({ open, onClose, items, remove }: { open: boolean; onClose: () => void; items: BagItem[]; remove: (id: string) => void }) {
-  const total = items.length * SITE.price;
-  return (
-    <Modal open={open} onClose={onClose} label="Your bag" side>
-      <div className="bag">
-        <div className="modal-top"><span className="eyebrow">Your bag{items.length ? ` · ${items.length}` : ''}</span><button className="x" onClick={onClose}>Close</button></div>
-        {items.length === 0 ? (
-          <div className="bag-empty"><p>Nothing in here yet.</p><a className="tlink" href="#shop" onClick={onClose}>Pick your route</a></div>
-        ) : (
-          <ul className="bag-list">
-            {items.map((it) => {
-              const dd = DESIGNS.find((x) => x.name === it.name)!;
-              return (
-                <li key={it.id}>
-                  <img src={img(dd.shots[0].cut)} alt="" width={64} height={128} />
-                  <div><b>{it.name}</b><span>{it.colour} <i className="sep">·</i> Size {it.size}</span><span>Batch 01 preorder</span></div>
-                  <div className="bag-r"><b>{rupee(SITE.price)}</b><button className="tlink" onClick={() => remove(it.id)}>Remove</button></div>
-                </li>
-              );
-            })}
-          </ul>
-        )}
-        <div className="bag-foot">
-          <div className="bag-sum"><span>Subtotal</span><b>{rupee(total)}</b></div>
-          <p className="fine">Shipping and taxes are shown at checkout.</p>
-          <button className="btn btn-wide" disabled>Checkout opens {SITE.dropShort}</button>
-          <p className="fine">Your bag stays in this tab only. Nothing is reserved or charged.</p>
-        </div>
-      </div>
-    </Modal>
   );
 }

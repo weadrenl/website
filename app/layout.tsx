@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from 'next';
 import './globals.css';
-import { BUSINESS, DESIGNS, FAQ, HERO_FILMS, SITE, SIZES } from '@/lib/data';
+import { BUSINESS, HERO_FILMS, SITE } from '@/lib/data';
 
 const title = 'ADRENL | Graphic tees for the long way. Batch 01 from Rs 799';
 const description = 'ADRENL Batch 01: three heavyweight graphic tees - RIDGE, GARUD and MARCOS - made for people who take the long route. Batch 01 price Rs 799, drops 31 October 2026.';
@@ -18,6 +18,7 @@ export const metadata: Metadata = {
 };
 export const viewport: Viewport = { themeColor: '#0d0e10', width: 'device-width', initialScale: 1 };
 
+// Brand-level structured data. Products, offers and the FAQ are added by app/page.tsx from the live catalogue.
 const jsonLd = {
   '@context': 'https://schema.org',
   '@graph': [
@@ -26,26 +27,6 @@ const jsonLd = {
       address: { '@type': 'PostalAddress', streetAddress: BUSINESS.street, addressLocality: BUSINESS.city, addressRegion: BUSINESS.state, postalCode: BUSINESS.pin, addressCountry: 'IN' },
       contactPoint: { '@type': 'ContactPoint', contactType: 'customer support', telephone: BUSINESS.tel, areaServed: 'IN', availableLanguage: ['en', 'hi'] } },
     { '@type': 'WebSite', '@id': `${SITE.url}/#site`, url: SITE.url, name: 'ADRENL', publisher: { '@id': `${SITE.url}/#org` }, inLanguage: 'en-IN' },
-    ...DESIGNS.map((d) => ({
-      '@type': 'Product',
-      name: `ADRENL ${d.name} graphic tee`,
-      description: `${d.story} ${d.print}.`,
-      brand: { '@type': 'Brand', name: 'ADRENL' },
-      color: d.colour,
-      category: 'T-shirts',
-      sku: `ADRENL-B01-${d.name}`,
-      material: 'Cotton',
-      size: SIZES,
-      countryOfOrigin: 'IN',
-      image: d.shots.map((v) => `${SITE.url}/img/${v.png}`),
-      url: `${SITE.url}/#${d.id}`,
-      offers: {
-        '@type': 'Offer', price: String(SITE.price), priceCurrency: SITE.currency,
-        availability: 'https://schema.org/PreOrder', availabilityStarts: SITE.dropISO, itemCondition: 'https://schema.org/NewCondition',
-        url: `${SITE.url}/#shop`, seller: { '@id': `${SITE.url}/#org` },
-      },
-    })),
-    { '@type': 'FAQPage', mainEntity: FAQ.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })) },
   ],
 };
 

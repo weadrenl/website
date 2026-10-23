@@ -1,6 +1,8 @@
 'use client';
 import { useState } from 'react';
 import { COPY, FAQ, QUOTES, SITE } from '@/lib/data';
+import { fromPrice, nextPrice } from '@/lib/catalog';
+import { useStore } from './Store';
 import { Mark } from './Mark';
 import { BusinessInfo, PolicyLinks } from './Business';
 import { Contours, RoutePath, TeeDrawing } from './Engrave';
@@ -28,12 +30,12 @@ export function Build() {
   );
 }
 
-function icsHref() {
+function icsHref(price: number) {
   const now = new Date().toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '');
   const ics = [
     'BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//ADRENL//Batch 01//EN', 'CALSCALE:GREGORIAN', 'BEGIN:VEVENT',
     'UID:batch-01-drop@adrenl.com', `DTSTAMP:${now}`, 'DTSTART;VALUE=DATE:20261031', 'DTEND;VALUE=DATE:20261101',
-    'SUMMARY:ADRENL Batch 01 opens', `DESCRIPTION:Preorder opens at ${SITE.url}. First-run price Rs ${SITE.price}.`, `URL:${SITE.url}`,
+    'SUMMARY:ADRENL Batch 01 opens', `DESCRIPTION:Preorder opens at ${SITE.url}. First-run price Rs ${price}.`, `URL:${SITE.url}`,
     'BEGIN:VALARM', 'TRIGGER:-PT12H', 'ACTION:DISPLAY', 'DESCRIPTION:ADRENL Batch 01 opens tomorrow', 'END:VALARM',
     'END:VEVENT', 'END:VCALENDAR',
   ].join('\r\n');
@@ -41,16 +43,18 @@ function icsHref() {
 }
 
 export function Drop() {
+  const { cat } = useStore();
+  const price = fromPrice(cat), next = nextPrice(cat);
   const t = useCountdown(SITE.dropISO);
   const cells: [number | null, string][] = [[t?.d ?? null, 'Days'], [t?.h ?? null, 'Hours'], [t?.m ?? null, 'Minutes'], [t?.s ?? null, 'Seconds']];
   const steps = [
     { t: 'Now', h: 'Design preview', p: 'Three routes drawn. Samples next.' },
-    { t: SITE.dropLabel, h: 'Batch 01 opens', p: `${rupee(SITE.price)}, first-run price.` },
-    { t: 'After Batch 01', h: 'Next batch', p: `${rupee(SITE.nextPrice)}.` },
+    { t: SITE.dropLabel, h: 'Batch 01 opens', p: `${rupee(price)}, first-run price.` },
+    ...(next ? [{ t: 'After Batch 01', h: 'Next batch', p: `${rupee(next)}.` }] : []),
   ];
   const addToCalendar = () => {
     const a = document.createElement('a');
-    a.href = icsHref(); a.download = 'adrenl-batch-01.ics';
+    a.href = icsHref(price); a.download = 'adrenl-batch-01.ics';
     document.body.appendChild(a); a.click(); a.remove();
     setTimeout(() => URL.revokeObjectURL(a.href), 2000);
   };
@@ -62,7 +66,7 @@ export function Drop() {
           <p className="eyebrow">{COPY.drop.eyebrow}</p>
           <h2 id="drop-t">{COPY.drop.title} <em>{COPY.drop.titleEm}</em></h2>
         </header>
-        {t?.done ? <p className="count-live">Preorder is open.</p> : (
+        {t?.done || cat.open ? <p className="count-live">Preorder is open.</p> : (
           <div className="count" role="timer" aria-label={`Time until ${SITE.dropLabel}`}>
             {cells.map(([v, l]) => <div key={l}><b>{v === null ? '--' : pad(v)}</b><span>{l}</span></div>)}
           </div>
@@ -102,6 +106,7 @@ export function Voices() {
 }
 
 export function Faq() {
+  const { cat } = useStore();
   const [open, setOpen] = useState<number | null>(0);
   return (
     <section className="faq" id="faq" aria-labelledby="faq-t">
@@ -115,7 +120,7 @@ export function Faq() {
           {FAQ.map((x, i) => (
             <div key={x.q} className={`faq-item ${open === i ? 'open' : ''}`}>
               <h3><button aria-expanded={open === i} aria-controls={`faq-${i}`} id={`faq-b-${i}`} onClick={() => setOpen(open === i ? null : i)}><span>{x.q}</span><i aria-hidden="true" /></button></h3>
-              <div className="faq-a" id={`faq-${i}`} role="region" aria-labelledby={`faq-b-${i}`}><div><p>{x.a}</p></div></div>
+              <div className="faq-a" id={`faq-${i}`} role="region" aria-labelledby={`faq-b-${i}`}><div><p>{(cat.open && x.aOpen) || x.a}</p></div></div>
             </div>
           ))}
         </div>
@@ -125,6 +130,8 @@ export function Faq() {
 }
 
 export function Footer() {
+  const { cat } = useStore();
+  const next = nextPrice(cat);
   return (
     <footer className="foot">
       <Contours className="foot-topo" seed={9} rings={14} />
@@ -134,7 +141,7 @@ export function Footer() {
           <a className="btn btn-paper" href="#shop">Pick your route</a>
         </div>
         <div className="foot-cols">
-          <div><p className="eyebrow">The drop</p><p>Opens {SITE.dropLabel}.<br />{rupee(SITE.price)} first run, {rupee(SITE.nextPrice)} after.<br />Made in {SITE.made}.</p></div>
+          <div><p className="eyebrow">The drop</p><p>{cat.open ? 'Preorder open now.' : `Opens ${SITE.dropLabel}.`}<br />{rupee(fromPrice(cat))} first run{next ? `, ${rupee(next)} after` : ''}.<br />Made in {SITE.made}.</p></div>
           <div><p className="eyebrow">Explore</p><p className="foot-links"><a href="#story">Story</a><a href="#routes">Routes</a><a href="#build">The tee</a><a href="#faq">FAQ</a></p></div>
           <div><p className="eyebrow">Policies</p><PolicyLinks /></div>
           <div><p className="eyebrow">Contact</p><BusinessInfo /></div>

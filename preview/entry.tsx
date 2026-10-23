@@ -3,6 +3,7 @@
 import '../app/globals.css';
 import { createRoot } from 'react-dom/client';
 import Site from '@/components/Site';
+import { FALLBACK } from '@/lib/catalog';
 import { setupGsap } from '@/lib/gsap';
 
 export function mount(host: HTMLElement, assets: Record<string, string>) {
@@ -18,6 +19,6 @@ export function mount(host: HTMLElement, assets: Record<string, string>) {
   const { ScrollTrigger } = setupGsap();
   ScrollTrigger.defaults({ scroller });
   const root = createRoot(inner);
-  root.render(<Site />);
+  root.render(<Site catalog={FALLBACK} />);
   return () => { root.unmount(); scroller.remove(); };
 }

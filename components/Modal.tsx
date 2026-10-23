@@ -5,6 +5,8 @@ declare global { interface Window { __lenis?: { stop: () => void; start: () => v
 
 export function Modal({ open, onClose, label, side = false, wide = false, children }: { open: boolean; onClose: () => void; label: string; side?: boolean; wide?: boolean; children: ReactNode }) {
   const ref = useRef<HTMLDivElement>(null);
+  const close = useRef(onClose);
+  close.current = onClose;
   useEffect(() => {
     if (!open) return;
     const prev = document.activeElement as HTMLElement | null;
@@ -13,7 +15,7 @@ export function Modal({ open, onClose, label, side = false, wide = false, childr
     const focusables = () => Array.from(ref.current?.querySelectorAll<HTMLElement>('button,a[href],input,select,[tabindex]:not([tabindex="-1"])') ?? []);
     focusables()[0]?.focus();
     const key = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
+      if (e.key === 'Escape') close.current();
       if (e.key === 'Tab') {
         const f = focusables();
         if (!f.length) return;
@@ -29,7 +31,7 @@ export function Modal({ open, onClose, label, side = false, wide = false, childr
       window.__lenis?.start();
       prev?.focus();
     };
-  }, [open, onClose]);
+  }, [open]); // onClose via a ref: a parent re-render must not steal focus mid-typing
   return (
     <div className={`modal ${side ? 'is-side' : ''} ${wide ? 'is-wide' : ''} ${open ? 'is-open' : ''}`} aria-hidden={!open} onMouseDown={(e) => { if (e.target === e.currentTarget) onClose(); }}>
       <div className="modal-panel" role="dialog" aria-modal="true" aria-label={label} ref={ref}>

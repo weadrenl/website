@@ -1,7 +1,8 @@
 'use client';
 import { useEffect, useRef, useState } from 'react';
 import { img } from '@/lib/assets';
-import { COPY, DESIGNS } from '@/lib/data';
+import { COPY } from '@/lib/data';
+import { useStore } from './Store';
 
 /**
  * The three routes, told once. Desktop: the copy scrolls, the models stay put and change with it.
@@ -10,6 +11,7 @@ import { COPY, DESIGNS } from '@/lib/data';
  */
 export function Routes({ onChoose }: { onChoose: (i: number) => void }) {
   const root = useRef<HTMLElement>(null);
+  const DESIGNS = useStore().cat.products;
   const [active, setActive] = useState(0);
 
   useEffect(() => {
@@ -19,9 +21,9 @@ export function Routes({ onChoose }: { onChoose: (i: number) => void }) {
     }, { rootMargin: '-48% 0px -48% 0px' });
     blocks.forEach((b) => io.observe(b));
     return () => io.disconnect();
-  }, []);
+  }, [DESIGNS.length]);
 
-  const d = DESIGNS[active];
+  const d = DESIGNS[active] ?? DESIGNS[0];
   return (
     <section ref={root} className="routes" id="routes" aria-labelledby="routes-t"
       style={{ ['--paper' as string]: d.paper, ['--tint' as string]: d.tint }}>
