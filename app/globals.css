@@ -441,9 +441,9 @@ video.film::-webkit-media-controls, video.film::-webkit-media-controls-start-pla
 }
 
 /* ---------- Modals, bag, toast ---------- */
-.modal { position: fixed; inset: 0; z-index: 200; background: rgba(21, 19, 15, .5); display: grid; place-items: center; padding: 16px; opacity: 0; visibility: hidden; transition: opacity .35s, visibility .35s; }
+.modal { position: fixed; inset: 0; z-index: 200; overscroll-behavior: contain; background: rgba(21, 19, 15, .5); display: grid; place-items: center; padding: 16px; opacity: 0; visibility: hidden; transition: opacity .35s, visibility .35s; }
 .modal.is-open { opacity: 1; visibility: visible; }
-.modal-panel { position: relative; background: var(--paper); color: var(--ink); max-width: 520px; width: 100%; max-height: 92svh; overflow: auto; padding: 24px 28px 28px; transform: translateY(16px); transition: transform .5s var(--ease); }
+.modal-panel { position: relative; background: var(--paper); color: var(--ink); max-width: 520px; width: 100%; max-height: 92svh; overflow: auto; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; padding: 24px 28px 28px; transform: translateY(16px); transition: transform .5s var(--ease); }
 .modal.is-open .modal-panel { transform: none; }
 .modal.is-side { place-items: stretch end; padding: 0; }
 .modal.is-side .modal-panel { max-width: 440px; height: 100%; max-height: none; transform: translateX(100%); display: flex; flex-direction: column; }
@@ -455,7 +455,7 @@ video.film::-webkit-media-controls, video.film::-webkit-media-controls-start-pla
 .guide ol { list-style: decimal; padding-left: 1.2em; }
 .bag { display: flex; flex-direction: column; height: 100%; }
 .bag-empty { flex: 1; padding: 24px 0; color: var(--ink-2); display: grid; align-content: start; gap: 10px; justify-items: start; }
-.bag-list { flex: 1; overflow: auto; }
+.bag-list { flex: 1; min-height: 0; overflow: auto; overscroll-behavior: contain; }
 .bag-list li { display: grid; grid-template-columns: 56px 1fr auto; gap: 14px; padding: 14px 0; border-bottom: 1px solid var(--line); align-items: start; }
 .bag-list img { width: 56px; height: 72px; object-fit: cover; object-position: 50% 6%; background: var(--paper-2); }
 .bag-list li div b { display: block; font-family: var(--serif); font-weight: 500; font-size: 1.15rem; letter-spacing: .02em; }
@@ -471,7 +471,7 @@ video.film::-webkit-media-controls, video.film::-webkit-media-controls-start-pla
 @media (max-width: 900px) { .toast { bottom: 84px; } }
 
 /* ---------- Checkout: sign-in, delivery, payment hand-off ---------- */
-.bag-step { flex: 1; overflow: auto; margin: 0 -28px; padding: 0 28px 8px; }
+.bag-step { flex: 1; min-height: 0; overflow: auto; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; margin: 0 -28px; padding: 0 28px 8px; }
 .form { display: grid; gap: 14px; }
 .form-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
 .form-t { font-size: 1.9rem; line-height: 1.05; letter-spacing: -.02em; font-variation-settings: 'opsz' 72; }
@@ -507,7 +507,7 @@ video.film::-webkit-media-controls, video.film::-webkit-media-controls-start-pla
 @media (max-width: 480px) { .modal.is-side .modal-panel { padding: 20px 18px 22px; } .bag-step { margin: 0 -18px; padding: 0 18px 8px; } .field-row { grid-template-columns: minmax(0, 1fr); } }
 
 /* ---------- Account ---------- */
-.acct { flex: 1; display: flex; flex-direction: column; overflow: auto; }
+.acct { flex: 1; min-height: 0; display: flex; flex-direction: column; overflow: auto; overscroll-behavior: contain; }
 .acct-who { display: grid; padding-bottom: 14px; }
 .acct-who b { font-family: var(--serif); font-weight: 500; font-size: 1.4rem; }
 .acct-who span { color: var(--ink-2); font-size: .9rem; }

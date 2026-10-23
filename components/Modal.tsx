@@ -33,7 +33,9 @@ export function Modal({ open, onClose, label, side = false, wide = false, childr
     };
   }, [open]); // onClose via a ref: a parent re-render must not steal focus mid-typing
   return (
-    <div className={`modal ${side ? 'is-side' : ''} ${wide ? 'is-wide' : ''} ${open ? 'is-open' : ''}`} aria-hidden={!open} onMouseDown={(e) => { if (e.target === e.currentTarget) onClose(); }}>
+    // data-lenis-prevent: Lenis is stopped while a modal is open and would otherwise cancel every touch and wheel
+    // scroll inside it, leaving long panels (the delivery form) stuck.
+    <div className={`modal ${side ? 'is-side' : ''} ${wide ? 'is-wide' : ''} ${open ? 'is-open' : ''}`} data-lenis-prevent aria-hidden={!open} onMouseDown={(e) => { if (e.target === e.currentTarget) onClose(); }}>
       <div className="modal-panel" role="dialog" aria-modal="true" aria-label={label} ref={ref}>
         {open && children}
       </div>
