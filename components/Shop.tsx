@@ -5,7 +5,8 @@ import { img } from '@/lib/assets';
 import { rupee } from './hooks';
 import { Modal } from './Modal';
 import { ArrowIcon, CheckIcon } from './Engrave';
-import { useStore, type BagItem } from './Store';
+import { useStore, MAX_UNITS } from './Store';
+import { track } from '@/lib/track';
 
 /** Photographs plus a close-up of the print. Swipe on phones, two-up with arrows on desktop. */
 function Gallery({ sel }: { sel: number }) {
@@ -55,18 +56,30 @@ function Gallery({ sel }: { sel: number }) {
   );
 }
 
-export function Shop({ sel, setSel, onAdd }: { sel: number; setSel: (i: number) => void; onAdd: (b: BagItem) => void }) {
-  const { cat } = useStore();
+export type Added = { id: string; size: string; at: number };
+
+export function Shop({ sel, setSel, onAdded, onOpenBag }: { sel: number; setSel: (i: number) => void; onAdded: (a: Added) => void; onOpenBag: () => void }) {
+  const { cat, bag, addItem } = useStore();
   const d = cat.products[sel] ?? cat.products[0];
   const [size, setSize] = useState<string | null>(null);
-  const [warn, setWarn] = useState(false);
+  const [warn, setWarn] = useState('');
   const [guide, setGuide] = useState(false);
+  const [done, setDone] = useState(false);
+  const doneT = useRef<ReturnType<typeof setTimeout>>(undefined);
+  const inBag = bag.filter((x) => x.id === d.id);
 
   const add = () => {
-    if (!size) { setWarn(true); return; }
-    setWarn(false);
-    onAdd({ key: `${d.id}-${size}-${Date.now()}`, id: d.id, name: d.name, size, colour: d.colour, price: d.price });
+    if (!size) { setWarn('Pick a size first.'); track('size_warn', { id: d.id }); return; }
+    const n = addItem(d, size, 1);
+    if (!n) { setWarn(`Your bag is full: one order holds up to ${MAX_UNITS} tees.`); track('bag_full', { id: d.id }); return; }
+    setWarn('');
+    track('add_to_bag', { id: d.id, size, qty: n, price: d.price });
+    onAdded({ id: d.id, size, at: Date.now() });
+    setDone(true); clearTimeout(doneT.current);
+    doneT.current = setTimeout(() => setDone(false), 1800);
   };
+  const pick = (i: number) => { setSel(i); track('select_design', { id: cat.products[i]?.id, from: 'picker' }); };
+  const pickSize = (s: string) => { setSize(s); setWarn(''); track('select_size', { id: d.id, size: s }); };
   // A size picked for one design may not exist for the next.
   useEffect(() => { if (size && !d.sizes.includes(size)) setSize(null); }, [d, size]);
 
@@ -80,7 +93,7 @@ export function Shop({ sel, setSel, onAdd }: { sel: number; setSel: (i: number) 
 
           <div className="picker" role="radiogroup" aria-label="Design">
             {cat.products.map((x, i) => (
-              <button key={x.id} role="radio" aria-checked={sel === i} className={sel === i ? 'on' : ''} onClick={() => setSel(i)}>
+              <button key={x.id} role="radio" aria-checked={sel === i} className={sel === i ? 'on' : ''} onClick={() => pick(i)}>
                 <img src={img(x.shots[0].cut)} width={512} height={1024} alt="" loading="lazy" decoding="async" />
                 <span><b>{x.name}</b><small>{x.colour}</small></span>
               </button>
@@ -93,14 +106,22 @@ export function Shop({ sel, setSel, onAdd }: { sel: number; setSel: (i: number) 
             <span>First-run price.{d.nextPrice ? ` ${rupee(d.nextPrice)} from the next batch.` : ''}</span>
           </div>
 
-          <div className="size-top"><span className="eyebrow">Size{size ? ` · ${size}` : ''}</span><button className="tlink" onClick={() => setGuide(true)}>Fit guide</button></div>
+          <div className="size-top"><span className="eyebrow">Size{size ? ` · ${size}` : ''}</span><button className="tlink" onClick={() => setGuide(true)} data-track="fit_guide">Fit guide</button></div>
           <div className="sizes" role="radiogroup" aria-label="Size">
             {d.sizes.map((s) => (
-              <button key={s} role="radio" aria-checked={size === s} className={size === s ? 'on' : ''} onClick={() => { setSize(s); setWarn(false); }}>{s}</button>
+              <button key={s} role="radio" aria-checked={size === s} className={size === s ? 'on' : ''} onClick={() => pickSize(s)}>{s}</button>
             ))}
           </div>
-          <p className={`warn ${warn ? 'show' : ''}`} role="alert">{warn ? 'Pick a size first.' : ''}</p>
-          <button className="btn btn-wide" onClick={add}>Add to bag <i className="sep">·</i> {rupee(d.price)}</button>
+          <p className={`warn ${warn ? 'show' : ''}`} role="alert">{warn}</p>
+          <button className={`btn btn-wide add-btn ${done ? 'is-done' : ''}`} onClick={add} aria-live="polite">
+            {done ? <><CheckIcon />Added to bag</> : <>Add to bag <i className="sep">·</i> {rupee(d.price)}</>}
+          </button>
+          {inBag.length > 0 && (
+            <p className="in-bag">
+              <span><CheckIcon />In your bag: {inBag.map((x) => `${x.size}${x.qty > 1 ? ` ×${x.qty}` : ''}`).join(', ')}</span>
+              <button className="tlink" onClick={onOpenBag} data-track="view_bag_link" data-track-props='{"from":"shop"}'>View bag</button>
+            </p>
+          )}
 
           <ul className="trust">
             <li><CheckIcon />{cat.open ? COPY.live.trust : `Checkout opens ${SITE.dropShort}`}</li>

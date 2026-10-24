@@ -6,7 +6,7 @@ import { BUSINESS as B, SITE } from './data';
  */
 export type Policy = { slug: string; title: string; description: string; intro: string; sections: { h: string; p: string[] }[] };
 
-export const UPDATED = '16 October 2026';
+export const UPDATED = '24 October 2026';
 const addr = `${B.street}, ${B.city}, ${B.district} district, ${B.state} ${B.pin}, India`;
 const contact = `Call or WhatsApp ${B.phone}, or write to ${B.legalName}, ${addr}.`;
 const who = `${SITE.url.replace('https://', '')} is run by ${B.legalName}, a partnership firm registered in India. ADRENL is its brand. Where these pages say "we" or "us", they mean ${B.legalName}.`;
@@ -22,10 +22,11 @@ export const LEGAL: Policy[] = [
       { h: 'What we collect', p: [
         'When you order: your name, phone number, email address, delivery address and what you bought.',
         'Payments are handled by Zoho Payments. You enter card, UPI or bank details on their secure page; we never see or store them.',
-        'When you browse: this site remembers which hero film you last saw, in your own browser only, so the next visit shows a different one. We use no advertising or tracking cookies. Our hosting provider keeps standard server logs (such as IP address and browser type) for security.',
+        'When you browse: this site keeps your bag and which hero film you last saw in your own browser. To see where the shop is hard to use, we also record anonymous usage on our own server: a random ID stored in your browser, the pages and buttons you use, the steps of checkout you reach, how fast pages load, and errors. It never includes your name, phone number, email or address, and it is not shared with anyone. We use no advertising or third-party tracking. Our hosting provider keeps standard server logs (such as IP address and browser type) for security.',
       ] },
       { h: 'How we use it', p: [
         'To take and deliver your order, send order and delivery updates, handle exchanges and refunds, answer your questions, prevent fraud, and keep the records Indian tax law requires.',
+        'Anonymous usage records are used only to find and fix what makes the shop hard to use, and are deleted after 400 days.',
         'We send offers or launch news only if you ask for them, and you can stop them at any time.',
       ] },
       { h: 'Who we share it with', p: [

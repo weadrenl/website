@@ -77,8 +77,8 @@ export function Hero() {
         <div className="hero-row" data-rise>
           <p className="hero-lead">{COPY.hero.lead}</p>
           <div className="hero-actions">
-            <a className="btn btn-paper" href="#shop">{COPY.hero.cta}</a>
-            <a className="tlink" href="#story">{COPY.hero.link}</a>
+            <a className="btn btn-paper" href="#shop" data-track="cta_click" data-track-props='{"cta":"hero_preorder"}'>{COPY.hero.cta}</a>
+            <a className="tlink" href="#story" data-track="cta_click" data-track-props='{"cta":"hero_story"}'>{COPY.hero.link}</a>
           </div>
         </div>
       </div>

@@ -1,12 +1,11 @@
 'use client';
 import { useEffect, useRef, useState, type FormEvent, type ReactNode, type RefObject } from 'react';
 import type { Address, Order, SavedAddress, User } from '@/lib/catalog';
-import { SITE } from '@/lib/data';
-import { img } from '@/lib/assets';
 import { api, ApiError } from '@/lib/api';
 import { useStore } from './Store';
 import { rupee } from './hooks';
 import { Modal } from './Modal';
+import { track, visitIds } from '@/lib/track';
 
 const STATES = ['Andaman and Nicobar Islands', 'Andhra Pradesh', 'Arunachal Pradesh', 'Assam', 'Bihar', 'Chandigarh', 'Chhattisgarh',
   'Dadra and Nagar Haveli and Daman and Diu', 'Delhi', 'Goa', 'Gujarat', 'Haryana', 'Himachal Pradesh', 'Jammu and Kashmir', 'Jharkhand',
@@ -50,7 +49,7 @@ function OtpBoxes({ value, onChange, inputRef }: { value: string; onChange: (v: 
 }
 
 /** Phone number, then the code. New customers also give a name. */
-export function Login({ onDone, intro }: { onDone: (u: User) => void; intro?: string }) {
+export function Login({ onDone, intro, ctx }: { onDone: (u: User) => void; intro?: string; ctx: 'checkout' | 'account' | 'order' }) {
   const { setUser } = useStore();
   const [step, setStep] = useState<'phone' | 'code'>('phone');
   const [phone, setPhone] = useState('');
@@ -66,12 +65,13 @@ export function Login({ onDone, intro }: { onDone: (u: User) => void; intro?: st
 
   const start = async (e: FormEvent) => {
     e.preventDefault();
-    if (!/^[6-9]\d{9}$/.test(phone)) return setErr('Enter your 10-digit mobile number.');
+    if (!/^[6-9]\d{9}$/.test(phone)) { track('form_error', { form: 'login', field: 'phone' }); return setErr('Enter your 10-digit mobile number.'); }
     setBusy(true); setErr('');
     try {
       const r = await api<{ newUser: boolean; testMode: boolean }>('/auth/start', { phone });
       setIsNew(r.newUser); setTest(r.testMode); setStep('code'); setCode('');
-    } catch (x) { setErr((x as Error).message); } finally { setBusy(false); }
+      track('login_code_sent', { ctx, new: r.newUser });
+    } catch (x) { setErr((x as Error).message); track('login_error', { ctx, msg: (x as Error).message }); } finally { setBusy(false); }
   };
   const verify = async (c = code) => {
     if (c.length < 4) return setErr('Enter the 4-digit code.');
@@ -79,8 +79,9 @@ export function Login({ onDone, intro }: { onDone: (u: User) => void; intro?: st
     setBusy(true); setErr('');
     try {
       const r = await api<{ user: User }>('/auth/verify', { phone, code: c, name: name.trim() });
+      track('login_done', { ctx, new: isNew });
       setUser(r.user); onDone(r.user);
-    } catch (x) { setErr((x as Error).message); setCode(''); codeRef.current?.focus(); setBusy(false); }
+    } catch (x) { setErr((x as Error).message); track('login_error', { ctx, msg: (x as Error).message }); setCode(''); codeRef.current?.focus(); setBusy(false); }
   };
   // A returning customer is signed in as soon as the fourth digit lands.
   const onCode = (v: string) => { setCode(v); setErr(''); if (v.length === 4 && !isNew && !busy) verify(v); };
@@ -148,8 +149,8 @@ function AddressForm({ f, set, errs }: { f: Address; set: (k: keyof Address) => 
  * Where it goes and the pay button. Saved addresses are offered first (the last one used is picked); with none
  * saved, the address form opens straight away. A new address is saved when the order is placed.
  */
-function Details({ onBack, onPaying, onSignedOut }: { onBack: () => void; onPaying: () => void; onSignedOut: () => void }) {
-  const { user, bag, cat } = useStore();
+export function Delivery({ onPaying, onSignedOut }: { onPaying: () => void; onSignedOut: () => void }) {
+  const { user, bag, cat, subtotal, units } = useStore();
   const saved = user?.addresses ?? [];
   const [sel, setSel] = useState<string>(saved[0]?.id ?? 'new');
   const [f, setF] = useState<Address>({ ...EMPTY, name: user?.name ?? '' });
@@ -162,8 +163,8 @@ function Details({ onBack, onPaying, onSignedOut }: { onBack: () => void; onPayi
     setF((x) => ({ ...x, [k]: k === 'pin' ? digits(e.target.value, 6) : e.target.value }));
     setErrs((x) => ({ ...x, [k]: undefined })); setErr('');
   };
-  const pick = (id: string) => { setSel(id); setErrs({}); setErr(''); };
-  const subtotal = bag.reduce((s, i) => s + i.price, 0), total = subtotal + cat.shipping;
+  const pick = (id: string) => { setSel(id); setErrs({}); setErr(''); track('address_choice', { saved: id !== 'new' }); };
+  const total = subtotal + cat.shipping;
   const isNew = sel === 'new' || !saved.some((a) => a.id === sel);
 
   const pay = async (e: FormEvent) => {
@@ -178,19 +179,22 @@ function Details({ onBack, onPaying, onSignedOut }: { onBack: () => void; onPayi
       if (!/^[1-9]\d{5}$/.test(f.pin)) v.pin = 'Add the 6-digit PIN code.';
     }
     setErrs(v);
+    Object.keys(v).forEach((field) => track('form_error', { form: 'delivery', field }));
     if (Object.keys(v).length) {
       setTimeout(() => (document.querySelector(`.form [name="${Object.keys(v).find((k) => k !== 'email') ?? 'email'}"]`) as HTMLElement | null)?.focus(), 0);
       return;
     }
     setBusy(true); setErr('');
+    track('pay_click', { value: total, units, saved: !isNew });
     try {
       const r = await api<{ order: string; url: string }>('/checkout', {
-        items: bag.map((i) => ({ id: i.id, size: i.size })), email: email.trim(),
-        ...(isNew ? { address: f } : { addressId: sel }),
+        items: bag.map((i) => ({ id: i.id, size: i.size, qty: i.qty })), email: email.trim(),
+        ...(isNew ? { address: f } : { addressId: sel }), ...visitIds(),
       });
       onPaying();
       window.location.assign(r.url);
     } catch (x) {
+      track('pay_error', { msg: (x as Error).message });
       if (x instanceof ApiError && x.status === 401) return onSignedOut();
       setErr((x as Error).message); setBusy(false);
     }
@@ -198,8 +202,7 @@ function Details({ onBack, onPaying, onSignedOut }: { onBack: () => void; onPayi
 
   return (
     <form className="form" onSubmit={pay} noValidate>
-      <div className="form-head"><h3 className="form-t">{saved.length ? 'Deliver to' : 'Delivery address'}</h3><button type="button" className="tlink" onClick={onBack}>Back to bag</button></div>
-      <p className="form-p">Signed in as {user && fmtPhone(user.phone)}</p>
+      <h2 className="form-t">{saved.length ? 'Deliver to' : 'Delivery address'}</h2>
       {saved.length > 0 && (
         <div className="addrs" role="radiogroup" aria-label="Delivery address">
           {saved.map((a) => (
@@ -226,88 +229,13 @@ function Details({ onBack, onPaying, onSignedOut }: { onBack: () => void; onPayi
         <p className="contact"><span className="field-l">Receipt to</span><span className="contact-v">{email}</span><button type="button" className="tlink" onClick={() => setEditEmail(true)}>Change</button></p>
       )}
 
-      <dl className="sum">
-        <div><dt>{bag.length} {bag.length === 1 ? 'tee' : 'tees'}</dt><dd>{rupee(subtotal)}</dd></div>
-        <div><dt>Shipping</dt><dd>{cat.shipping ? rupee(cat.shipping) : 'Free'}</dd></div>
-        <div className="sum-t"><dt>Total</dt><dd>{rupee(total)}</dd></div>
-      </dl>
-      <p className={`warn ${err ? 'show' : ''}`} role="alert">{err}</p>
-      <button className="btn btn-wide" disabled={busy} aria-busy={busy}>{busy ? 'Creating your order…' : `Pay ${rupee(total)}`}</button>
-      <p className="fine center">You pay on Zoho Payments&apos; secure page: UPI, cards and more. Prices include taxes.</p>
-    </form>
-  );
-}
-
-function Paying() {
-  return (
-    <div className="state" role="status" aria-live="polite">
-      <span className="spin" aria-hidden="true" />
-      <h3 className="form-t">Opening secure payment</h3>
-      <p className="form-p">Taking you to Zoho Payments. Please don&apos;t close this tab.</p>
-    </div>
-  );
-}
-
-type Step = 'bag' | 'login' | 'details' | 'paying';
-
-export function BagDrawer({ open, onClose }: { open: boolean; onClose: () => void }) {
-  const { bag, removeItem, product, cat, user } = useStore();
-  const [step, setStep] = useState<Step>('bag');
-  const [note, setNote] = useState('');
-  const total = bag.reduce((s, i) => s + i.price, 0);
-
-  useEffect(() => { if (!open) setStep((s) => (s === 'paying' ? s : 'bag')); }, [open]);
-  useEffect(() => { if (!bag.length) setStep((s) => (s === 'paying' ? s : 'bag')); }, [bag.length]);
-  // Coming back from the payment page with the browser's Back button: show the form again, not the spinner.
-  useEffect(() => {
-    const f = (e: PageTransitionEvent) => { if (e.persisted) setStep((s) => (s === 'paying' ? 'details' : s)); };
-    window.addEventListener('pageshow', f);
-    return () => window.removeEventListener('pageshow', f);
-  }, []);
-
-  const checkout = () => { setNote(''); setStep(user ? 'details' : 'login'); };
-  const title = { bag: `Your bag${bag.length ? ` · ${bag.length}` : ''}`, login: 'Checkout · Sign in', details: 'Checkout · Delivery', paying: 'Checkout · Payment' }[step];
-
-  return (
-    <Modal open={open} onClose={step === 'paying' ? () => {} : onClose} label="Your bag" side>
-      <div className="bag">
-        <div className="modal-top"><span className="eyebrow">{title}</span>{step !== 'paying' && <button className="x" onClick={onClose}>Close</button>}</div>
-        {step === 'login' && (
-          <div className="bag-step">
-            <Login intro={note || 'Sign in with your mobile number to place the order. It also keeps your orders in one place.'} onDone={() => setStep('details')} />
-            <button className="tlink back" onClick={() => setStep('bag')}>Back to bag</button>
-          </div>
-        )}
-        {step === 'details' && <div className="bag-step"><Details onBack={() => setStep('bag')} onPaying={() => setStep('paying')} onSignedOut={() => { setNote('Your sign-in expired. Please sign in again.'); setStep('login'); }} /></div>}
-        {step === 'paying' && <Paying />}
-        {step === 'bag' && (bag.length === 0 ? (
-          <div className="bag-empty"><p>Nothing in here yet.</p><a className="tlink" href="#shop" onClick={onClose}>Pick your route</a></div>
-        ) : (
-          <ul className="bag-list">
-            {bag.map((it) => {
-              const p = product(it.id);
-              return (
-                <li key={it.key}>
-                  {p ? <img src={img(p.shots[0].cut)} alt="" width={64} height={128} /> : <i />}
-                  <div><b>{it.name}</b><span>{it.colour} <i className="sep">·</i> Size {it.size}</span><span>Batch 01 preorder</span></div>
-                  <div className="bag-r"><b>{rupee(it.price)}</b><button className="tlink" onClick={() => removeItem(it.key)}>Remove</button></div>
-                </li>
-              );
-            })}
-          </ul>
-        ))}
-        {step === 'bag' && (
-          <div className="bag-foot">
-            <div className="bag-sum"><span>Subtotal</span><b>{rupee(total)}</b></div>
-            <p className="fine">{cat.open ? `Shipping ${cat.shipping ? rupee(cat.shipping) : 'is free'}. Prices include taxes.` : 'Shipping and taxes are shown at checkout.'}</p>
-            {cat.open
-              ? <button className="btn btn-wide" disabled={!bag.length || user === undefined} onClick={checkout}>Checkout</button>
-              : <button className="btn btn-wide" disabled>Checkout opens {SITE.dropShort}</button>}
-            <p className="fine">{cat.open ? 'Nothing is charged until you pay on the secure payment page.' : 'Your bag is saved on this device. Nothing is reserved or charged.'}</p>
-          </div>
-        )}
+      <div className="pay-box">
+        <div className="pay-total"><span>Total <small>{units} {units === 1 ? 'tee' : 'tees'}, shipping {cat.shipping ? rupee(cat.shipping) : 'free'}</small></span><b>{rupee(total)}</b></div>
+        <p className={`warn ${err ? 'show' : ''}`} role="alert">{err}</p>
+        <button className="btn btn-wide" disabled={busy || !bag.length} aria-busy={busy}>{busy ? 'Creating your order…' : `Pay ${rupee(total)} securely`}</button>
+        <p className="fine center">Next: Zoho Payments&apos; secure page. UPI, cards and netbanking. Prices include taxes.</p>
       </div>
-    </Modal>
+    </form>
   );
 }
 
@@ -340,7 +268,7 @@ export function Account({ open, onClose }: { open: boolean; onClose: () => void 
       <div className="bag">
         <div className="modal-top"><span className="eyebrow">{user ? 'Your orders' : 'Account'}</span><button className="x" onClick={onClose}>Close</button></div>
         {user === undefined && <div className="state"><span className="spin" aria-hidden="true" /></div>}
-        {user === null && <div className="bag-step"><Login onDone={() => {}} intro="Sign in with your mobile number to see your orders." /></div>}
+        {user === null && <div className="bag-step"><Login ctx="account" onDone={() => {}} intro="Sign in with your mobile number to see your orders." /></div>}
         {user && (
           <div className="acct">
             <p className="acct-who"><b>{user.name}</b><span>{fmtPhone(user.phone)}</span></p>
@@ -353,7 +281,7 @@ export function Account({ open, onClose }: { open: boolean; onClose: () => void 
                   <li key={o.id}>
                     <a href={`/order?id=${o.id}`}>
                       <span className="o-top"><b>{o.id}</b><i className={`badge s-${o.status}`}>{statusOf(o)}</i></span>
-                      <span>{o.items.map((i) => `${i.name} ${i.size}`).join(', ')}</span>
+                      <span>{o.items.map((i) => `${i.name} ${i.size}${i.qty > 1 ? ` ×${i.qty}` : ''}`).join(', ')}</span>
                       <span className="o-meta">{date(o.created)} <i className="sep">·</i> {rupee(o.amount)}</span>
                     </a>
                   </li>

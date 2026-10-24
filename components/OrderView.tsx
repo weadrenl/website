@@ -5,6 +5,7 @@ import { BUSINESS } from '@/lib/data';
 import { api, ApiError } from '@/lib/api';
 import { useStore } from './Store';
 import { Login, STATUS } from './Checkout';
+import { track } from '@/lib/track';
 
 const time = (s: string) => new Date(s).toLocaleTimeString('en-IN', { hour: 'numeric', minute: '2-digit' });
 import { rupee } from './hooks';
@@ -22,6 +23,7 @@ export function OrderView() {
   const [err, setErr] = useState('');
   const [slow, setSlow] = useState(false);
   const started = useRef(0);
+  const seen = useRef('');
 
   useEffect(() => {
     const v = new URLSearchParams(window.location.search).get('id');
@@ -34,6 +36,9 @@ export function OrderView() {
       const r = await api<{ order: Order }>(`/orders/${id}`);
       setOrder(r.order); setErr('');
       if (r.order.status === 'paid') clearBag();
+      // What the customer saw when they came back: one event per status reached.
+      const key = `${r.order.id}:${r.order.status}:${r.order.stage ?? ''}`;
+      if (seen.current !== key) { seen.current = key; track('order_view', { status: r.order.status, stage: r.order.stage }); }
     } catch (x) {
       setErr(x instanceof ApiError && x.status === 401 ? 'signin' : (x as Error).message);
     }
@@ -55,7 +60,7 @@ export function OrderView() {
   if (id === null) {
     body = <Msg t="We could not find that order." p="If you just paid, open Your orders from the menu, or contact us with your payment details." cta={['/', 'Back to ADRENL']} />;
   } else if (user === null || err === 'signin') {
-    body = <div className="ord-login"><Login onDone={() => setErr('')} intro="Sign in with the number you ordered with to see this order." /></div>;
+    body = <div className="ord-login"><Login ctx="order" onDone={() => setErr('')} intro="Sign in with the number you ordered with to see this order." /></div>;
   } else if (err && !order) {
     body = <Msg t="We could not load your order." p={err} retry={load} />;
   } else if (order?.status === 'pending' && order.stage === 'awaiting') {
@@ -127,7 +132,7 @@ function Summary({ o }: { o: Order }) {
   const a = o.address;
   return (
     <div className="ord-sum">
-      <ul>{o.items.map((i, n) => <li key={n}><span><b>{i.name}</b> {i.colour}, size {i.size}</span><span>{rupee(i.price)}</span></li>)}</ul>
+      <ul>{o.items.map((i, n) => <li key={n}><span><b>{i.name}</b> {i.colour}, size {i.size}{i.qty > 1 ? ` × ${i.qty}` : ''}</span><span>{rupee(i.price * i.qty)}</span></li>)}</ul>
       <dl>
         <div><dt>Shipping</dt><dd>{o.shipping ? rupee(o.shipping) : 'Free'}</dd></div>
         <div className="sum-t"><dt>Total</dt><dd>{rupee(o.amount)}</dd></div>

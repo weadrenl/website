@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { COPY, FAQ, QUOTES, SITE } from '@/lib/data';
 import { fromPrice, nextPrice } from '@/lib/catalog';
 import { useStore } from './Store';
+import { track } from '@/lib/track';
 import { Mark } from './Mark';
 import { BusinessInfo, PolicyLinks } from './Business';
 import { Contours, RoutePath, TeeDrawing } from './Engrave';
@@ -80,7 +81,7 @@ export function Drop() {
         <div className="drop-foot">
           <p>{COPY.drop.note}</p>
           <div className="drop-actions">
-            <button className="btn btn-paper" onClick={addToCalendar}>Add to calendar</button>
+            <button className="btn btn-paper" onClick={addToCalendar} data-track="calendar_add">Add to calendar</button>
             <a className="tlink" href="#shop">Pick your route</a>
           </div>
         </div>
@@ -119,7 +120,7 @@ export function Faq() {
         <div className="faq-list">
           {FAQ.map((x, i) => (
             <div key={x.q} className={`faq-item ${open === i ? 'open' : ''}`}>
-              <h3><button aria-expanded={open === i} aria-controls={`faq-${i}`} id={`faq-b-${i}`} onClick={() => setOpen(open === i ? null : i)}><span>{x.q}</span><i aria-hidden="true" /></button></h3>
+              <h3><button aria-expanded={open === i} aria-controls={`faq-${i}`} id={`faq-b-${i}`} onClick={() => { setOpen(open === i ? null : i); if (open !== i) track('faq_open', { q: i }); }}><span>{x.q}</span><i aria-hidden="true" /></button></h3>
               <div className="faq-a" id={`faq-${i}`} role="region" aria-labelledby={`faq-b-${i}`}><div><p>{(cat.open && x.aOpen) || x.a}</p></div></div>
             </div>
           ))}

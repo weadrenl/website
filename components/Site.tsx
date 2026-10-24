@@ -8,9 +8,11 @@ import { Mark } from './Mark';
 import { Hero } from './Hero';
 import { Story } from './Story';
 import { Routes } from './Routes';
-import { Shop } from './Shop';
-import { Account, BagDrawer } from './Checkout';
-import { StoreProvider, useStore, type BagItem } from './Store';
+import { Shop, type Added } from './Shop';
+import { Account } from './Checkout';
+import { AddedSheet, BagDrawer } from './Bag';
+import { StoreProvider, useStore } from './Store';
+import { track } from '@/lib/track';
 import { Build, Drop, Voices, Faq, Footer } from './Sections';
 import { rupee } from './hooks';
 
@@ -22,14 +24,14 @@ export default function Site({ catalog }: { catalog: Catalog }) {
 
 function Page() {
   const root = useRef<HTMLDivElement>(null);
-  const { cat, bag, addItem, user } = useStore();
+  const { cat, units, subtotal, user } = useStore();
   const [sel, setSel] = useState(0);
   const [drawer, setDrawer] = useState(false);
   const [account, setAccount] = useState(false);
+  const [added, setAdded] = useState<Added | null>(null);
+  const [bump, setBump] = useState(false);
   const [menu, setMenu] = useState(false);
-  const [toast, setToast] = useState('');
   const [loaded, setLoaded] = useState(false);
-  const toastT = useRef<ReturnType<typeof setTimeout>>(undefined);
 
   const scrollTo = useCallback((id: string) => {
     const el = document.getElementById(id);
@@ -38,13 +40,27 @@ function Page() {
     if (l?.scrollTo) l.scrollTo(el, { duration: 1.4 }); else el.scrollIntoView({ behavior: 'smooth' });
   }, []);
   const choose = useCallback((i: number) => { setSel(i); scrollTo('shop'); }, [scrollTo]);
+  const chooseRoute = useCallback((i: number) => { choose(i); track('select_design', { id: cat.products[i]?.id, from: 'routes' }); }, [choose, cat.products]);
 
-  const add = useCallback((b: BagItem) => {
-    addItem(b);
-    setToast(`${b.name}, size ${b.size}, is in your bag`);
-    clearTimeout(toastT.current);
-    toastT.current = setTimeout(() => setToast(''), 2600);
-  }, [addItem]);
+  const onAdded = useCallback((a: Added) => {
+    setAdded(a); setBump(true);
+    setTimeout(() => setBump(false), 600);
+  }, []);
+  const closeAdded = useCallback(() => setAdded(null), []);
+  const openBag = useCallback(() => { setAdded(null); setDrawer(true); }, []);
+  // From the bag's suggestions: show that design in the shop.
+  const pickFromBag = useCallback((i: number) => { setSel(i); track('select_design', { id: cat.products[i]?.id, from: 'bag' }); setTimeout(() => scrollTo('shop'), 350); }, [cat.products, scrollTo]);
+
+  // How far down the page each visit gets (once per section).
+  useEffect(() => {
+    const seen = new Set<string>();
+    const io = new IntersectionObserver((entries) => entries.forEach((e) => {
+      const id = (e.target as HTMLElement).id || 'footer';
+      if (e.isIntersecting && !seen.has(id)) { seen.add(id); track('section_view', { section: id }); }
+    }), { threshold: 0.35 });
+    document.querySelectorAll('main section[id], footer.foot').forEach((el) => io.observe(el));
+    return () => io.disconnect();
+  }, []);
 
   // "Try again" from the order page lands on /?bag=open: open the bag (still saved) and tidy the address bar.
   useEffect(() => {
@@ -156,12 +172,12 @@ function Page() {
     <div ref={root} className={`site ${loaded ? 'is-loaded' : ''}`}>
       <header className={`nav on-dark ${menu ? 'is-open' : ''}`}>
         <a href="#top" className="brand" aria-label="ADRENL, back to top"><Mark className="brand-mark" title="" /><span>ADRENL</span></a>
-        <nav className="nav-links" aria-label="Main">{LINKS.map(([h, t]) => <a key={h} href={h}>{t}</a>)}</nav>
+        <nav className="nav-links" aria-label="Main">{LINKS.map(([h, t]) => <a key={h} href={h} data-track="nav_click" data-track-props={JSON.stringify({ to: h })}>{t}</a>)}</nav>
         <div className="nav-right">
-          <a className="btn btn-sm nav-cta" href="#shop">Preorder</a>
-          <button className="acct-btn" onClick={() => setAccount(true)}>{user ? 'Orders' : 'Sign in'}</button>
-          <button className="bag-btn" onClick={() => setDrawer(true)} aria-label={`Bag, ${bag.length} ${bag.length === 1 ? 'item' : 'items'}`}>
-            Bag{bag.length > 0 && <span className="bag-n" aria-hidden="true">{bag.length}</span>}
+          <a className="btn btn-sm nav-cta" href="#shop" data-track="cta_click" data-track-props='{"cta":"nav_preorder"}'>Preorder</a>
+          <button className="acct-btn" onClick={() => setAccount(true)} data-track="account_open">{user ? 'Orders' : 'Sign in'}</button>
+          <button className={`bag-btn ${bump ? 'bump' : ''}`} onClick={openBag} aria-label={`Bag, ${units} ${units === 1 ? 'tee' : 'tees'}`}>
+            Bag{units > 0 && <span className="bag-n" aria-hidden="true">{units}</span>}
           </button>
           <button className="menu-btn" aria-expanded={menu} aria-controls="menu" onClick={() => setMenu((m) => !m)}>{menu ? 'Close' : 'Menu'}</button>
         </div>
@@ -178,8 +194,8 @@ function Page() {
       <main id="main">
         <Hero />
         <Story />
-        <Routes onChoose={choose} />
-        <Shop sel={sel} setSel={setSel} onAdd={add} />
+        <Routes onChoose={chooseRoute} />
+        <Shop sel={sel} setSel={setSel} onAdded={onAdded} onOpenBag={openBag} />
         <Build />
         <Drop />
         <Voices />
@@ -187,13 +203,24 @@ function Page() {
       </main>
       <Footer />
 
-      <div className="buybar" aria-hidden="false">
-        <p><b>{rupee(fromPrice(cat))}</b><span>Batch 01 <i className="sep">·</i> {cat.open ? COPY.live.badge : `Opens ${SITE.dropShort}`}</span></p>
-        <a className="btn btn-sm" href="#shop">Preorder</a>
+      <div className={`buybar ${added ? 'is-hidden' : ''}`} aria-hidden="false">
+        {units > 0 ? (
+          <>
+            <button className="buybar-bag" onClick={openBag}><b>{rupee(subtotal)}</b><span>{units} {units === 1 ? 'tee' : 'tees'} in your bag <i className="sep">·</i> View</span></button>
+            {cat.open
+              ? <a className="btn btn-sm" href="/checkout" data-track="checkout_click" data-track-props='{"from":"buybar"}'>Checkout</a>
+              : <button className="btn btn-sm" onClick={openBag}>View bag</button>}
+          </>
+        ) : (
+          <>
+            <p><b>{rupee(fromPrice(cat))}</b><span>Batch 01 <i className="sep">·</i> {cat.open ? COPY.live.badge : `Opens ${SITE.dropShort}`}</span></p>
+            <a className="btn btn-sm" href="#shop" data-track="cta_click" data-track-props='{"cta":"buybar_preorder"}'>Preorder</a>
+          </>
+        )}
       </div>
-      <BagDrawer open={drawer} onClose={() => setDrawer(false)} />
+      <AddedSheet added={added} onClose={closeAdded} onView={openBag} />
+      <BagDrawer open={drawer} onClose={() => setDrawer(false)} onPick={pickFromBag} />
       <Account open={account} onClose={() => setAccount(false)} />
-      <div className={`toast ${toast ? 'show' : ''}`} role="status" aria-live="polite">{toast}</div>
     </div>
   );
 }

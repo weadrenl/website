@@ -13,7 +13,7 @@ export type Catalog = {
 export type Address = { name: string; line1: string; line2: string; city: string; state: string; pin: string };
 export type SavedAddress = Address & { id: string };
 export type User = { name: string; phone: string; email: string | null; addresses: SavedAddress[] };
-export type OrderItem = { id: string; name: string; colour: string; size: string; price: number };
+export type OrderItem = { id: string; name: string; colour: string; size: string; price: number; qty: number };
 export type Order = {
   id: string; status: 'pending' | 'paid' | 'failed' | 'expired' | 'amount_mismatch'; amount: number; shipping: number; items: OrderItem[];
   name: string; phone: string; email: string; address: Address; created: string; paid: string | null;
