@@ -48,9 +48,15 @@ function loadBag(): BagItem[] { try { return normalise(JSON.parse(localStorage.g
 function savedBag(): BagItem[] | null { try { return normalise(JSON.parse(localStorage.getItem(BAG_KEY) || '[]')); } catch { return null; } }
 function saveBag(b: BagItem[]) { try { localStorage.setItem(BAG_KEY, JSON.stringify(b)); } catch { /* private mode: the bag just lives in this tab */ } }
 
-/** Real-user speed: LCP, CLS, INP, FCP, TTFB, as the visitor experienced them. */
+/** Real-user speed: LCP, CLS, INP, FCP, TTFB, as the visitor experienced them. Once per metric per page. */
+const reported = new Set<string>();
+const report: Parameters<typeof useReportWebVitals>[0] = (m) => {
+  if (reported.has(m.name)) return;
+  reported.add(m.name);
+  track('web_vital', { metric: m.name, value: m.name === 'CLS' ? Number(m.value.toFixed(4)) : Math.round(m.value), rating: m.rating });
+};
 function Vitals() {
-  useReportWebVitals((m) => track('web_vital', { metric: m.name, value: m.name === 'CLS' ? Number(m.value.toFixed(4)) : Math.round(m.value), rating: m.rating }));
+  useReportWebVitals(report); // a stable function: an inline one re-subscribes on every render and repeats reports
   return null;
 }
 
