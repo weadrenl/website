@@ -3,7 +3,7 @@ import './globals.css';
 import { BUSINESS, HERO_FILMS, SITE } from '@/lib/data';
 
 const title = 'ADRENL | Graphic tees for the long way. Batch 01 from Rs 799';
-const description = 'ADRENL Batch 01: three heavyweight graphic tees - RIDGE, GARUD and MARCOS - made for people who take the long route. Batch 01 price Rs 799, drops 31 October 2026.';
+const description = 'ADRENL Batch 01: three heavyweight graphic tees - RIDGE, GARUD and MARCOS - made for people who take the long route. Batch 01 from Rs 799, drops 31 October 2026.';
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE.url),

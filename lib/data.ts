@@ -175,7 +175,7 @@ export const DETAILS = [
 
 export const FAQ: { q: string; a: string; aOpen?: string }[] = [
   { q: 'What does preorder mean here?', a: 'Batch 01 is made after the drop opens, not pulled from a warehouse. We say so up front instead of pretending stock exists. Dispatch dates are confirmed before the drop.' },
-  { q: 'What is the price, and what happens next batch?', a: 'Batch 01 is Rs 799. The next batch is planned at Rs 999. Nothing is crossed out and no fake discount is shown: Rs 799 is simply the price for the first run.' },
+  { q: 'What is the price, and what happens next batch?', a: 'Batch 01 is Rs 799 to Rs 899, depending on the tee; the shop shows the price of each. The next batch is planned at Rs 999. Nothing is crossed out and no fake discount is shown: these are simply the prices for the first run.' },
   { q: 'What if the size is wrong?', a: 'One free size exchange within 7 days of delivery. Exchange details are confirmed before the drop.' },
   { q: 'Are those the real tees?', a: 'Not yet. The pictures are design previews that show the intended fit, colours and graphics. Photos of the finished tees replace them once the sample is made.' },
   { q: 'How thick is the fabric?', a: 'The target is 240 GSM, which is on the heavy side for a tee. We confirm the number on the final sample and publish it here.' },

@@ -9,7 +9,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const c = await getCatalog();
   const p = fromPrice(c), names = c.products.map((x) => x.name);
   const title = `ADRENL | Graphic tees for the long way. Batch 01 from Rs ${p}`;
-  const description = `ADRENL Batch 01: ${['one', 'two', 'three', 'four', 'five', 'six'][names.length - 1] ?? names.length} heavyweight graphic tees - ${names.slice(0, -1).join(', ')}${names.length > 1 ? ' and ' : ''}${names.at(-1)} - made for people who take the long route. Batch 01 price Rs ${p}, ${c.open ? 'preorder open now' : `drops ${SITE.dropLabel}`}.`;
+  const description = `ADRENL Batch 01: ${['one', 'two', 'three', 'four', 'five', 'six'][names.length - 1] ?? names.length} heavyweight graphic tees - ${names.slice(0, -1).join(', ')}${names.length > 1 ? ' and ' : ''}${names.at(-1)} - made for people who take the long route. Batch 01 from Rs ${p}, ${c.open ? 'preorder open now' : `drops ${SITE.dropLabel}`}.`;
   return {
     title, description,
     // Next replaces (does not merge) these objects, so they are complete here.
