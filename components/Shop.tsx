@@ -1,6 +1,6 @@
 'use client';
 import { useEffect, useRef, useState } from 'react';
-import { COPY, DETAILS, SITE } from '@/lib/data';
+import { COPY, DETAILS, SITE, TRYON } from '@/lib/data';
 import { img } from '@/lib/assets';
 import { rupee } from './hooks';
 import { Modal } from './Modal';
@@ -121,6 +121,10 @@ export function Shop({ sel, setSel, onAdded, onOpenBag }: { sel: number; setSel:
               <span><CheckIcon />In your bag: {inBag.map((x) => `${x.size}${x.qty > 1 ? ` ×${x.qty}` : ''}`).join(', ')}</span>
               <button className="tlink" onClick={onOpenBag} data-track="view_bag_link" data-track-props='{"from":"shop"}'>View bag</button>
             </p>
+          )}
+
+          {TRYON.inShop && (
+            <p className="try-link"><a className="tlink" href={`/try?tee=${d.id}`} data-track="tryroom_link" data-track-props={JSON.stringify({ id: d.id })}>Try {d.name} on, live, on your camera</a></p>
           )}
 
           <ul className="trust">

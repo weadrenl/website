@@ -22,6 +22,23 @@ export const BUSINESS = {
   phone: '+91 70249 96969',
   tel: '+917024996969',
 };
+/**
+ * The trial room: the live video try-on, served from the GPU server at `url` (backend/, `deploy/aws.sh`). It is open only
+ * while that server is on and set to public (`LIVE_PUBLIC=1`); /try asks it from the browser and says open or closed.
+ * try.adrenl.com must point at the server's address of that boot (it changes every boot; `deploy/aws.sh start` says what to set).
+ * `hours`: when it opens, in plain words ('Fridays to Sundays, 7 to 9 pm'); empty says "set hours while we test it".
+ * `privacy`: shown under "Your video". The founder confirms it before the page is linked: the server keeps recent try-ons.
+ */
+export const TRYON = {
+  url: 'https://try.adrenl.com',
+  hours: '',
+  inShop: true, // the "Try it on, live" link under each tee in the shop
+  privacy: [
+    'Your camera video goes to our trial-room server, which dresses it and sends it back. Nothing is shown to anyone else.',
+    'While we test the trial room, recent try-ons are kept for a short time so we can make it better, and are never published.',
+  ],
+};
+
 export const POLICIES: [string, string][] = [
   ['/privacy', 'Privacy policy'], ['/terms', 'Terms of service'], ['/refunds', 'Refunds and cancellation'], ['/shipping', 'Shipping and delivery'],
 ];

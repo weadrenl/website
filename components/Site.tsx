@@ -70,6 +70,16 @@ function Page() {
     history.replaceState(null, '', window.location.pathname + window.location.hash);
   }, []);
 
+  // A link to one tee (/?tee=garud#shop, from the trial room's Buy or /try): show that tee in the shop.
+  useEffect(() => {
+    const q = new URLSearchParams(window.location.search);
+    const id = q.get('tee'), i = cat.products.findIndex((x) => x.id === id);
+    if (i < 0) return;
+    setSel(i);
+    track('select_design', { id, from: q.get('utm_source') === 'tryon' ? 'tryon' : 'link' });
+    setTimeout(() => scrollTo('shop'), 400);
+  }, [cat.products, scrollTo]);
+
   // Nav and phone buy bar react to where the reader is: light over the hero, solid after, bar hidden in the shop.
   useEffect(() => {
     const nav = document.querySelector('.nav'), bar = document.querySelector('.buybar');

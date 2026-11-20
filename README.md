@@ -49,6 +49,7 @@ Best upgrade later: your own footage of the finished tees on the road, shot in 4
 - `lib/data.ts`              copy (`COPY`), `HERO_FILMS`, designs, price, drop date, `DETAILS`, FAQ, quotes
 - `components/Hero.tsx`      hero, film player; `Dawn.tsx` is the drawn fallback scene (canvas, cheap on phones)
 - `components/Story.tsx`, `Routes.tsx`, `Shop.tsx`, `Sections.tsx` (the tee, drop, voices, FAQ, footer)
+- `components/TryRoom.tsx`   `/try`, the trial room's door: asks the live try-on server whether it is open (`TRYON` in `lib/data.ts`)
 - `components/Engrave.tsx`   SVG: contours, ridge edge, compass rose, route line, tee drawing, icons
 - `components/Site.tsx`      shell: smooth scroll, intro, nav, phone menu, buy bar, global reveals
 - `app/layout.tsx`           SEO: metadata, Open Graph, JSON-LD (Organization, WebSite, Product x3 as PreOrder, FAQPage)
