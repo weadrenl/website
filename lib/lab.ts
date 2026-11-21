@@ -60,7 +60,7 @@ export const LAB_COPY = {
   eyebrow: 'ADRENL design lab',
   title: 'Adrenaline, worn.',
   motto: 'Hills, land, air and sea.',
-  intro: 'Every design here is shown on a person first, so we see how it really looks before we make it. The ones that look right go to the shop.',
+  intro: 'Every design here is shown on a person first, so we see how it really looks before we make it. Open any design and tap the heart if you would wear it: that is how we decide what to make.',
 };
 
 /** Batch 01 comes straight from the shop's own data, so the lab never drifts from what is on sale. */
@@ -87,7 +87,8 @@ const batch01: LabDesign[] = DESIGNS.map((d) => ({
  * New designs. Pictures on a person come from backend/scripts/lab_mockup.py (no GPU) until the AI try-on has a run;
  * the design picture as sent, and the prints alone, are kept in backend/designs/<id>/.
  */
-const MOCKUP = 'A quick mock-up made on the laptop: the print is laid on the RIDGE photo, so it stays flat where real cloth would fold. The AI try-on drapes it properly; that needs one GPU run.';
+// Public wording (the lab is shared from 2026-11-21): no laptops, model names or GPUs.
+const MOCKUP = 'A preview: the print is placed on a photo, so it stays flat where real cloth would fold. Photos of the real tee come before it goes on sale.';
 
 const tests: LabDesign[] = [
   {
