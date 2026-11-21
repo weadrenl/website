@@ -40,7 +40,7 @@ export function Lab() {
               <span className={`lab-st lab-${d.status}`}>{LAB_STATUS[d.status]}</span>
             </header>
             <div className="lab-body">
-              <div className="lab-shots">
+              <div className="lab-shots" style={{ '--n': d.shots.length } as React.CSSProperties}>
                 {d.shots.map((s) => (
                   <figure key={s.label}>
                     <img className="cut" src={img(s.src)} width={512} height={1024} alt={`${d.name}, ${s.label.toLowerCase()}, on a person`} loading={i === 0 ? 'eager' : 'lazy'} decoding="async" />
@@ -53,18 +53,12 @@ export function Lab() {
                 <p>{d.story}</p>
                 {d.note && <p className="lab-note"><b>What we are testing:</b> {d.note}</p>}
                 <div className="lab-refs">
-                  {d.flat && (
-                    <figure>
-                      <img src={img(d.flat)} width={1100} height={1375} alt={`${d.name}, flat lay`} loading="lazy" decoding="async" />
-                      <figcaption>Flat lay</figcaption>
+                  {d.refs.map((r) => (
+                    <figure key={r.src} className={r.w > r.h * 1.8 ? 'lab-art' : undefined}>
+                      <img src={img(r.src)} width={r.w} height={r.h} alt={`${d.name}: ${r.label}`} loading="lazy" decoding="async" style={r.bg ? { background: r.bg, padding: 10 } : undefined} />
+                      <figcaption>{r.label}</figcaption>
                     </figure>
-                  )}
-                  {d.art && (
-                    <figure className="lab-art">
-                      <img src={img(d.art.src)} width={d.art.w} height={d.art.h} alt={`${d.name} back print: ${d.print}`} loading="lazy" decoding="async" />
-                      <figcaption>{d.print}</figcaption>
-                    </figure>
-                  )}
+                  ))}
                 </div>
               </div>
             </div>

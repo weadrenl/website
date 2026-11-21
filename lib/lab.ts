@@ -9,6 +9,8 @@ import { DESIGNS } from './data';
  */
 export type LabStatus = 'site' | 'test' | 'idea';
 export type LabShot = { label: string; src: string };
+/** A picture beside the story: flat lay, print plate, the design picture. `bg` puts a print made for a dark tee on a tile. */
+export type LabRef = { src: string; w: number; h: number; label: string; bg?: string };
 export type LabDesign = {
   id: string;
   name: string;
@@ -23,8 +25,8 @@ export type LabDesign = {
   show: boolean;
   /** On a person: back first, then front and side, as in the shop. Paths under public/img. */
   shots: LabShot[];
-  flat?: string;
-  art?: { src: string; w: number; h: number };
+  /** At most two: the first sits in the narrow column, the second in the wide one. */
+  refs: LabRef[];
   /** What we want to learn from this one. */
   note?: string;
 };
@@ -55,15 +57,31 @@ const batch01: LabDesign[] = DESIGNS.map((d) => ({
   status: 'site',
   show: true,
   shots: d.shots.map((s) => ({ label: s.label, src: s.cut })),
-  flat: d.flat,
-  art: { src: d.art.ink, w: d.art.w, h: d.art.h },
+  refs: [
+    { src: d.flat, w: 1100, h: 1375, label: 'Flat lay' },
+    { src: d.art.ink, w: d.art.w, h: d.art.h, label: d.print },
+  ],
 }));
 
-export const LAB: LabDesign[] = [
-  ...batch01,
-  // New designs go here, for example:
-  // { id: 'tide', name: 'TIDE', colour: 'Off white', swatch: '#ece8df', field: 'Sea', line: '...', story: '...',
-  //   print: '...', status: 'test', show: true,
-  //   shots: [{ label: 'Back', src: 'lab/tide/back.webp' }, { label: 'Front', src: 'lab/tide/front.webp' }],
-  //   flat: 'lab/tide/flat.jpg', note: 'Does a light tee still feel rugged?' },
+/**
+ * New designs. Pictures on a person come from backend/scripts/lab_mockup.py (no GPU) until the AI try-on has a run;
+ * the design picture as sent, and the prints alone, are kept in backend/designs/<id>/.
+ */
+const tests: LabDesign[] = [
+  {
+    // 2026-11-21. Working name; the founder called it "skydiving".
+    id: 'freefall', name: 'FREEFALL', colour: 'Black', swatch: '#1d1d1d', field: 'Open air',
+    line: 'Leave a trail.',
+    story: 'Ten thousand feet, the door open, one step out. FREEFALL is the minute after it: arms wide, the wind loud, a red trail tearing through the clouds behind you. On the front, only ADRENL, raised in the tee’s own black, and the trail coming off the shoulder.',
+    print: 'Skydiver in freefall, red trail, clouds',
+    status: 'test', show: true,
+    shots: [{ label: 'Back', src: 'lab/freefall/back.webp' }, { label: 'Front', src: 'lab/freefall/front.webp' }],
+    refs: [
+      { src: 'lab/freefall/back-print.webp', w: 342, h: 524, label: 'Back print: white line art, red trail', bg: '#151515' },
+      { src: 'lab/freefall/flat.jpg', w: 1024, h: 708, label: 'The design, front and back' },
+    ],
+    note: 'A quick mock-up made on the laptop: the print is laid on the RIDGE photo, so it stays flat where real cloth would fold. The AI try-on drapes it properly; that needs one GPU run.',
+  },
 ];
+
+export const LAB: LabDesign[] = [...batch01, ...tests];
