@@ -161,6 +161,34 @@ const tests: LabDesign[] = [
     ],
     note: MOCKUP,
   },
+  {
+    // 2026-11-21. Working name: a snowboarder down a steep face.
+    id: 'powder', name: 'POWDER', colour: 'Black', swatch: '#1d1d1d', field: 'Snow',
+    line: 'First tracks.',
+    story: 'The slope drops away, the board finds the fall line and the snow explodes off every turn. POWDER is first tracks on a face nobody has touched yet. White and grey on black with one orange line through it; on the front, ADRENL raised in black and the slope rising from the hem.',
+    print: 'Snowboarder in spray, mountain face, orange line',
+    status: 'test', show: true,
+    shots: [{ label: 'Back', src: 'lab/powder/back.webp' }, { label: 'Front', src: 'lab/powder/front.webp' }],
+    refs: [
+      { src: 'lab/powder/back-print.webp', w: 342, h: 510, label: 'Back print: rider, snow, orange line', bg: '#151515' },
+      { src: 'lab/powder/flat.jpg', w: 1024, h: 708, label: 'The design, front and back' },
+    ],
+    note: MOCKUP,
+  },
+  {
+    // 2026-11-21. Working name: a freediver head down through a swirl of water.
+    id: 'dive', name: 'DIVE', colour: 'Black', swatch: '#1d1d1d', field: 'Deep water',
+    line: 'One breath.',
+    story: 'One breath, then down, fins together, into blue that gets darker every metre. DIVE is the quiet kind of adrenaline. A turquoise swirl and a diver on black; on the front, ADRENL raised in black and the water falling from the shoulder to the hem.',
+    print: 'Freediver in a turquoise swirl, bubbles',
+    status: 'test', show: true,
+    shots: [{ label: 'Back', src: 'lab/dive/back.webp' }, { label: 'Front', src: 'lab/dive/front.webp' }],
+    refs: [
+      { src: 'lab/dive/back-print.webp', w: 305, h: 498, label: 'Back print: diver and swirl', bg: '#151515' },
+      { src: 'lab/dive/flat.jpg', w: 1024, h: 708, label: 'The design, front and back' },
+    ],
+    note: MOCKUP,
+  },
 ];
 
 /** New designs first: they are what the lab is for. */
