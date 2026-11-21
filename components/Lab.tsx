@@ -1,11 +1,11 @@
-import { LAB, LAB_BADGE, LAB_COPY, LAB_STATUS, type LabDesign } from '@/lib/lab';
+import { LAB, LAB_BADGE, LAB_COPY, LAB_RANGES, LAB_STATUS, type LabDesign } from '@/lib/lab';
 import { img } from '@/lib/assets';
 import { Mark } from './Mark';
 import { LabShowroom } from './LabStrip';
 
 /**
- * The design lab (/lab). First every design side by side to compare (LabShowroom: swipe on a phone, tap for the full view),
- * then each one written out: on a person from every side, its line, story and prints.
+ * The design lab (/lab). First every design side by side to compare (LabShowroom: line tabs, swipe on a phone, tap for the
+ * full view), then each one written out, grouped by line: on a person from every side, its motto, story and prints.
  */
 export function Lab() {
   const list = LAB.filter((d) => d.show);
@@ -30,7 +30,13 @@ export function Lab() {
 
         <LabShowroom items={list.map((d) => ({ ...d, badge: LAB_BADGE[d.status] }))} />
 
-        {list.map((d, i) => (
+        {LAB_RANGES.map((r) => ({ r, ds: list.filter((d) => d.range === r.id) })).filter((g) => g.ds.length > 0).map(({ r, ds }) => (
+          <section key={r.id} className="lab-group" aria-labelledby={`line-${r.id}`}>
+            <header className="lab-group-h">
+              <h2 id={`line-${r.id}`}>{r.name}<span>{ds.length}</span></h2>
+              <p>{r.blurb}</p>
+            </header>
+        {ds.map((d) => { const i = list.indexOf(d); const pair = d.pair && list.find((x) => x.id === d.pair!.id); return (
           <article key={d.id} id={d.id} className="lab-d">
             <header className="lab-head">
               <span className="lab-n">{String(i + 1).padStart(2, '0')}</span>
@@ -52,6 +58,7 @@ export function Lab() {
               <div className="lab-text">
                 <p className="lab-line">{d.line}</p>
                 <p>{d.story}</p>
+                {pair && <p className="lab-pair"><b>{d.pair!.label}:</b> <a className="tlink" href={`#${pair.id}`}>compare with {pair.name}</a></p>}
                 {d.note && <p className="lab-note"><b>Note:</b> {d.note}</p>}
                 <div className="lab-refs">
                   {d.refs.map((r) => (
@@ -65,6 +72,8 @@ export function Lab() {
               </div>
             </div>
           </article>
+        ); })}
+          </section>
         ))}
       </main>
       <footer className="wrap"><div className="lab-foot"><span>&copy; 2026 NINETY4 VENTURES</span><span>Adrenaline, worn.</span></div></footer>

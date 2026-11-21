@@ -8,6 +8,8 @@ import { DESIGNS } from './data';
  * add an entry below with status 'test', and it shows up. `show: false` takes a design off the page without deleting it.
  */
 export type LabStatus = 'site' | 'test' | 'idea';
+/** Which line a design belongs to: big full prints, a single line on black, or what is on sale now. */
+export type LabRange = 'bold' | 'minimal' | 'batch01';
 export type LabShot = { label: string; src: string };
 /** A picture beside the story: flat lay, print plate, the design picture. `bg` puts a print made for a dark tee on a tile. */
 export type LabRef = { src: string; w: number; h: number; label: string; bg?: string };
@@ -29,7 +31,17 @@ export type LabDesign = {
   refs: LabRef[];
   /** What we want to learn from this one. */
   note?: string;
+  range: LabRange;
+  /** A sister design on the same idea in the other line, shown side by side in the full view (WAKE and BARREL). */
+  pair?: { id: string; label: string };
 };
+
+/** The lines, in the order the lab shows them (founder, 2026-11-21). */
+export const LAB_RANGES: { id: LabRange; name: string; blurb: string }[] = [
+  { id: 'bold', name: 'Bold', blurb: 'Big prints, the whole back, colour that shows from across the street.' },
+  { id: 'minimal', name: 'Minimal', blurb: 'One line on black. Quiet until someone looks closer.' },
+  { id: 'batch01', name: 'Batch 01', blurb: 'RIDGE, GARUD and MARCOS: on sale now.' },
+];
 
 export const LAB_STATUS: Record<LabStatus, string> = {
   site: 'On the site · Batch 01',
@@ -63,6 +75,7 @@ const batch01: LabDesign[] = DESIGNS.map((d) => ({
   print: d.print,
   status: 'site',
   show: true,
+  range: 'batch01',
   shots: d.shots.map((s) => ({ label: s.label, src: s.cut })),
   refs: [
     { src: d.flat, w: 1100, h: 1375, label: 'Flat lay' },
@@ -83,7 +96,7 @@ const tests: LabDesign[] = [
     line: 'Leave a trail.',
     story: 'Ten thousand feet, the door open, one step out. FREEFALL is the minute after it: arms wide, the wind loud, a red trail tearing through the clouds behind you. On the front, only ADRENL, raised in the tee’s own black, and the trail coming off the shoulder.',
     print: 'Skydiver in freefall, red trail, clouds',
-    status: 'test', show: true,
+    status: 'test', show: true, range: 'bold',
     shots: [{ label: 'Back', src: 'lab/freefall/back.webp' }, { label: 'Front', src: 'lab/freefall/front.webp' }],
     refs: [
       { src: 'lab/freefall/back-print.webp', w: 342, h: 524, label: 'Back print: white line art, red trail', bg: '#151515' },
@@ -97,7 +110,7 @@ const tests: LabDesign[] = [
     line: 'Lose the grip. Keep the line.',
     story: 'The back steps out, the wheel goes the other way, and for a second the car is flying sideways through its own smoke. DRIFT is that second: tyre lines burnt into the road, sparks, a flame from the exhaust. On the front, only ADRENL, raised in the tee’s own black, and the tyre lines curling up from the hem.',
     print: 'Drifting car, tyre lines, smoke and flame',
-    status: 'test', show: true,
+    status: 'test', show: true, range: 'bold',
     shots: [{ label: 'Back', src: 'lab/drift/back.webp' }, { label: 'Front', src: 'lab/drift/front.webp' }],
     refs: [
       { src: 'lab/drift/back-print.webp', w: 350, h: 515, label: 'Back print: car, smoke, tyre lines', bg: '#151515' },
@@ -111,7 +124,7 @@ const tests: LabDesign[] = [
     line: 'Hold on. Lean back.',
     story: 'A rope, a board and a boat that will not slow down. WAKE is the moment you cut across your own spray and the sea goes white behind you. Only white on black; on the front, ADRENL raised in the tee’s own black and a wave rising from the hem.',
     print: 'Wakeboarder in spray, rising wave',
-    status: 'test', show: true,
+    status: 'test', show: true, range: 'minimal', pair: { id: 'barrel', label: 'The sea, two ways' },
     shots: [{ label: 'Back', src: 'lab/wake/back.webp' }, { label: 'Front', src: 'lab/wake/front.webp' }],
     refs: [
       { src: 'lab/wake/back-print.webp', w: 332, h: 235, label: 'Back print: rider and spray', bg: '#151515' },
@@ -125,7 +138,7 @@ const tests: LabDesign[] = [
     line: 'Fly the gap.',
     story: 'Arms out, the suit fills, and the rock walls rush past a few metres away. GLIDE is that flight down the gap, held up by nothing but air. Dark on dark: grey rock, a silver line of wind, and on the front ADRENL raised in black with the same silver line coming over the shoulder.',
     print: 'Wingsuit flyer between cliffs, silver ribbon',
-    status: 'test', show: true,
+    status: 'test', show: true, range: 'bold',
     shots: [{ label: 'Back', src: 'lab/glide/back.webp' }, { label: 'Front', src: 'lab/glide/front.webp' }],
     refs: [
       { src: 'lab/glide/back-print.webp', w: 345, h: 506, label: 'Back print: flyer, cliffs, silver ribbon', bg: '#151515' },
@@ -139,7 +152,7 @@ const tests: LabDesign[] = [
     line: 'Take the line up.',
     story: 'No road, just a white crest and a machine that wants the top of it. CLIMB is the moment the wheels bite and the line goes up. Almost nothing on it: one white ridge and the buggy at its top; on the front, ADRENL raised in black and a thin trail from the hem with a single marker, like a route on a map.',
     print: 'Buggy on a white ridge line, trail with a marker',
-    status: 'test', show: true,
+    status: 'test', show: true, range: 'minimal',
     shots: [{ label: 'Back', src: 'lab/climb/back.webp' }, { label: 'Front', src: 'lab/climb/front.webp' }],
     refs: [
       { src: 'lab/climb/back-print.webp', w: 318, h: 197, label: 'Back print: buggy and ridge line', bg: '#151515' },
@@ -153,7 +166,7 @@ const tests: LabDesign[] = [
     line: 'Drop in.',
     story: 'Down one wall, up the other, a grind along the lip and back in before you can think about it. CARVE is that line around the bowl. White and grey on black; on the front, ADRENL raised in black and one brushed curve of the bowl at the hem.',
     print: 'Skater on the lip of a bowl, carve line',
-    status: 'test', show: true,
+    status: 'test', show: true, range: 'minimal',
     shots: [{ label: 'Back', src: 'lab/carve/back.webp' }, { label: 'Front', src: 'lab/carve/front.webp' }],
     refs: [
       { src: 'lab/carve/back-print.webp', w: 282, h: 240, label: 'Back print: skater, bowl, carve line', bg: '#151515' },
@@ -167,7 +180,7 @@ const tests: LabDesign[] = [
     line: 'First tracks.',
     story: 'The slope drops away, the board finds the fall line and the snow explodes off every turn. POWDER is first tracks on a face nobody has touched yet. White and grey on black with one orange line through it; on the front, ADRENL raised in black and the slope rising from the hem.',
     print: 'Snowboarder in spray, mountain face, orange line',
-    status: 'test', show: true,
+    status: 'test', show: true, range: 'bold',
     shots: [{ label: 'Back', src: 'lab/powder/back.webp' }, { label: 'Front', src: 'lab/powder/front.webp' }],
     refs: [
       { src: 'lab/powder/back-print.webp', w: 342, h: 510, label: 'Back print: rider, snow, orange line', bg: '#151515' },
@@ -181,7 +194,7 @@ const tests: LabDesign[] = [
     line: 'One breath.',
     story: 'One breath, then down, fins together, into blue that gets darker every metre. DIVE is the quiet kind of adrenaline. A turquoise swirl and a diver on black; on the front, ADRENL raised in black and the water falling from the shoulder to the hem.',
     print: 'Freediver in a turquoise swirl, bubbles',
-    status: 'test', show: true,
+    status: 'test', show: true, range: 'bold',
     shots: [{ label: 'Back', src: 'lab/dive/back.webp' }, { label: 'Front', src: 'lab/dive/front.webp' }],
     refs: [
       { src: 'lab/dive/back-print.webp', w: 305, h: 498, label: 'Back print: diver and swirl', bg: '#151515' },
@@ -195,7 +208,7 @@ const tests: LabDesign[] = [
     line: 'Knee down.',
     story: 'Brake late, tip in, knee on the tarmac and the bike leaning further than feels possible. APEX is the middle of the corner, sparks behind you and the exit already in sight. On the front, ADRENL raised in black and a sweep of light and sparks.',
     print: 'Rider leaning into a corner, sparks, light trails',
-    status: 'test', show: true,
+    status: 'test', show: true, range: 'bold',
     shots: [{ label: 'Back', src: 'lab/apex/back.webp' }, { label: 'Front', src: 'lab/apex/front.webp' }],
     refs: [
       { src: 'lab/apex/back-print.webp', w: 335, h: 356, label: 'Back print: rider, sparks, light trails', bg: '#151515' },
@@ -209,7 +222,7 @@ const tests: LabDesign[] = [
     line: 'One more pitch.',
     story: 'Head torch on, axe in, a wall of ice above and only the rope behind you. ICEFALL is the climb before sunrise. On the front, ADRENL raised in black and an ice axe bitten into the ice, its rope running up over the shoulder.',
     print: 'Climber on an ice face, head torch, ice axe and rope',
-    status: 'test', show: true,
+    status: 'test', show: true, range: 'bold',
     shots: [{ label: 'Back', src: 'lab/icefall/back.webp' }, { label: 'Front', src: 'lab/icefall/front.webp' }],
     refs: [
       { src: 'lab/icefall/back-print.webp', w: 188, h: 572, label: 'Back print: climber and ice face', bg: '#151515' },
@@ -223,7 +236,7 @@ const tests: LabDesign[] = [
     line: 'Ride it out.',
     story: 'The wave stands up, throws over, and for a few seconds you are inside it with the light at the end of the tube. BARREL is that ride, and the wave does not stop at the back: it carries on round the left sleeve. On the front, only ADRENL raised in black and the wave coming round the sleeve.',
     print: 'Surfer in a breaking wave, wave round the left sleeve',
-    status: 'test', show: true,
+    status: 'test', show: true, range: 'bold', pair: { id: 'wake', label: 'The sea, two ways' },
     shots: [{ label: 'Back', src: 'lab/barrel/back.webp' }, { label: 'Front', src: 'lab/barrel/front.webp' }],
     refs: [
       { src: 'lab/barrel/back-print.webp', w: 301, h: 350, label: 'Back print: surfer in the barrel', bg: '#151515' },
@@ -233,5 +246,6 @@ const tests: LabDesign[] = [
   },
 ];
 
-/** New designs first: they are what the lab is for. */
-export const LAB: LabDesign[] = [...tests, ...batch01];
+/** Grouped by line (Bold, Minimal, Batch 01), each in the order it came in. BARREL ends Bold and WAKE starts Minimal, so the
+ * sea pair sits side by side under All. */
+export const LAB: LabDesign[] = LAB_RANGES.flatMap((r) => [...tests, ...batch01].filter((d) => d.range === r.id));

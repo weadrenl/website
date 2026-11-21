@@ -1,7 +1,7 @@
 'use client';
 import { useEffect, useRef, useState } from 'react';
 import { img } from '@/lib/assets';
-import type { LabDesign } from '@/lib/lab';
+import { LAB_RANGES, type LabDesign, type LabRange } from '@/lib/lab';
 import { track } from '@/lib/track';
 import { LabViewer } from './LabViewer';
 
@@ -22,19 +22,45 @@ const readPicks = (): string[] => {
   } catch { return []; }
 };
 
+type Filter = 'all' | LabRange;
+const isFilter = (v: string | null): v is Filter => v === 'all' || LAB_RANGES.some((r) => r.id === v);
+
 /**
  * The lab's first screen: every design as a card, the whole person, the same side of each, to compare at a glance. Swipe on
- * a phone, a grid on wider screens. Back or Front turns every card at once. A tap opens the full view (LabViewer) on that
- * design; without script the card still jumps to its section below.
+ * a phone, a grid on wider screens. Tabs pick a line (All, Bold, Minimal, Batch 01; `?line=minimal` opens on one, to share a
+ * single line). Back or Front turns every card at once. A tap opens the full view (LabViewer) on that design, inside the
+ * chosen line; without script the card still jumps to its section below.
  */
 export function LabShowroom({ items }: { items: ShowItem[] }) {
   const [view, setView] = useState(VIEWS[0]);
+  const [filter, setFilter] = useState<Filter>('all');
   const [at, setAt] = useState(0);
-  const [full, setFull] = useState<number | null>(null);
+  const [full, setFull] = useState<{ id: string; n: number } | null>(null);
   const [picks, setPicks] = useState<string[]>([]);
   const strip = useRef<HTMLDivElement>(null);
+  const shown = filter === 'all' ? items : items.filter((d) => d.range === filter);
+  const blurb = LAB_RANGES.find((r) => r.id === filter)?.blurb;
 
-  useEffect(() => { setPicks(readPicks()); }, []);
+  useEffect(() => {
+    setPicks(readPicks());
+    const q = new URLSearchParams(window.location.search).get('line');
+    if (isFilter(q)) setFilter(q);
+  }, []);
+  const pickFilter = (f: Filter) => {
+    setFilter(f);
+    setAt(0);
+    if (strip.current) strip.current.scrollLeft = 0;
+    try {
+      const u = new URL(window.location.href);
+      if (f === 'all') u.searchParams.delete('line'); else u.searchParams.set('line', f);
+      window.history.replaceState(window.history.state, '', u);
+    } catch { /* the address just does not follow */ }
+  };
+  // From the full view: open a design's sister (WAKE and BARREL sit in different lines, so widen to All if needed).
+  const openPair = (id: string) => {
+    if (!shown.some((d) => d.id === id)) setFilter('all');
+    setFull((f) => ({ id, n: (f?.n ?? 0) + 1 }));
+  };
   const togglePick = (id: string) => {
     const on = !picks.includes(id);
     const next = on ? [...picks, id] : picks.filter((x) => x !== id);
@@ -49,11 +75,24 @@ export function LabShowroom({ items }: { items: ShowItem[] }) {
     const card = el?.firstElementChild as HTMLElement | null;
     if (!el || !card) return;
     const step = card.offsetWidth + parseFloat(getComputedStyle(el).columnGap || '0');
-    setAt(Math.min(items.length - 1, Math.max(0, Math.round(el.scrollLeft / step))));
+    setAt(Math.min(shown.length - 1, Math.max(0, Math.round(el.scrollLeft / step))));
   };
+
+  const tabs: { id: Filter; name: string; n: number }[] = [
+    { id: 'all', name: 'All', n: items.length },
+    ...LAB_RANGES.map((r) => ({ id: r.id, name: r.name, n: items.filter((d) => d.range === r.id).length })).filter((t) => t.n > 0),
+  ];
 
   return (
     <section id="compare" className="lab-cmp" aria-label="All designs">
+      <div className="lab-ranges" role="tablist" aria-label="Line">
+        {tabs.map((t) => (
+          <button key={t.id} type="button" role="tab" aria-selected={filter === t.id} className={filter === t.id ? 'on' : ''} onClick={() => pickFilter(t.id)}>
+            {t.name}<span>{t.n}</span>
+          </button>
+        ))}
+      </div>
+      {blurb && <p className="lab-range-blurb">{blurb}</p>}
       <div className="lab-cmp-head">
         <p className="lab-hint">
           <span className="lab-phone">Swipe to compare · tap for full view</span>
@@ -66,10 +105,10 @@ export function LabShowroom({ items }: { items: ShowItem[] }) {
         </div>
       </div>
       <div className="lab-cards" ref={strip} onScroll={onScroll}>
-        {items.map((d, i) => {
+        {shown.map((d, i) => {
           const s = d.shots.find((x) => x.label === view) ?? d.shots[0];
           return (
-            <a key={d.id} href={`#${d.id}`} className="lab-card" onClick={(e) => { e.preventDefault(); setFull(i); }}>
+            <a key={d.id} href={`#${d.id}`} className="lab-card" onClick={(e) => { e.preventDefault(); setFull({ id: d.id, n: 0 }); }}>
               <figure>
                 <img className="cut" src={img(s.src)} width={512} height={1024} alt={`${d.name}, ${s.label.toLowerCase()}, on a person`} loading={i < 3 ? 'eager' : 'lazy'} decoding="async" />
                 <span className={`lab-st lab-${d.status}`}>{d.badge}</span>
@@ -85,8 +124,10 @@ export function LabShowroom({ items }: { items: ShowItem[] }) {
           );
         })}
       </div>
-      <p className="lab-at lab-phone" aria-hidden="true">{at + 1} / {items.length}</p>
-      {full !== null && <LabViewer items={items} start={full} view={view} picks={picks} onPick={togglePick} onClose={() => setFull(null)} />}
+      <p className="lab-at lab-phone" aria-hidden="true">{Math.min(at + 1, shown.length)} / {shown.length}</p>
+      {full !== null && (
+        <LabViewer items={shown} all={items} focus={full} view={view} picks={picks} onPick={togglePick} onPair={openPair} onClose={() => setFull(null)} />
+      )}
     </section>
   );
 }

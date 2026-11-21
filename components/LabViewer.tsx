@@ -1,6 +1,7 @@
 'use client';
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { img } from '@/lib/assets';
+import { LAB_RANGES } from '@/lib/lab';
 import type { ShowItem } from './LabStrip';
 
 /** The hint shows on the first open of a visit only. */
@@ -12,13 +13,19 @@ const isWide = () => window.matchMedia('(min-width: 900px)').matches;
 const views = (d: ShowItem) => (d.shots.length > 1 ? [...d.shots.map((s) => s.label), 'Both'] : d.shots.map((s) => s.label));
 
 type Props = {
+  /** The designs in the chosen line, in order. */
   items: ShowItem[];
-  start: number;
+  /** Every design, to find a sister in another line. */
+  all: ShowItem[];
+  /** Open on this design; a new n jumps to it while open (the pair button). */
+  focus: { id: string; n: number };
   view: string;
   picks: string[];
   onPick: (id: string) => void;
+  onPair: (id: string) => void;
   onClose: () => void;
 };
+const rangeName = (x: ShowItem) => LAB_RANGES.find((r) => r.id === x.range)?.name ?? '';
 
 /**
  * Full view of the lab, built on what phones already teach (decided with the founder, 2026-11-21):
@@ -28,12 +35,15 @@ type Props = {
  *   heart                "I'd wear this", remembered here and counted as an anonymous event
  * Wide screens: photos on the left, the story always on the right; arrow keys and buttons move. Back, x or Esc close.
  */
-export function LabViewer({ items, start, view, picks, onPick, onClose }: Props) {
-  const [at, setAt] = useState(start);
-  const [shown, setShown] = useState(() => {
+export function LabViewer({ items, all, focus, view, picks, onPick, onPair, onClose }: Props) {
+  // Designs are followed by id, not position: the list can change while open (the pair button widens the line to All).
+  const [cur, setCur] = useState(focus.id);
+  const at = Math.max(0, items.findIndex((x) => x.id === cur));
+  const [shown, setShown] = useState<Record<string, number>>(() => {
     const wide = isWide();
-    return items.map((d) => (wide && d.shots.length > 1 ? d.shots.length : Math.max(0, d.shots.findIndex((s) => s.label === view))));
+    return Object.fromEntries(all.map((d) => [d.id, wide && d.shots.length > 1 ? d.shots.length : Math.max(0, d.shots.findIndex((s) => s.label === view))]));
   });
+  const lastFocus = useRef(-1);
   const [sheet, setSheet] = useState(false);
   const [drag, setDrag] = useState<number | null>(null);
   const [hint, setHint] = useState(!hinted);
@@ -65,13 +75,26 @@ export function LabViewer({ items, start, view, picks, onPick, onClose }: Props)
     calm();
   };
 
-  const api = useRef({ close, goDesign, goView, at, shown, sheet, setSheet });
-  api.current = { close, goDesign, goView, at, shown, sheet, setSheet };
+  const side = (i: number) => shown[items[i]?.id] ?? 0;
+  const api = useRef({ close, goDesign, goView, at, side, sheet, setSheet });
+  api.current = { close, goDesign, goView, at, side, sheet, setSheet };
+
+  // On open, and when the pair button asks for another design (or the line changes under us): put that design on screen and
+  // each rail on its side, without animation.
+  const ids = items.map((x) => x.id).join(',');
+  useLayoutEffect(() => {
+    const jump = lastFocus.current !== focus.n;
+    lastFocus.current = focus.n;
+    const i = Math.max(0, items.findIndex((x) => x.id === (jump ? focus.id : cur)));
+    const el = track.current;
+    if (el) el.scrollTop = i * el.clientHeight;
+    rails.current.forEach((r, j) => { const x = items[j]; if (r && x) r.scrollLeft = (shown[x.id] ?? 0) * r.clientWidth; });
+    if (items[i]) setCur(items[i].id);
+    if (jump) setSheet(false);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [focus.n, ids]);
 
   useLayoutEffect(() => {
-    const el = track.current;
-    if (el) el.scrollTop = start * el.clientHeight;
-    rails.current.forEach((r, i) => { if (r) r.scrollLeft = shown[i] * r.clientWidth; });
     const root = document.documentElement;
     const before = root.style.overflow;
     root.style.overflow = 'hidden';
@@ -82,8 +105,8 @@ export function LabViewer({ items, start, view, picks, onPick, onClose }: Props)
       if (e.key === 'Escape') { if (a.sheet) a.setSheet(false); else a.close(); }
       else if (e.key === 'ArrowDown' || e.key === 'PageDown') a.goDesign(1);
       else if (e.key === 'ArrowUp' || e.key === 'PageUp') a.goDesign(-1);
-      else if (e.key === 'ArrowRight') a.goView(a.at, a.shown[a.at] + 1);
-      else if (e.key === 'ArrowLeft') a.goView(a.at, a.shown[a.at] - 1);
+      else if (e.key === 'ArrowRight') a.goView(a.at, a.side(a.at) + 1);
+      else if (e.key === 'ArrowLeft') a.goView(a.at, a.side(a.at) - 1);
       else return;
       e.preventDefault();
     };
@@ -108,14 +131,15 @@ export function LabViewer({ items, start, view, picks, onPick, onClose }: Props)
   const onTrack = () => {
     const el = track.current;
     if (!el) return;
-    const i = Math.round(el.scrollTop / el.clientHeight);
-    if (i !== at && i >= 0 && i < items.length) { setAt(i); setSheet(false); calm(); }
+    const x = items[Math.round(el.scrollTop / el.clientHeight)];
+    if (x && x.id !== cur) { setCur(x.id); setSheet(false); calm(); }
   };
   const onRail = (i: number) => {
     const el = rails.current[i];
-    if (!el) return;
+    const x = items[i];
+    if (!el || !x) return;
     const k = Math.round(el.scrollLeft / el.clientWidth);
-    if (k !== shown[i]) { setShown((v) => v.map((x, j) => (j === i ? k : x))); calm(); }
+    if (k !== shown[x.id]) { setShown((v) => ({ ...v, [x.id]: k })); calm(); }
   };
 
   const sheetDown = (e: React.PointerEvent<HTMLElement>) => {
@@ -152,6 +176,25 @@ export function LabViewer({ items, start, view, picks, onPick, onClose }: Props)
       </button>
     );
   };
+  // A sister design on the same idea in the other line: both backs side by side, and a button over to the other.
+  const pairBlock = (x: ShowItem) => {
+    const p = x.pair && all.find((y) => y.id === x.pair!.id);
+    if (!x.pair || !p) return null;
+    return (
+      <div className="lv-pair">
+        <p className="lv-pair-h">{x.pair.label}</p>
+        <div className="lv-pair-row">
+          {[x, p].map((y) => (
+            <figure key={y.id} className={y.id === x.id ? 'here' : undefined}>
+              <img className="cut" src={img(y.shots[0].src)} width={512} height={1024} alt={`${y.name}, back, on a person`} loading="lazy" decoding="async" />
+              <figcaption><b>{y.name}</b>{rangeName(y)}</figcaption>
+            </figure>
+          ))}
+        </div>
+        <button type="button" className="lv-pair-go" onClick={() => onPair(p.id)}>Open {p.name}</button>
+      </div>
+    );
+  };
   const story = (x: ShowItem) => (
     <>
       <div className="lv-title">
@@ -159,8 +202,9 @@ export function LabViewer({ items, start, view, picks, onPick, onClose }: Props)
         <span className={`lab-st lab-${x.status}`}>{x.badge}</span>
       </div>
       <p className="lv-line">{x.line}</p>
-      <p className="lv-meta">{x.colour} · {x.field} · {x.print}</p>
+      <p className="lv-meta">{rangeName(x)} · {x.colour} · {x.field} · {x.print}</p>
       <p className="lv-story">{x.story}</p>
+      {pairBlock(x)}
       {x.note && <p className="lab-note"><b>Note:</b> {x.note}</p>}
       <div className="lv-refs">
         {x.refs.map((r) => (
@@ -200,8 +244,8 @@ export function LabViewer({ items, start, view, picks, onPick, onClose }: Props)
       <div className="lv-track" ref={track} onScroll={onTrack}>
         {items.map((x, i) => {
           const labels = views(x);
-          const k = shown[i];
-          const near = Math.abs(i - start) <= 1;
+          const k = shown[x.id] ?? 0;
+          const near = Math.abs(i - at) <= 1;
           return (
             <section key={x.id} className="lv-slide" aria-roledescription="slide" aria-label={`${x.name}, ${i + 1} of ${items.length}`}>
               <div className="lv-stage">
