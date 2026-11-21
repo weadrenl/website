@@ -726,10 +726,7 @@ html[data-motion='off'] .drop-route li > * { opacity: 1; transform: none; }
 .lab h1 em { display: block; font-style: italic; font-weight: 350; color: var(--ink-2); font-variation-settings: var(--display-it); }
 .lab-intro { font-size: 1.2rem; line-height: 1.5; color: var(--ink-2); max-width: 40rem; }
 .lab-count { margin-top: 22px; font: 600 .74rem/1.4 var(--sans); letter-spacing: .08em; text-transform: uppercase; color: var(--ink-3); }
-.lab-jump { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
-.lab-jump a { display: inline-flex; align-items: center; gap: 8px; height: 38px; padding: 0 14px; border: 1px solid var(--line-2); font: 600 .82rem var(--sans); letter-spacing: .1em; text-decoration: none; transition: border-color .2s; }
-.lab-jump a:hover { border-color: var(--ink); }
-.lab-jump i, .lab-meta i { width: 10px; height: 10px; border-radius: 50%; flex: none; }
+.lab-meta i { width: 10px; height: 10px; border-radius: 50%; flex: none; }
 .lab-d { border-top: 1px solid var(--ink); padding: 22px 0 clamp(48px, 6vw, 88px); scroll-margin-top: 16px; }
 .lab-head { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: baseline; gap: 18px; margin-bottom: clamp(18px, 3vw, 36px); }
 .lab-n { font: 600 .78rem var(--sans); letter-spacing: .1em; color: var(--ink-3); }
@@ -754,6 +751,35 @@ html[data-motion='off'] .drop-route li > * { opacity: 1; transform: none; }
 .lab-refs img { display: block; width: 100%; height: auto; }
 .lab-art img { max-height: 160px; object-fit: contain; object-position: left bottom; }
 .lab-refs figcaption { font-size: .8rem; color: var(--ink-3); margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--line-2); }
+/* Compare strip: every design, the same side, side by side. A grid on wide screens, a swipe on phones. */
+:root:has(.lab) { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) { :root:has(.lab) { scroll-behavior: auto; } }
+.lab-cmp { margin-bottom: clamp(48px, 7vw, 96px); scroll-margin-top: 12px; }
+.lab-cmp-head { display: flex; justify-content: space-between; align-items: center; gap: 12px 20px; flex-wrap: wrap; margin-bottom: 18px; }
+.lab-hint { margin: 0; font: 600 .74rem/1.4 var(--sans); letter-spacing: .08em; text-transform: uppercase; color: var(--ink-2); }
+.lab-phone { display: none; }
+.lab-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 14px; }
+.lab-card { display: grid; gap: 4px; text-decoration: none; color: inherit; border-top: 1px solid var(--ink); padding-top: 10px; }
+.lab-card figure { margin: 0 0 6px; position: relative; }
+.lab-card img { display: block; width: 100%; height: auto; aspect-ratio: 9 / 16; object-fit: cover; object-position: 50% 0;
+  -webkit-mask-image: linear-gradient(to bottom, #000 86%, transparent); mask-image: linear-gradient(to bottom, #000 86%, transparent);
+  transition: transform .5s var(--ease); }
+.lab-card:hover img { transform: translateY(-4px); }
+.lab-card .lab-st { position: absolute; top: 0; left: 0; }
+.lab-card-name { display: flex; align-items: center; gap: 8px; font-family: var(--serif); font-size: 1.5rem; line-height: 1.1; letter-spacing: .02em; }
+.lab-card-name i { width: 9px; height: 9px; border-radius: 50%; flex: none; }
+.lab-card-line { font-family: var(--serif); font-style: italic; color: var(--ink-2); font-size: 1rem; line-height: 1.3; font-variation-settings: 'opsz' 24, 'SOFT' 30, 'WONK' 1; }
+.lab-at { margin: 12px 0 0; text-align: center; font: 600 .74rem var(--sans); letter-spacing: .1em; color: var(--ink-3); font-variant-numeric: tabular-nums; }
+.lab-up { display: inline-block; margin-top: 24px; font-size: .88rem; }
+@media (max-width: 760px) {
+  .lab-phone { display: inline; }
+  p.lab-phone { display: block; }
+  .lab-wide { display: none; }
+  .lab-cards { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; margin: 0 calc(-1 * var(--pad)); padding: 0 var(--pad) 4px; scroll-padding: 0 var(--pad); scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+  .lab-cards::-webkit-scrollbar { display: none; }
+  .lab-card { flex: 0 0 74%; scroll-snap-align: start; }
+  .lab-top { padding-bottom: 28px; }
+}
 .lab-foot { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; border-top: 1px solid var(--line); padding: 16px 0 28px; font-size: .85rem; color: var(--ink-3); }
 @media (max-width: 900px) { .lab-body { grid-template-columns: minmax(0, 1fr); } }
 @media (max-width: 600px) {

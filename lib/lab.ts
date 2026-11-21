@@ -37,8 +37,15 @@ export const LAB_STATUS: Record<LabStatus, string> = {
   idea: 'Idea',
 };
 
+/** The short label on each card in the compare strip. */
+export const LAB_BADGE: Record<LabStatus, string> = {
+  site: 'Batch 01',
+  test: 'New',
+  idea: 'Idea',
+};
+
 export const LAB_COPY = {
-  eyebrow: 'ADRENL design lab · private',
+  eyebrow: 'ADRENL design lab',
   title: 'Adrenaline, worn.',
   motto: 'Hills, land, air and sea.',
   intro: 'Every design here is shown on a person first, so we see how it really looks before we make it. The ones that look right go to the shop.',
@@ -67,6 +74,8 @@ const batch01: LabDesign[] = DESIGNS.map((d) => ({
  * New designs. Pictures on a person come from backend/scripts/lab_mockup.py (no GPU) until the AI try-on has a run;
  * the design picture as sent, and the prints alone, are kept in backend/designs/<id>/.
  */
+const MOCKUP = 'A quick mock-up made on the laptop: the print is laid on the RIDGE photo, so it stays flat where real cloth would fold. The AI try-on drapes it properly; that needs one GPU run.';
+
 const tests: LabDesign[] = [
   {
     // 2026-11-21. Working name; the founder called it "skydiving".
@@ -80,8 +89,23 @@ const tests: LabDesign[] = [
       { src: 'lab/freefall/back-print.webp', w: 342, h: 524, label: 'Back print: white line art, red trail', bg: '#151515' },
       { src: 'lab/freefall/flat.jpg', w: 1024, h: 708, label: 'The design, front and back' },
     ],
-    note: 'A quick mock-up made on the laptop: the print is laid on the RIDGE photo, so it stays flat where real cloth would fold. The AI try-on drapes it properly; that needs one GPU run.',
+    note: MOCKUP,
+  },
+  {
+    // 2026-11-21. Working name; the founder called it "car drifting".
+    id: 'drift', name: 'DRIFT', colour: 'Black', swatch: '#1d1d1d', field: 'Tarmac',
+    line: 'Lose the grip. Keep the line.',
+    story: 'The back steps out, the wheel goes the other way, and for a second the car is flying sideways through its own smoke. DRIFT is that second: tyre lines burnt into the road, sparks, a flame from the exhaust. On the front, only ADRENL, raised in the tee’s own black, and the tyre lines curling up from the hem.',
+    print: 'Drifting car, tyre lines, smoke and flame',
+    status: 'test', show: true,
+    shots: [{ label: 'Back', src: 'lab/drift/back.webp' }, { label: 'Front', src: 'lab/drift/front.webp' }],
+    refs: [
+      { src: 'lab/drift/back-print.webp', w: 350, h: 515, label: 'Back print: car, smoke, tyre lines', bg: '#151515' },
+      { src: 'lab/drift/flat.jpg', w: 1024, h: 708, label: 'The design, front and back' },
+    ],
+    note: MOCKUP,
   },
 ];
 
-export const LAB: LabDesign[] = [...batch01, ...tests];
+/** New designs first: they are what the lab is for. */
+export const LAB: LabDesign[] = [...tests, ...batch01];

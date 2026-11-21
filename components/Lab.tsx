@@ -1,8 +1,12 @@
-import { LAB, LAB_COPY, LAB_STATUS, type LabDesign } from '@/lib/lab';
+import { LAB, LAB_BADGE, LAB_COPY, LAB_STATUS, type LabDesign } from '@/lib/lab';
 import { img } from '@/lib/assets';
 import { Mark } from './Mark';
+import { LabStrip } from './LabStrip';
 
-/** The design lab (/lab): each design on a person, back, front and side, with its flat lay and print. No script needed. */
+/**
+ * The design lab (/lab). First every design side by side to compare (LabStrip, swipe on a phone), then each one in full:
+ * on a person from every side, its line, story and prints.
+ */
 export function Lab() {
   const list = LAB.filter((d) => d.show);
   const count = (s: LabDesign['status']) => list.filter((d) => d.status === s).length;
@@ -22,12 +26,9 @@ export function Lab() {
             {list.length} {list.length === 1 ? 'design' : 'designs'} · {count('site')} on the site · {count('test')} in test
             {count('idea') > 0 && ` · ${count('idea')} ideas`}
           </p>
-          <nav className="lab-jump" aria-label="Designs">
-            {list.map((d) => (
-              <a key={d.id} href={`#${d.id}`}><i style={{ background: d.swatch }} aria-hidden="true" />{d.name}</a>
-            ))}
-          </nav>
         </section>
+
+        <LabStrip items={list.map((d) => ({ id: d.id, name: d.name, line: d.line, swatch: d.swatch, status: d.status, badge: LAB_BADGE[d.status], shots: d.shots }))} />
 
         {list.map((d, i) => (
           <article key={d.id} id={d.id} className="lab-d">
@@ -51,7 +52,7 @@ export function Lab() {
               <div className="lab-text">
                 <p className="lab-line">{d.line}</p>
                 <p>{d.story}</p>
-                {d.note && <p className="lab-note"><b>What we are testing:</b> {d.note}</p>}
+                {d.note && <p className="lab-note"><b>Note:</b> {d.note}</p>}
                 <div className="lab-refs">
                   {d.refs.map((r) => (
                     <figure key={r.src} className={r.w > r.h * 1.8 ? 'lab-art' : undefined}>
@@ -60,6 +61,7 @@ export function Lab() {
                     </figure>
                   ))}
                 </div>
+                <a className="tlink lab-up" href="#compare">Back to all designs</a>
               </div>
             </div>
           </article>
