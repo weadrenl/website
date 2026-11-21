@@ -38,7 +38,7 @@ export function LabShowroom({ items }: { items: ShowItem[] }) {
   const [view, setView] = useState(VIEWS[0]);
   const [filter, setFilter] = useState<Filter>('all');
   const [at, setAt] = useState(0);
-  const [full, setFull] = useState<{ id: string; n: number } | null>(null);
+  const [full, setFull] = useState<{ id: string; n: number; auto?: boolean } | null>(null);
   const [picks, setPicks] = useState<string[]>([]);
   const [booted, setBooted] = useState(false);
   const strip = useRef<HTMLDivElement>(null);
@@ -52,7 +52,7 @@ export function LabShowroom({ items }: { items: ShowItem[] }) {
     const f: Filter = isFilter(q) ? q : 'all';
     setFilter(f);
     const first = (f === 'all' ? items : items.filter((d) => d.range === f))[0] ?? items[0];
-    if (first) setFull({ id: first.id, n: 0 });
+    if (first) setFull({ id: first.id, n: 0, auto: true });
     setBooted(true);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -137,7 +137,7 @@ export function LabShowroom({ items }: { items: ShowItem[] }) {
       <p className="lab-at lab-phone" aria-hidden="true">{Math.min(at + 1, shown.length)} / {shown.length}</p>
       {!booted && <div className="lab-cover" aria-hidden="true" />}
       {full !== null && (
-        <LabViewer items={shown} all={items} focus={full} view={view} picks={picks} onPick={togglePick} onPair={openPair} onClose={() => setFull(null)} />
+        <LabViewer items={shown} all={items} focus={full} instant={!!full.auto} view={view} picks={picks} onPick={togglePick} onPair={openPair} onClose={() => setFull(null)} />
       )}
     </section>
   );

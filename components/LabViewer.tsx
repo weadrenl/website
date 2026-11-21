@@ -22,6 +22,8 @@ type Props = {
   all: ShowItem[];
   /** Open on this design; a new n jumps to it while open (the pair button). */
   focus: { id: string; n: number };
+  /** Opened by itself on page load: appear at once, no fade, so the page underneath never shows. */
+  instant?: boolean;
   view: string;
   picks: string[];
   onPick: (id: string) => void;
@@ -38,7 +40,8 @@ const rangeName = (x: ShowItem) => LAB_RANGES.find((r) => r.id === x.range)?.nam
  *   heart                "I'd wear this", remembered here and counted as an anonymous event
  * Wide screens: photos on the left, the story always on the right; arrow keys and buttons move. Back, x or Esc close.
  */
-export function LabViewer({ items, all, focus, view, picks, onPick, onPair, onClose }: Props) {
+export function LabViewer({ items, all, focus, instant, view, picks, onPick, onPair, onClose }: Props) {
+  const [noFade] = useState(!!instant); // fixed for this opening, so a later jump does not replay the fade
   // Designs are followed by id, not position: the list can change while open (the pair button widens the line to All).
   const [cur, setCur] = useState(focus.id);
   const at = Math.max(0, items.findIndex((x) => x.id === cur));
@@ -233,7 +236,7 @@ export function LabViewer({ items, all, focus, view, picks, onPick, onPair, onCl
   );
 
   return (
-    <div className="lv" role="dialog" aria-modal="true" aria-label="Designs, full view">
+    <div className={`lv${noFade ? ' lv-now' : ''}`} role="dialog" aria-modal="true" aria-label="Designs, full view">
       <header className="lv-top">
         <span className="lv-count">{at + 1} / {items.length}</span>
         <span className="lv-brand">ADRENL design lab</span>

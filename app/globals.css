@@ -815,6 +815,7 @@ html[data-motion='off'] .drop-route li > * { opacity: 1; transform: none; }
    900 px and wider: photos left, the story always on the right. Keep the 900 in step with isWide() in LabViewer.tsx. */
 .lv { position: fixed; inset: 0; z-index: 300; background: var(--paper); color: var(--ink); --lv-top: 52px; overscroll-behavior: contain; animation: lv-in .28s var(--ease) both; }
 @keyframes lv-in { from { opacity: 0; transform: scale(.985); } }
+.lv.lv-now { animation: none; }
 .lv-top { position: absolute; z-index: 3; top: 0; left: 0; right: 0; height: var(--lv-top); display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; padding: 0 var(--edge); }
 .lv-count { font: 600 .8rem var(--sans); letter-spacing: .1em; color: var(--ink-2); font-variant-numeric: tabular-nums; }
 .lv-brand { font: 600 .68rem var(--sans); letter-spacing: .14em; text-transform: uppercase; color: var(--ink-3); }
