@@ -2,7 +2,8 @@
 import { useEffect, useRef, useState } from 'react';
 import { img } from '@/lib/assets';
 import { LAB_RANGES, type LabDesign, type LabRange } from '@/lib/lab';
-import { track } from '@/lib/track';
+import { labTrack } from '@/lib/labtrack';
+import { startTracking } from '@/lib/track';
 import { LabViewer } from './LabViewer';
 
 export type ShowItem = LabDesign & { badge: string };
@@ -30,6 +31,8 @@ const isFilter = (v: string | null): v is Filter => v === 'all' || LAB_RANGES.so
  * a phone, a grid on wider screens. Tabs pick a line (All, Bold, Minimal, Batch 01; `?line=minimal` opens on one, to share a
  * single line). Back or Front turns every card at once. A tap opens the full view (LabViewer) on that design, inside the
  * chosen line; without script the card still jumps to its section below.
+ * Opening /lab goes straight into the full view on the first design of the line (founder, 2026-11-21); x or the phone's back
+ * leaves people on this page. A paper cover hides the page until then, and fades by itself if script never runs.
  */
 export function LabShowroom({ items }: { items: ShowItem[] }) {
   const [view, setView] = useState(VIEWS[0]);
@@ -37,17 +40,25 @@ export function LabShowroom({ items }: { items: ShowItem[] }) {
   const [at, setAt] = useState(0);
   const [full, setFull] = useState<{ id: string; n: number } | null>(null);
   const [picks, setPicks] = useState<string[]>([]);
+  const [booted, setBooted] = useState(false);
   const strip = useRef<HTMLDivElement>(null);
   const shown = filter === 'all' ? items : items.filter((d) => d.range === filter);
   const blurb = LAB_RANGES.find((r) => r.id === filter)?.blurb;
 
   useEffect(() => {
+    startTracking(); // the page view, so /insights can count visits to the lab
     setPicks(readPicks());
     const q = new URLSearchParams(window.location.search).get('line');
-    if (isFilter(q)) setFilter(q);
+    const f: Filter = isFilter(q) ? q : 'all';
+    setFilter(f);
+    const first = (f === 'all' ? items : items.filter((d) => d.range === f))[0] ?? items[0];
+    if (first) setFull({ id: first.id, n: 0 });
+    setBooted(true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   const pickFilter = (f: Filter) => {
     setFilter(f);
+    labTrack('lab_line', { line: f });
     setAt(0);
     if (strip.current) strip.current.scrollLeft = 0;
     try {
@@ -66,8 +77,7 @@ export function LabShowroom({ items }: { items: ShowItem[] }) {
     const next = on ? [...picks, id] : picks.filter((x) => x !== id);
     setPicks(next);
     try { localStorage.setItem(PICKS, JSON.stringify(next)); } catch { /* private mode: this visit only */ }
-    const local = /^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname);
-    track('lab_pick', { id, on, ...(local ? { local: true } : {}) });
+    labTrack('lab_pick', { id, on });
   };
 
   const onScroll = () => {
@@ -108,7 +118,7 @@ export function LabShowroom({ items }: { items: ShowItem[] }) {
         {shown.map((d, i) => {
           const s = d.shots.find((x) => x.label === view) ?? d.shots[0];
           return (
-            <a key={d.id} href={`#${d.id}`} className="lab-card" onClick={(e) => { e.preventDefault(); setFull({ id: d.id, n: 0 }); }}>
+            <a key={d.id} href={`#${d.id}`} className="lab-card" onClick={(e) => { e.preventDefault(); setFull({ id: d.id, n: 0 }); labTrack('lab_open', { id: d.id, line: filter }); }}>
               <figure>
                 <img className="cut" src={img(s.src)} width={512} height={1024} alt={`${d.name}, ${s.label.toLowerCase()}, on a person`} loading={i < 3 ? 'eager' : 'lazy'} decoding="async" />
                 <span className={`lab-st lab-${d.status}`}>{d.badge}</span>
@@ -125,6 +135,7 @@ export function LabShowroom({ items }: { items: ShowItem[] }) {
         })}
       </div>
       <p className="lab-at lab-phone" aria-hidden="true">{Math.min(at + 1, shown.length)} / {shown.length}</p>
+      {!booted && <div className="lab-cover" aria-hidden="true" />}
       {full !== null && (
         <LabViewer items={shown} all={items} focus={full} view={view} picks={picks} onPick={togglePick} onPair={openPair} onClose={() => setFull(null)} />
       )}

@@ -1,6 +1,7 @@
 'use client';
 import { useCallback, useEffect, useState } from 'react';
 import { API } from '@/lib/catalog';
+import { LAB, LAB_RANGES } from '@/lib/lab';
 import { Mark } from './Mark';
 import { rupee } from './hooks';
 
@@ -16,7 +17,17 @@ type Stats = {
   vitals: { metric: string; device: string; n: number; p75: number }[];
   checkoutSeconds: number | null; checkoutsTimed: number;
   journeys: Journey[];
+  /** The design lab (/lab). Missing from a server older than 2026-11-21. */
+  lab?: {
+    visits: number; visitors: number; opened: number;
+    lines: { line: string; visits: number }[];
+    designs: { id: string; seen: number; opened: number; stories: number; taps: number; hearts: number }[];
+  };
 };
+
+const LAB_NAME = Object.fromEntries(LAB.map((d) => [d.id, d.name]));
+const LAB_LINE = Object.fromEntries(LAB.map((d) => [d.id, LAB_RANGES.find((r) => r.id === d.range)?.name ?? '']));
+const LINE_NAME: Record<string, string> = { all: 'All', ...Object.fromEntries(LAB_RANGES.map((r) => [r.id, r.name])) };
 
 const KEY = 'adrenl-admin';
 const RANGES = [['today', 'Today'], ['7d', '7 days'], ['30d', '30 days'], ['90d', '90 days']] as const;
@@ -177,6 +188,24 @@ export function Insights() {
                 <tbody>{data.sources.map((r) => <tr key={String(r.source)}><td>{r.source}</td><td className="n">{r.visits}</td><td className="n">{pct(Number(r.adds), Number(r.visits))}</td><td className="n">{r.paid}</td></tr>)}</tbody></table>
             </section>
           </div>
+
+          {data.lab && (
+            <section className="panel">
+              <header><h2>Design lab</h2><p>www.adrenl.com/lab: visits, and per design how many visits saw it in the full view (which opens by itself), tapped its card, read its story, and how many people would wear it. Not counted in the shop numbers above.</p></header>
+              <div className="tiles">
+                <div><span>Lab visits</span><b>{data.lab.visits}</b><small>{data.lab.visitors} people</small></div>
+                <div><span>Tapped a card</span><b>{pct(data.lab.opened, data.lab.visits)}</b><small>{data.lab.opened} visits went back to the grid and chose</small></div>
+                <div><span>Hearts now</span><b>{data.lab.designs.reduce((n, d) => n + d.hearts, 0)}</b><small>all time, one per person per design</small></div>
+                <div><span>Lines picked</span><b>{data.lab.lines.length ? LINE_NAME[data.lab.lines[0].line] ?? data.lab.lines[0].line : '–'}</b><small>{data.lab.lines.map((l) => `${LINE_NAME[l.line] ?? l.line} ${l.visits}`).join(' · ') || 'nobody changed the tab'}</small></div>
+              </div>
+              {data.lab.designs.length === 0 ? <p className="empty">No design opened in this range yet.</p> : (
+                <table><thead><tr><th>Design</th><th>Line</th><th className="n">Hearts</th><th className="n">Seen</th><th className="n">Tapped</th><th className="n">Story</th><th className="n">Heart / seen</th></tr></thead>
+                  <tbody>{data.lab.designs.map((d) => (
+                    <tr key={d.id}><td>{LAB_NAME[d.id] ?? d.id}</td><td>{LAB_LINE[d.id] ?? ''}</td><td className="n"><b>{d.hearts}</b></td><td className="n">{d.seen}</td><td className="n">{d.opened}</td><td className="n">{d.stories}</td><td className="n">{pct(d.hearts, d.seen)}</td></tr>
+                  ))}</tbody></table>
+              )}
+            </section>
+          )}
 
           <section className="panel">
             <header><h2>Page speed, as visitors felt it</h2><p>75th percentile. Under Google&apos;s “good” line is marked ✓.</p></header>

@@ -806,6 +806,10 @@ html[data-motion='off'] .drop-route li > * { opacity: 1; transform: none; }
 .lv-pair-go { margin-top: 12px; height: 40px; padding: 0 16px; border: 1px solid var(--ink); font: 600 .84rem var(--sans); }
 .lv-pair-go:hover { background: var(--ink); color: var(--paper); }
 
+/* Covers the lab page for the moment before the full view opens on load; fades by itself if script never runs. */
+.lab-cover { position: fixed; inset: 0; z-index: 299; background: var(--paper); animation: lab-cover 0s 2.5s forwards; }
+@keyframes lab-cover { to { opacity: 0; visibility: hidden; } }
+
 /* ---------- Lab full view (LabViewer) ----------
    Phone: up and down for designs (one per screen), sideways for back, front, side and both, the name bar opens the story.
    900 px and wider: photos left, the story always on the right. Keep the 900 in step with isWide() in LabViewer.tsx. */

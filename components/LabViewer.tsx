@@ -2,10 +2,13 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { img } from '@/lib/assets';
 import { LAB_RANGES } from '@/lib/lab';
+import { labTrack } from '@/lib/labtrack';
 import type { ShowItem } from './LabStrip';
 
 /** The hint shows on the first open of a visit only. */
 let hinted = false;
+/** Each design is reported as seen once per page load. */
+const seen = new Set<string>();
 
 const reducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 /** Wide screens get photos left and the story right; below this, the phone layout. Keep in step with globals.css. */
@@ -120,6 +123,12 @@ export function LabViewer({ items, all, focus, view, picks, onPick, onPair, onCl
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+    if (!cur || seen.has(cur)) return;
+    seen.add(cur);
+    labTrack('lab_view', { id: cur });
+  }, [cur]);
 
   useEffect(() => {
     if (!hint) return;
@@ -275,7 +284,7 @@ export function LabViewer({ items, all, focus, view, picks, onPick, onPair, onCl
                 )}
                 {pick(x, 'lv-pick-float')}
               </div>
-              <button type="button" className="lv-cap" onClick={() => { setSheet(true); calm(); }} aria-label={`${x.name}: open the story`}>
+              <button type="button" className="lv-cap" onClick={() => { setSheet(true); calm(); labTrack('lab_story', { id: x.id }); }} aria-label={`${x.name}: open the story`}>
                 <span className="lv-cap-name"><i style={{ background: x.swatch }} aria-hidden="true" />{x.name}<span className={`lab-st lab-${x.status}`}>{x.badge}</span></span>
                 <span className="lv-cap-line">{x.line}</span>
                 <span className="lv-cap-more">Story
