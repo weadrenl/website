@@ -189,6 +189,48 @@ const tests: LabDesign[] = [
     ],
     note: MOCKUP,
   },
+  {
+    // 2026-11-21. Working name: a motorbike rider knee-down in a corner.
+    id: 'apex', name: 'APEX', colour: 'Black', swatch: '#1d1d1d', field: 'Race track',
+    line: 'Knee down.',
+    story: 'Brake late, tip in, knee on the tarmac and the bike leaning further than feels possible. APEX is the middle of the corner, sparks behind you and the exit already in sight. On the front, ADRENL raised in black and a sweep of light and sparks.',
+    print: 'Rider leaning into a corner, sparks, light trails',
+    status: 'test', show: true,
+    shots: [{ label: 'Back', src: 'lab/apex/back.webp' }, { label: 'Front', src: 'lab/apex/front.webp' }],
+    refs: [
+      { src: 'lab/apex/back-print.webp', w: 335, h: 356, label: 'Back print: rider, sparks, light trails', bg: '#151515' },
+      { src: 'lab/apex/flat.jpg', w: 1024, h: 708, label: 'The design, front and back' },
+    ],
+    note: MOCKUP,
+  },
+  {
+    // 2026-11-21. Working name: a climber with a head torch on an ice face.
+    id: 'icefall', name: 'ICEFALL', colour: 'Black', swatch: '#1d1d1d', field: 'Ice',
+    line: 'One more pitch.',
+    story: 'Head torch on, axe in, a wall of ice above and only the rope behind you. ICEFALL is the climb before sunrise. On the front, ADRENL raised in black and an ice axe bitten into the ice, its rope running up over the shoulder.',
+    print: 'Climber on an ice face, head torch, ice axe and rope',
+    status: 'test', show: true,
+    shots: [{ label: 'Back', src: 'lab/icefall/back.webp' }, { label: 'Front', src: 'lab/icefall/front.webp' }],
+    refs: [
+      { src: 'lab/icefall/back-print.webp', w: 188, h: 572, label: 'Back print: climber and ice face', bg: '#151515' },
+      { src: 'lab/icefall/flat.jpg', w: 1024, h: 708, label: 'The design, front and back' },
+    ],
+    note: MOCKUP,
+  },
+  {
+    // 2026-11-21. Working name: a surfer in the barrel of a wave, the wave wrapping round the left sleeve. WAKE's sea, bolder.
+    id: 'barrel', name: 'BARREL', colour: 'Black', swatch: '#1d1d1d', field: 'Surf',
+    line: 'Ride it out.',
+    story: 'The wave stands up, throws over, and for a few seconds you are inside it with the light at the end of the tube. BARREL is that ride, and the wave does not stop at the back: it carries on round the left sleeve. On the front, only ADRENL raised in black and the wave coming round the sleeve.',
+    print: 'Surfer in a breaking wave, wave round the left sleeve',
+    status: 'test', show: true,
+    shots: [{ label: 'Back', src: 'lab/barrel/back.webp' }, { label: 'Front', src: 'lab/barrel/front.webp' }],
+    refs: [
+      { src: 'lab/barrel/back-print.webp', w: 301, h: 350, label: 'Back print: surfer in the barrel', bg: '#151515' },
+      { src: 'lab/barrel/flat.jpg', w: 1024, h: 700, label: 'The design, front and back' },
+    ],
+    note: MOCKUP,
+  },
 ];
 
 /** New designs first: they are what the lab is for. */
