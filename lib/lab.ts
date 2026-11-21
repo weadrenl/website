@@ -133,6 +133,34 @@ const tests: LabDesign[] = [
     ],
     note: MOCKUP,
   },
+  {
+    // 2026-11-21. Working name: an off-road buggy at the top of a white ridge line.
+    id: 'climb', name: 'CLIMB', colour: 'Black', swatch: '#1d1d1d', field: 'Off road',
+    line: 'Take the line up.',
+    story: 'No road, just a white crest and a machine that wants the top of it. CLIMB is the moment the wheels bite and the line goes up. Almost nothing on it: one white ridge and the buggy at its top; on the front, ADRENL raised in black and a thin trail from the hem with a single marker, like a route on a map.',
+    print: 'Buggy on a white ridge line, trail with a marker',
+    status: 'test', show: true,
+    shots: [{ label: 'Back', src: 'lab/climb/back.webp' }, { label: 'Front', src: 'lab/climb/front.webp' }],
+    refs: [
+      { src: 'lab/climb/back-print.webp', w: 318, h: 197, label: 'Back print: buggy and ridge line', bg: '#151515' },
+      { src: 'lab/climb/flat.jpg', w: 1024, h: 645, label: 'The design, front and back' },
+    ],
+    note: MOCKUP,
+  },
+  {
+    // 2026-11-21. Working name: a skater grinding the lip of a bowl.
+    id: 'carve', name: 'CARVE', colour: 'Black', swatch: '#1d1d1d', field: 'Concrete',
+    line: 'Drop in.',
+    story: 'Down one wall, up the other, a grind along the lip and back in before you can think about it. CARVE is that line around the bowl. White and grey on black; on the front, ADRENL raised in black and one brushed curve of the bowl at the hem.',
+    print: 'Skater on the lip of a bowl, carve line',
+    status: 'test', show: true,
+    shots: [{ label: 'Back', src: 'lab/carve/back.webp' }, { label: 'Front', src: 'lab/carve/front.webp' }],
+    refs: [
+      { src: 'lab/carve/back-print.webp', w: 282, h: 240, label: 'Back print: skater, bowl, carve line', bg: '#151515' },
+      { src: 'lab/carve/flat.jpg', w: 1024, h: 690, label: 'The design, front and back' },
+    ],
+    note: MOCKUP,
+  },
 ];
 
 /** New designs first: they are what the lab is for. */
