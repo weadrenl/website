@@ -119,6 +119,20 @@ const tests: LabDesign[] = [
     ],
     note: MOCKUP,
   },
+  {
+    // 2026-11-21. Working name: a wingsuit flyer between cliffs.
+    id: 'glide', name: 'GLIDE', colour: 'Black', swatch: '#1d1d1d', field: 'Between cliffs',
+    line: 'Fly the gap.',
+    story: 'Arms out, the suit fills, and the rock walls rush past a few metres away. GLIDE is that flight down the gap, held up by nothing but air. Dark on dark: grey rock, a silver line of wind, and on the front ADRENL raised in black with the same silver line coming over the shoulder.',
+    print: 'Wingsuit flyer between cliffs, silver ribbon',
+    status: 'test', show: true,
+    shots: [{ label: 'Back', src: 'lab/glide/back.webp' }, { label: 'Front', src: 'lab/glide/front.webp' }],
+    refs: [
+      { src: 'lab/glide/back-print.webp', w: 345, h: 506, label: 'Back print: flyer, cliffs, silver ribbon', bg: '#151515' },
+      { src: 'lab/glide/flat.jpg', w: 1024, h: 690, label: 'The design, front and back' },
+    ],
+    note: MOCKUP,
+  },
 ];
 
 /** New designs first: they are what the lab is for. */
