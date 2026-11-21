@@ -1,11 +1,11 @@
 import { LAB, LAB_BADGE, LAB_COPY, LAB_STATUS, type LabDesign } from '@/lib/lab';
 import { img } from '@/lib/assets';
 import { Mark } from './Mark';
-import { LabStrip } from './LabStrip';
+import { LabShowroom } from './LabStrip';
 
 /**
- * The design lab (/lab). First every design side by side to compare (LabStrip, swipe on a phone), then each one in full:
- * on a person from every side, its line, story and prints.
+ * The design lab (/lab). First every design side by side to compare (LabShowroom: swipe on a phone, tap for the full view),
+ * then each one written out: on a person from every side, its line, story and prints.
  */
 export function Lab() {
   const list = LAB.filter((d) => d.show);
@@ -28,7 +28,7 @@ export function Lab() {
           </p>
         </section>
 
-        <LabStrip items={list.map((d) => ({ id: d.id, name: d.name, line: d.line, swatch: d.swatch, status: d.status, badge: LAB_BADGE[d.status], shots: d.shots }))} />
+        <LabShowroom items={list.map((d) => ({ ...d, badge: LAB_BADGE[d.status] }))} />
 
         {list.map((d, i) => (
           <article key={d.id} id={d.id} className="lab-d">

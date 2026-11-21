@@ -105,6 +105,20 @@ const tests: LabDesign[] = [
     ],
     note: MOCKUP,
   },
+  {
+    // 2026-11-21. Working name: a rider on a wakeboard, towed, cutting through spray.
+    id: 'wake', name: 'WAKE', colour: 'Black', swatch: '#1d1d1d', field: 'Open water',
+    line: 'Hold on. Lean back.',
+    story: 'A rope, a board and a boat that will not slow down. WAKE is the moment you cut across your own spray and the sea goes white behind you. Only white on black; on the front, ADRENL raised in the tee’s own black and a wave rising from the hem.',
+    print: 'Wakeboarder in spray, rising wave',
+    status: 'test', show: true,
+    shots: [{ label: 'Back', src: 'lab/wake/back.webp' }, { label: 'Front', src: 'lab/wake/front.webp' }],
+    refs: [
+      { src: 'lab/wake/back-print.webp', w: 332, h: 235, label: 'Back print: rider and spray', bg: '#151515' },
+      { src: 'lab/wake/flat.jpg', w: 1024, h: 700, label: 'The design, front and back' },
+    ],
+    note: MOCKUP,
+  },
 ];
 
 /** New designs first: they are what the lab is for. */
