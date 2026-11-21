@@ -140,6 +140,36 @@ export function LabViewer({ items, all, focus, instant, view, picks, onPick, ans
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Mouse wheel and touchpad (2026-11-21, "the transition in PC is not smooth"): left alone, a wheel notch scrolls a little and
+  // then the snap jumps. Instead one flick, however long its inertia, glides exactly one design (up/down) or one side
+  // (sideways). A gesture is a run of wheel events less than 200 ms apart. Over the story column or sheet, if that can still
+  // scroll that way, it scrolls as usual.
+  useEffect(() => {
+    const el = track.current;
+    if (!el) return;
+    let last = 0;
+    let fired = false;
+    const canScroll = (box: Element | null, dy: number) =>
+      !!box && (dy > 0 ? box.scrollTop + box.clientHeight < box.scrollHeight - 1 : box.scrollTop > 0);
+    const onWheel = (e: WheelEvent) => {
+      const vertical = Math.abs(e.deltaY) >= Math.abs(e.deltaX);
+      const target = e.target as Element | null;
+      if (vertical && canScroll(target?.closest?.('.lv-aside, .lv-body') ?? null, e.deltaY)) return;
+      e.preventDefault();
+      const now = performance.now();
+      if (now - last > 200) fired = false;
+      last = now;
+      const d = vertical ? e.deltaY : e.deltaX;
+      if (fired || Math.abs(d) < 4) return;
+      fired = true;
+      const a = api.current;
+      if (vertical) a.goDesign(d > 0 ? 1 : -1);
+      else a.goView(a.at, a.side(a.at) + (d > 0 ? 1 : -1));
+    };
+    el.addEventListener('wheel', onWheel, { passive: false });
+    return () => el.removeEventListener('wheel', onWheel);
+  }, []);
+
   // Wide screens: if the right column was scrolled down when the heart went on, bring the question back into view.
   useEffect(() => {
     if (!ask || !isWide()) return;
