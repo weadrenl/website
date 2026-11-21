@@ -140,6 +140,15 @@ export function LabViewer({ items, all, focus, instant, view, picks, onPick, ans
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Wide screens: if the right column was scrolled down when the heart went on, bring the question back into view.
+  useEffect(() => {
+    if (!ask || !isWide()) return;
+    const id = window.requestAnimationFrame(() => {
+      document.querySelector('.lv-ask-wide')?.scrollIntoView({ block: 'nearest', behavior: reducedMotion() ? 'auto' : 'smooth' });
+    });
+    return () => window.cancelAnimationFrame(id);
+  }, [ask]);
+
   useEffect(() => {
     if (!cur || seen.has(cur)) return;
     seen.add(cur);
@@ -273,13 +282,16 @@ export function LabViewer({ items, all, focus, instant, view, picks, onPick, ans
       </div>
     );
   };
-  const story = (x: ShowItem) => (
+  // `top` goes right under the name and motto: on wide screens the heart and "Would you buy it?" live there, so they are
+  // on screen without scrolling the column (they sat below the fold at 1366 x 800 before, 2026-11-21).
+  const story = (x: ShowItem, top?: React.ReactNode) => (
     <>
       <div className="lv-title">
         <h2><i style={{ background: x.swatch }} aria-hidden="true" />{x.name}</h2>
         <span className={`lab-st lab-${x.status}`}>{x.badge}</span>
       </div>
       <p className="lv-line">{x.line}</p>
+      {top}
       <p className="lv-meta">{rangeName(x)} · {x.colour} · {x.field} · {x.print}</p>
       <p className="lv-story">{x.story}</p>
       {pairBlock(x)}
@@ -367,9 +379,7 @@ export function LabViewer({ items, all, focus, instant, view, picks, onPick, ans
                 </span>
               </button>
               <aside className="lv-aside" aria-label={`${x.name}: story and prints`}>
-                {story(x)}
-                {pick(x, 'lv-pick-wide')}
-                {askCard(x, 'lv-ask-wide')}
+                {story(x, <div className="lv-aside-act">{pick(x, 'lv-pick-wide')}{askCard(x, 'lv-ask-wide')}</div>)}
               </aside>
             </section>
           );

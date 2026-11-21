@@ -870,6 +870,8 @@ html[data-motion='off'] .drop-route li > * { opacity: 1; transform: none; }
 @keyframes lv-ask-in { from { opacity: 0; transform: translateY(12px); } }
 .lv-ask-float { position: absolute; left: 10px; right: 10px; bottom: 50px; box-shadow: 0 10px 30px rgba(21, 19, 15, .12); }
 .lv-ask-wide { margin-top: 14px; max-width: 420px; }
+.lv-aside-act { margin: 4px 0 6px; }
+.lv-aside-act .lv-pick-wide { margin-top: 12px; }
 .lv-ask-x { position: absolute; top: 4px; right: 4px; display: grid; place-items: center; width: 36px; height: 36px; color: var(--ink-2); }
 .lv-ask-h { margin: 0 36px 2px 0; font-family: var(--serif); font-size: 1.3rem; line-height: 1.15; }
 .lv-ask-sub { margin: 0 0 8px; font-size: .86rem; color: var(--ink-2); }
