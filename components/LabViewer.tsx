@@ -2,6 +2,7 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { img } from '@/lib/assets';
 import { LAB_RANGES } from '@/lib/lab';
+import { rupee } from './hooks';
 import { labTrack } from '@/lib/labtrack';
 import type { ShowItem } from './LabStrip';
 
@@ -27,10 +28,15 @@ type Props = {
   view: string;
   picks: string[];
   onPick: (id: string) => void;
+  /** "Would you buy it?" answers: the most they would pay in rupees, 0 for "just liking it". Asked once per design. */
+  answers: Record<string, number>;
+  onAnswer: (id: string, price: number) => void;
   onPair: (id: string) => void;
   onClose: () => void;
 };
 const rangeName = (x: ShowItem) => LAB_RANGES.find((r) => r.id === x.range)?.name ?? '';
+/** The price slider: Batch 01 sells at 799 to 899, so the range runs well either side of it. */
+const PRICE = { min: 399, max: 1499, step: 50, start: 799 };
 
 /**
  * Full view of the lab, built on what phones already teach (decided with the founder, 2026-11-21):
@@ -40,7 +46,7 @@ const rangeName = (x: ShowItem) => LAB_RANGES.find((r) => r.id === x.range)?.nam
  *   heart                "I'd wear this", remembered here and counted as an anonymous event
  * Wide screens: photos on the left, the story always on the right; arrow keys and buttons move. Back, x or Esc close.
  */
-export function LabViewer({ items, all, focus, instant, view, picks, onPick, onPair, onClose }: Props) {
+export function LabViewer({ items, all, focus, instant, view, picks, onPick, answers, onAnswer, onPair, onClose }: Props) {
   const [noFade] = useState(!!instant); // fixed for this opening, so a later jump does not replay the fade
   // Designs are followed by id, not position: the list can change while open (the pair button widens the line to All).
   const [cur, setCur] = useState(focus.id);
@@ -50,6 +56,13 @@ export function LabViewer({ items, all, focus, instant, view, picks, onPick, onP
     return Object.fromEntries(all.map((d) => [d.id, wide && d.shots.length > 1 ? d.shots.length : Math.max(0, d.shots.findIndex((s) => s.label === view))]));
   });
   const lastFocus = useRef(-1);
+  // The heart: a pop and a burst on the button, a big heart on the photo after a double tap, then "Would you buy it?".
+  const [pop, setPop] = useState<{ id: string; n: number } | null>(null);
+  const [big, setBig] = useState<{ id: string; n: number } | null>(null);
+  const [ask, setAsk] = useState<string | null>(null);
+  const [askVal, setAskVal] = useState(PRICE.start);
+  const [thanks, setThanks] = useState<string | null>(null);
+  const lastTap = useRef<{ id: string; t: number } | null>(null);
   const [sheet, setSheet] = useState(false);
   const [drag, setDrag] = useState<number | null>(null);
   const [hint, setHint] = useState(!hinted);
@@ -173,6 +186,55 @@ export function LabViewer({ items, all, focus, instant, view, picks, onPick, onP
     if (p && (!p.moved || e.clientY - p.y > 70)) setSheet(false);
   };
 
+  const heartTap = (x: ShowItem) => {
+    const on = !picks.includes(x.id);
+    onPick(x.id);
+    calm();
+    if (on) {
+      setPop({ id: x.id, n: Date.now() });
+      setSheet(false);
+      if (answers[x.id] === undefined) { setAskVal(PRICE.start); setAsk(x.id); }
+    } else if (ask === x.id) setAsk(null);
+  };
+  // Double tap on the photo, as on Instagram: always a heart, never an undo.
+  const photoTap = (x: ShowItem) => {
+    const now = Date.now();
+    const last = lastTap.current;
+    if (last && last.id === x.id && now - last.t < 320) {
+      lastTap.current = null;
+      setBig({ id: x.id, n: now });
+      window.setTimeout(() => setBig((b) => (b && b.n === now ? null : b)), 1000);
+      if (!picks.includes(x.id)) heartTap(x); else setPop({ id: x.id, n: now });
+    } else lastTap.current = { id: x.id, t: now };
+  };
+  const answer = (id: string, price: number) => {
+    onAnswer(id, price);
+    setAsk(null);
+    setThanks(id);
+    window.setTimeout(() => setThanks((t) => (t === id ? null : t)), 1600);
+  };
+  const askCard = (x: ShowItem, where: string) => {
+    if (thanks === x.id) return <div className={`lv-ask ${where}`} role="status"><p className="lv-ask-done">Noted. Thank you.</p></div>;
+    if (ask !== x.id) return null;
+    return (
+      <div className={`lv-ask ${where}`} role="group" aria-label={`Would you buy ${x.name}?`}>
+        <button type="button" className="lv-ask-x" onClick={() => setAsk(null)} aria-label="Not now">
+          <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" strokeWidth="1.6" fill="none" /></svg>
+        </button>
+        <p className="lv-ask-h">Would you buy {x.name}?</p>
+        <p className="lv-ask-sub">Slide to the most you would pay.</p>
+        <output className="lv-ask-val">{rupee(askVal)}</output>
+        <input type="range" min={PRICE.min} max={PRICE.max} step={PRICE.step} value={askVal} onChange={(e) => setAskVal(Number(e.target.value))}
+          aria-label="The most you would pay, in rupees" aria-valuetext={rupee(askVal)} />
+        <div className="lv-ask-scale"><span>{rupee(PRICE.min)}</span><span>{rupee(PRICE.max)}</span></div>
+        <div className="lv-ask-btns">
+          <button type="button" className="lv-ask-yes" onClick={() => answer(x.id, askVal)}>I&apos;d buy at {rupee(askVal)}</button>
+          <button type="button" className="lv-ask-no" onClick={() => answer(x.id, 0)}>Just liking it</button>
+        </div>
+      </div>
+    );
+  };
+
   const heart = (on: boolean) => (
     <svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true">
       <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"
@@ -182,9 +244,13 @@ export function LabViewer({ items, all, focus, instant, view, picks, onPick, onP
   const pick = (x: ShowItem, where: string) => {
     const on = picks.includes(x.id);
     return (
-      <button type="button" className={`lv-pick ${where}${on ? ' on' : ''}`} aria-pressed={on} onClick={() => { onPick(x.id); calm(); }}
+      <button type="button" className={`lv-pick ${where}${on ? ' on' : ''}`} aria-pressed={on} onClick={() => heartTap(x)}
         aria-label={on ? `You'd wear ${x.name}. Tap to undo` : `I'd wear ${x.name}`}>
-        {heart(on)}<span>{on ? 'Your pick' : 'I’d wear this'}</span>
+        <span className={`lv-heart${pop?.id === x.id ? ' pop' : ''}`} key={pop?.id === x.id ? pop.n : 'still'}>
+          {heart(on)}
+          {pop?.id === x.id && <span className="lv-burst" aria-hidden="true"><i /><i /><i /><i /><i /><i /></span>}
+        </span>
+        <span>{on ? 'Your pick' : 'I’d wear this'}</span>
       </button>
     );
   };
@@ -263,7 +329,7 @@ export function LabViewer({ items, all, focus, instant, view, picks, onPick, onP
               <div className="lv-stage">
                 <div className="lv-rail" ref={(el) => { rails.current[i] = el; }} onScroll={() => onRail(i)}>
                   {labels.map((label, j) => (
-                    <div key={label} className={`lv-view${label === 'Both' ? ' both' : ''}`} aria-hidden={j !== k}>
+                    <div key={label} className={`lv-view${label === 'Both' ? ' both' : ''}`} aria-hidden={j !== k} onClick={() => photoTap(x)}>
                       {label === 'Both'
                         ? x.shots.slice(0, 2).map((s) => fig(x, s, near, true))
                         : fig(x, x.shots[j], near && (j === k || j === 0), false)}
@@ -285,7 +351,13 @@ export function LabViewer({ items, all, focus, instant, view, picks, onPick, onP
                     </button>
                   </>
                 )}
+                {big?.id === x.id && (
+                  <span className="lv-big" key={big.n} aria-hidden="true">
+                    <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" fill="currentColor" /></svg>
+                  </span>
+                )}
                 {pick(x, 'lv-pick-float')}
+                {askCard(x, 'lv-ask-float')}
               </div>
               <button type="button" className="lv-cap" onClick={() => { setSheet(true); calm(); labTrack('lab_story', { id: x.id }); }} aria-label={`${x.name}: open the story`}>
                 <span className="lv-cap-name"><i style={{ background: x.swatch }} aria-hidden="true" />{x.name}<span className={`lab-st lab-${x.status}`}>{x.badge}</span></span>
@@ -297,6 +369,7 @@ export function LabViewer({ items, all, focus, instant, view, picks, onPick, onP
               <aside className="lv-aside" aria-label={`${x.name}: story and prints`}>
                 {story(x)}
                 {pick(x, 'lv-pick-wide')}
+                {askCard(x, 'lv-ask-wide')}
               </aside>
             </section>
           );

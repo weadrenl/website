@@ -16,6 +16,14 @@ const VIEWS = ['Back', 'Front'];
  * local: true, so tests can be left out of the count.
  */
 const PICKS = 'adrenl-lab-picks';
+/** "Would you buy it?" answers per design, rupees (0 = just liking it), so each design is asked once in this browser. */
+const PRICES = 'adrenl-lab-prices';
+const readPrices = (): Record<string, number> => {
+  try {
+    const v = JSON.parse(localStorage.getItem(PRICES) || '{}');
+    return v && typeof v === 'object' && !Array.isArray(v) ? Object.fromEntries(Object.entries(v).filter(([, n]) => typeof n === 'number')) as Record<string, number> : {};
+  } catch { return {}; }
+};
 const readPicks = (): string[] => {
   try {
     const v = JSON.parse(localStorage.getItem(PICKS) || '[]');
@@ -40,6 +48,7 @@ export function LabShowroom({ items }: { items: ShowItem[] }) {
   const [at, setAt] = useState(0);
   const [full, setFull] = useState<{ id: string; n: number; auto?: boolean } | null>(null);
   const [picks, setPicks] = useState<string[]>([]);
+  const [answers, setAnswers] = useState<Record<string, number>>({});
   const [booted, setBooted] = useState(false);
   const strip = useRef<HTMLDivElement>(null);
   const shown = filter === 'all' ? items : items.filter((d) => d.range === filter);
@@ -48,6 +57,7 @@ export function LabShowroom({ items }: { items: ShowItem[] }) {
   useEffect(() => {
     startTracking(); // the page view, so /insights can count visits to the lab
     setPicks(readPicks());
+    setAnswers(readPrices());
     const q = new URLSearchParams(window.location.search).get('line');
     const f: Filter = isFilter(q) ? q : 'all';
     setFilter(f);
@@ -78,6 +88,12 @@ export function LabShowroom({ items }: { items: ShowItem[] }) {
     setPicks(next);
     try { localStorage.setItem(PICKS, JSON.stringify(next)); } catch { /* private mode: this visit only */ }
     labTrack('lab_pick', { id, on });
+  };
+  const answerPrice = (id: string, price: number) => {
+    const next = { ...answers, [id]: price };
+    setAnswers(next);
+    try { localStorage.setItem(PRICES, JSON.stringify(next)); } catch { /* this visit only */ }
+    labTrack('lab_price', { id, price, buy: price > 0 });
   };
 
   const onScroll = () => {
@@ -137,7 +153,7 @@ export function LabShowroom({ items }: { items: ShowItem[] }) {
       <p className="lab-at lab-phone" aria-hidden="true">{Math.min(at + 1, shown.length)} / {shown.length}</p>
       {!booted && <div className="lab-cover" aria-hidden="true" />}
       {full !== null && (
-        <LabViewer items={shown} all={items} focus={full} instant={!!full.auto} view={view} picks={picks} onPick={togglePick} onPair={openPair} onClose={() => setFull(null)} />
+        <LabViewer items={shown} all={items} focus={full} instant={!!full.auto} view={view} picks={picks} onPick={togglePick} answers={answers} onAnswer={answerPrice} onPair={openPair} onClose={() => setFull(null)} />
       )}
     </section>
   );

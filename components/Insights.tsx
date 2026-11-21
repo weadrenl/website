@@ -21,7 +21,7 @@ type Stats = {
   lab?: {
     visits: number; visitors: number; opened: number;
     lines: { line: string; visits: number }[];
-    designs: { id: string; seen: number; opened: number; stories: number; taps: number; hearts: number }[];
+    designs: { id: string; seen: number; opened: number; stories: number; taps: number; hearts: number; buyers?: number; passes?: number; priceMedian?: number | null }[];
   };
 };
 
@@ -191,17 +191,18 @@ export function Insights() {
 
           {data.lab && (
             <section className="panel">
-              <header><h2>Design lab</h2><p>www.adrenl.com/lab: visits, and per design how many visits saw it in the full view (which opens by itself), tapped its card, read its story, and how many people would wear it. Not counted in the shop numbers above.</p></header>
+              <header><h2>Design lab</h2><p>www.adrenl.com/lab: visits, and per design how many visits saw it in the full view (which opens by itself), tapped its card, read its story, how many people would wear it, and after a heart, whether they would buy it and the most they would pay. Not counted in the shop numbers above.</p></header>
               <div className="tiles">
                 <div><span>Lab visits</span><b>{data.lab.visits}</b><small>{data.lab.visitors} people</small></div>
                 <div><span>Tapped a card</span><b>{pct(data.lab.opened, data.lab.visits)}</b><small>{data.lab.opened} visits went back to the grid and chose</small></div>
                 <div><span>Hearts now</span><b>{data.lab.designs.reduce((n, d) => n + d.hearts, 0)}</b><small>all time, one per person per design</small></div>
+                <div><span>Would buy</span><b>{data.lab.designs.reduce((n, d) => n + (d.buyers ?? 0), 0)}</b><small>{data.lab.designs.reduce((n, d) => n + (d.passes ?? 0), 0)} just liking it</small></div>
                 <div><span>Lines picked</span><b>{data.lab.lines.length ? LINE_NAME[data.lab.lines[0].line] ?? data.lab.lines[0].line : '–'}</b><small>{data.lab.lines.map((l) => `${LINE_NAME[l.line] ?? l.line} ${l.visits}`).join(' · ') || 'nobody changed the tab'}</small></div>
               </div>
               {data.lab.designs.length === 0 ? <p className="empty">No design opened in this range yet.</p> : (
-                <table><thead><tr><th>Design</th><th>Line</th><th className="n">Hearts</th><th className="n">Seen</th><th className="n">Tapped</th><th className="n">Story</th><th className="n">Heart / seen</th></tr></thead>
+                <table><thead><tr><th>Design</th><th>Line</th><th className="n">Hearts</th><th className="n">Would buy</th><th className="n">Median price</th><th className="n">Just liking</th><th className="n">Seen</th><th className="n">Tapped</th><th className="n">Story</th><th className="n">Heart / seen</th></tr></thead>
                   <tbody>{data.lab.designs.map((d) => (
-                    <tr key={d.id}><td>{LAB_NAME[d.id] ?? d.id}</td><td>{LAB_LINE[d.id] ?? ''}</td><td className="n"><b>{d.hearts}</b></td><td className="n">{d.seen}</td><td className="n">{d.opened}</td><td className="n">{d.stories}</td><td className="n">{pct(d.hearts, d.seen)}</td></tr>
+                    <tr key={d.id}><td>{LAB_NAME[d.id] ?? d.id}</td><td>{LAB_LINE[d.id] ?? ''}</td><td className="n"><b>{d.hearts}</b></td><td className="n">{d.buyers ?? 0}</td><td className="n">{d.priceMedian ? rupee(d.priceMedian) : '–'}</td><td className="n">{d.passes ?? 0}</td><td className="n">{d.seen}</td><td className="n">{d.opened}</td><td className="n">{d.stories}</td><td className="n">{pct(d.hearts, d.seen)}</td></tr>
                   ))}</tbody></table>
               )}
             </section>
