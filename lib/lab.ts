@@ -42,7 +42,7 @@ export const LAB_RANGES: { id: LabRange; name: string; blurb: string }[] = [
   { id: 'minimal', name: 'Minimal', blurb: 'One line on black. Quiet until someone looks closer.' },
   { id: 'batch01', name: 'Batch 01', blurb: 'RIDGE, GARUD and MARCOS: on sale now.' },
   // Another brand's design, credited, kept as a benchmark to compare ours against (founder's call, 2026-11-22).
-  { id: 'guest', name: 'Guest', blurb: 'A friend\u2019s brand, here to compare.' },
+  { id: 'guest', name: 'Guest', blurb: 'Friends\u2019 brands, here to compare.' },
 ];
 
 export const LAB_STATUS: Record<LabStatus, string> = {
@@ -296,6 +296,18 @@ const tests: LabDesign[] = [
     note: MOCKUP,
   },
   {
+    // 2026-11-22. Drawn by Claude (backend/scripts/art_bat.py) to the founder's brief, orange sparks by the founder's pick: a
+    // bat lit only on some edges. Print-safe: two solid inks, every line at least 1 mm, no loose piece under 3 mm2.
+    id: 'echo', name: 'ECHO', colour: 'Black', swatch: '#1d1d1d', field: 'Night',
+    line: 'Own the dark.',
+    story: 'A bat at night, seen only where the light catches it: the top of its wings, the tips of its ears, the long bones of its fingers, two white eyes. Your eye fills in the rest. Sparks fly off its wingtips as it turns. A bat finds its way in the dark by sound, not sight. On the front, only ADRENL raised in black.',
+    print: 'Bat lit on some edges, white eyes, orange sparks',
+    status: 'test', show: true, range: 'minimal',
+    shots: [{ label: 'Back', src: 'lab/echo/back.webp' }, { label: 'Front', src: 'lab/echo/front.webp' }],
+    refs: [{ src: 'lab/echo/print.jpg', w: 1400, h: 723, label: 'Back print: the bat, about 35 cm across' }],
+    note: MOCKUP,
+  },
+  {
     // 2026-11-22. Not ADRENL's: Dead Bear's bear tee, a friend's brand, shown credited as a benchmark (founder's call). Their
     // print lifted from their product photo (backend/designs/_refs/) and placed on our model, so it is compared like ours.
     id: 'deadbear', name: 'BEAR', colour: 'Charcoal', swatch: '#2b2a28', field: 'Guest \u00b7 Dead Bear',
@@ -306,6 +318,18 @@ const tests: LabDesign[] = [
     shots: [{ label: 'Back', src: 'lab/deadbear/back.webp' }],
     refs: [{ src: 'lab/deadbear/photo.jpg', w: 894, h: 1200, label: 'Their photo \u00b7 Dead Bear' }],
     note: 'Design and photo by Dead Bear. On our model the print is placed on a photo, so every design here is seen the same way.',
+  },
+  {
+    // 2026-11-22. Not ADRENL's: a friend's CLIMB tee, shown credited as a benchmark (founder's call: "my friend's"). The label's
+    // name was not given yet; add it to field, story, print, refs and note when it is. Print lifted from their product photo.
+    id: 'climb-guest', name: 'CLIMB', colour: 'Black', swatch: '#1d1d1d', field: 'Guest · a friend’s label',
+    line: 'A friend’s design, here to compare.',
+    story: 'Not an ADRENL tee: this one is by a friend’s label, shown here so we can see how our designs compare with it. A climber hanging off the rock, cut out of a square of white smoke, over the word CLIMB spaced wide.',
+    print: 'Climber in a square of smoke, by a friend’s label',
+    status: 'guest', show: true, range: 'guest',
+    shots: [{ label: 'Front', src: 'lab/climb-guest/front.webp' }],
+    refs: [{ src: 'lab/climb-guest/photo.jpg', w: 900, h: 900, label: 'Their photo' }],
+    note: 'Design and photo by a friend’s label. On our model the print is placed on a photo, so every design here is seen the same way.',
   },
 ];
 
