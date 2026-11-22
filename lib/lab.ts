@@ -236,20 +236,6 @@ const tests: LabDesign[] = [
     note: MOCKUP,
   },
   {
-    // 2026-11-21. Working name: a surfer in the barrel of a wave, the wave wrapping round the left sleeve. WAKE's sea, bolder.
-    id: 'barrel', name: 'BARREL', colour: 'Black', swatch: '#1d1d1d', field: 'Surf',
-    line: 'Ride it out.',
-    story: 'The wave stands up, throws over, and for a few seconds you are inside it with the light at the end of the tube. BARREL is that ride, and the wave does not stop at the back: it carries on round the left sleeve. On the front, only ADRENL raised in black and the wave coming round the sleeve.',
-    print: 'Surfer in a breaking wave, wave round the left sleeve',
-    status: 'test', show: true, range: 'bold', pair: { id: 'wake', label: 'The sea, two ways' },
-    shots: [{ label: 'Back', src: 'lab/barrel/back.webp' }, { label: 'Front', src: 'lab/barrel/front.webp' }],
-    refs: [
-      { src: 'lab/barrel/back-print.webp', w: 301, h: 350, label: 'Back print: surfer in the barrel', bg: '#151515' },
-      { src: 'lab/barrel/flat.jpg', w: 1024, h: 700, label: 'The design, front and back' },
-    ],
-    note: MOCKUP,
-  },
-  {
     // 2026-11-22. The founder's CHASE: one hunt wrapped round the tee. The deer was lowered 37 px on the back so its body meets
     // the front's at the same height at the wearer's right side seam (backend/scripts/lab_mockup.py, 'chase').
     id: 'chase', name: 'CHASE', colour: 'Black', swatch: '#1d1d1d', field: 'Jungle',
@@ -261,6 +247,20 @@ const tests: LabDesign[] = [
     refs: [
       { src: 'lab/chase/wrap.jpg', w: 1486, h: 960, label: 'The hunt unrolled: back and front meet at your right side' },
       { src: 'lab/chase/flat.jpg', w: 1024, h: 700, label: 'The design, front and back' },
+    ],
+    note: MOCKUP,
+  },
+  {
+    // 2026-11-21. Working name: a surfer in the barrel of a wave, the wave wrapping round the left sleeve. WAKE's sea, bolder.
+    id: 'barrel', name: 'BARREL', colour: 'Black', swatch: '#1d1d1d', field: 'Surf',
+    line: 'Ride it out.',
+    story: 'The wave stands up, throws over, and for a few seconds you are inside it with the light at the end of the tube. BARREL is that ride, and the wave does not stop at the back: it carries on round the left sleeve. On the front, only ADRENL raised in black and the wave coming round the sleeve.',
+    print: 'Surfer in a breaking wave, wave round the left sleeve',
+    status: 'test', show: true, range: 'bold', pair: { id: 'wake', label: 'The sea, two ways' },
+    shots: [{ label: 'Back', src: 'lab/barrel/back.webp' }, { label: 'Front', src: 'lab/barrel/front.webp' }],
+    refs: [
+      { src: 'lab/barrel/back-print.webp', w: 301, h: 350, label: 'Back print: surfer in the barrel', bg: '#151515' },
+      { src: 'lab/barrel/flat.jpg', w: 1024, h: 700, label: 'The design, front and back' },
     ],
     note: MOCKUP,
   },
