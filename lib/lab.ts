@@ -251,6 +251,21 @@ const tests: LabDesign[] = [
     note: MOCKUP,
   },
   {
+    // 2026-11-22. The founder's FERAL: a wolf on the front, a lynx on the back, their fur breaking into shards that meet at
+    // the wearer's left side seam (backend/scripts/lab_mockup.py, 'feral'). Both live in the high Himalaya (Ladakh, Spiti).
+    id: 'feral', name: 'FERAL', colour: 'Black', swatch: '#1d1d1d', field: 'Himalaya',
+    line: 'Never tamed.',
+    story: 'A wolf on your chest, a lynx on your back, both with their teeth out. The two hunters of the high Himalaya, from Ladakh to Spiti. Their fur breaks into shards that fly round your left side and meet, so the front and the back are one fight. FERAL is the part of you nobody trained.',
+    print: 'Wolf on the front, lynx on the back, shards round the left side',
+    status: 'test', show: true, range: 'bold',
+    shots: [{ label: 'Back', src: 'lab/feral/back.webp' }, { label: 'Front', src: 'lab/feral/front.webp' }],
+    refs: [
+      { src: 'lab/feral/wrap.jpg', w: 1452, h: 790, label: 'Unrolled: wolf and lynx meet at your left side' },
+      { src: 'lab/feral/flat.jpg', w: 1024, h: 700, label: 'The design, front and back' },
+    ],
+    note: MOCKUP,
+  },
+  {
     // 2026-11-21. Working name: a surfer in the barrel of a wave, the wave wrapping round the left sleeve. WAKE's sea, bolder.
     id: 'barrel', name: 'BARREL', colour: 'Black', swatch: '#1d1d1d', field: 'Surf',
     line: 'Ride it out.',
