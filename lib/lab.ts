@@ -250,6 +250,21 @@ const tests: LabDesign[] = [
     note: MOCKUP,
   },
   {
+    // 2026-11-22. The founder's CHASE: one hunt wrapped round the tee. The deer was lowered 37 px on the back so its body meets
+    // the front's at the same height at the wearer's right side seam (backend/scripts/lab_mockup.py, 'chase').
+    id: 'chase', name: 'CHASE', colour: 'Black', swatch: '#1d1d1d', field: 'Jungle',
+    line: 'Don\u2019t look back.',
+    story: 'A tiger launches off your back. The deer it wants runs round your right side and bursts out across your chest, antlers up, eye red with fear. CHASE wraps one hunt round the whole tee: the back and the front are one picture, and the deer\u2019s body meets itself at the side seam.',
+    print: 'Tiger chasing a deer, wrapping from back to front',
+    status: 'test', show: true, range: 'bold',
+    shots: [{ label: 'Back', src: 'lab/chase/back.webp' }, { label: 'Front', src: 'lab/chase/front.webp' }],
+    refs: [
+      { src: 'lab/chase/wrap.jpg', w: 1486, h: 960, label: 'The hunt unrolled: back and front meet at your right side' },
+      { src: 'lab/chase/flat.jpg', w: 1024, h: 700, label: 'The design, front and back' },
+    ],
+    note: MOCKUP,
+  },
+  {
     // 2026-11-22. Drawn by Claude (backend/scripts/art_pulse_ink.py), the founder's yes to add it to Minimal: the heart rate
     // of one jump as a brush-ink mountain range. An earlier PULSE drawn as an instrument strip was turned down as "a
     // designer view, not art".
