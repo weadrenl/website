@@ -735,6 +735,7 @@ html[data-motion='off'] .drop-route li > * { opacity: 1; transform: none; }
 .lab-st { align-self: center; font: 600 .68rem/1 var(--sans); letter-spacing: .09em; text-transform: uppercase; padding: 7px 10px; border: 1px solid var(--line-2); white-space: nowrap; }
 .lab-site { background: var(--ink); color: var(--paper); border-color: var(--ink); }
 .lab-test { border-color: var(--rust); color: var(--rust); }
+.lab-guest { border-color: var(--ink-2); color: var(--ink-2); border-style: dashed; }
 .lab-body { display: grid; grid-template-columns: minmax(0, 1.65fr) minmax(0, 1fr); gap: clamp(24px, 4vw, 64px); align-items: start; }
 /* Two views stay the size of three, not stretched to fill the row. */
 .lab-shots { display: grid; grid-template-columns: repeat(var(--n, 3), minmax(0, 1fr)); gap: clamp(8px, 1.2vw, 18px); max-width: calc(var(--n, 3) * 300px); }

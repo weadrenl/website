@@ -25,6 +25,7 @@ export function Lab() {
           <p className="lab-count">
             {list.length} {list.length === 1 ? 'design' : 'designs'} · {count('site')} on the site · {count('test')} in test
             {count('idea') > 0 && ` · ${count('idea')} ideas`}
+            {count('guest') > 0 && ` · ${count('guest')} guest`}
           </p>
         </section>
 

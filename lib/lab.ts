@@ -7,9 +7,9 @@ import { DESIGNS } from './data';
  * To add a design: put its pictures in public/img/lab/<id>/ (model cut-outs 512 x 1024, transparent, like the shop's),
  * add an entry below with status 'test', and it shows up. `show: false` takes a design off the page without deleting it.
  */
-export type LabStatus = 'site' | 'test' | 'idea';
+export type LabStatus = 'site' | 'test' | 'idea' | 'guest';
 /** Which line a design belongs to: big full prints, a single line on black, or what is on sale now. */
-export type LabRange = 'bold' | 'minimal' | 'batch01';
+export type LabRange = 'bold' | 'minimal' | 'batch01' | 'guest';
 export type LabShot = { label: string; src: string };
 /** A picture beside the story: flat lay, print plate, the design picture. `bg` puts a print made for a dark tee on a tile. */
 export type LabRef = { src: string; w: number; h: number; label: string; bg?: string };
@@ -41,12 +41,15 @@ export const LAB_RANGES: { id: LabRange; name: string; blurb: string }[] = [
   { id: 'bold', name: 'Bold', blurb: 'Big prints, the whole back, colour that shows from across the street.' },
   { id: 'minimal', name: 'Minimal', blurb: 'One line on black. Quiet until someone looks closer.' },
   { id: 'batch01', name: 'Batch 01', blurb: 'RIDGE, GARUD and MARCOS: on sale now.' },
+  // Another brand's design, credited, kept as a benchmark to compare ours against (founder's call, 2026-11-22).
+  { id: 'guest', name: 'Guest', blurb: 'A friend\u2019s brand, here to compare.' },
 ];
 
 export const LAB_STATUS: Record<LabStatus, string> = {
   site: 'On the site · Batch 01',
   test: 'In test',
   idea: 'Idea',
+  guest: 'Guest design',
 };
 
 /** The short label on each card in the compare strip. */
@@ -54,6 +57,7 @@ export const LAB_BADGE: Record<LabStatus, string> = {
   site: 'Batch 01',
   test: 'New',
   idea: 'Idea',
+  guest: 'Guest',
 };
 
 export const LAB_COPY = {
@@ -260,6 +264,18 @@ const tests: LabDesign[] = [
       { src: 'lab/pulse/flat.jpg', w: 1400, h: 758, label: 'The artwork, back and front' },
     ],
     note: MOCKUP,
+  },
+  {
+    // 2026-11-22. Not ADRENL's: Dead Bear's bear tee, a friend's brand, shown credited as a benchmark (founder's call). Their
+    // print lifted from their product photo (backend/designs/_refs/) and placed on our model, so it is compared like ours.
+    id: 'deadbear', name: 'BEAR', colour: 'Charcoal', swatch: '#2b2a28', field: 'Guest \u00b7 Dead Bear',
+    line: 'A friend\u2019s design, here to compare.',
+    story: 'Not an ADRENL tee: this one is by Dead Bear, a friend\u2019s brand, shown here so we can see how our designs compare with it. A bear\u2019s head drawn only as an outline of fur that glows, with nothing inside it.',
+    print: 'Bear head as a glowing fur outline, by Dead Bear',
+    status: 'guest', show: true, range: 'guest',
+    shots: [{ label: 'Back', src: 'lab/deadbear/back.webp' }],
+    refs: [{ src: 'lab/deadbear/photo.jpg', w: 894, h: 1200, label: 'Their photo \u00b7 Dead Bear' }],
+    note: 'Design and photo by Dead Bear. On our model the print is placed on a photo, so every design here is seen the same way.',
   },
 ];
 
