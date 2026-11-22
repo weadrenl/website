@@ -296,15 +296,22 @@ const tests: LabDesign[] = [
     note: MOCKUP,
   },
   {
-    // 2026-11-22. Drawn by Claude (backend/scripts/art_bat.py) to the founder's brief, orange sparks by the founder's pick: a
-    // bat lit only on some edges. Print-safe: two solid inks, every line at least 1 mm, no loose piece under 3 mm2.
+    // 2026-11-22, round 4 (rounds 1-3 were drawn in code and turned down). The founder's Gemini bat, inked by Claude
+    // (backend/scripts/echo4.py): wings from the shoulders down both sleeves, so it opens when the arms go out; orange eyes.
     id: 'echo', name: 'ECHO', colour: 'Black', swatch: '#1d1d1d', field: 'Night',
     line: 'Own the dark.',
-    story: 'A bat at night, seen only where the light catches it: the top of its wings, the tips of its ears, the long bones of its fingers, two white eyes. Your eye fills in the rest. Sparks fly off its wingtips as it turns. A bat finds its way in the dark by sound, not sight. On the front, only ADRENL raised in black.',
-    print: 'Bat lit on some edges, white eyes, orange sparks',
+    story: 'A bat sits between your shoulders, eyes burning orange, and its wings run down both your arms. Arms down, it folds round you. Arms out, it opens to its full span, sleeve to sleeve, sparks flying off one wing. Drawn like an old etching, in white ink on black. On the front, only ADRENL raised in black.',
+    print: 'Etched bat across the back and down both sleeves, orange eyes and sparks',
     status: 'test', show: true, range: 'minimal',
-    shots: [{ label: 'Back', src: 'lab/echo/back.webp' }, { label: 'Front', src: 'lab/echo/front.webp' }],
-    refs: [{ src: 'lab/echo/print.jpg', w: 1400, h: 723, label: 'Back print: the bat, about 35 cm across' }],
+    shots: [
+      { label: 'Back', src: 'lab/echo/back.webp' },
+      { label: 'Front', src: 'lab/echo/front.webp' },
+      { label: 'Arms out', src: 'lab/echo/arms.webp' },
+    ],
+    refs: [
+      { src: 'lab/echo/arms-out.jpg', w: 1400, h: 962, label: 'Arms out: the wings open, sleeve to sleeve' },
+      { src: 'lab/echo/print.jpg', w: 1400, h: 814, label: 'Back print, about 60 cm across; each sleeve carries a wing' },
+    ],
     note: MOCKUP,
   },
   {
