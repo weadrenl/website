@@ -245,6 +245,22 @@ const tests: LabDesign[] = [
     ],
     note: MOCKUP,
   },
+  {
+    // 2026-11-22. Drawn by Claude (backend/scripts/art_pulse_ink.py), the founder's yes to add it to Minimal: the heart rate
+    // of one jump as a brush-ink mountain range. An earlier PULSE drawn as an instrument strip was turned down as "a
+    // designer view, not art".
+    id: 'pulse', name: 'PULSE', colour: 'Black', swatch: '#1d1d1d', field: 'Every jump',
+    line: 'Every peak is a heartbeat.',
+    story: 'Calm foothills, a climb, one summit the second the door opens, then racing peaks and the long way down: the heart rate of one jump, painted as a mountain range in dry-brush ink. The summit catches the sunrise as it breaks through the sun, and an ADRENL seal signs it. On the front, ADRENL raised in black with a small brush heartbeat under it.',
+    print: 'Heartbeat as a brush-ink mountain range, orange sun, seal',
+    status: 'test', show: true, range: 'minimal',
+    shots: [{ label: 'Back', src: 'lab/pulse/back.webp' }, { label: 'Front', src: 'lab/pulse/front.webp' }],
+    refs: [
+      { src: 'lab/pulse/back-print.webp', w: 900, h: 658, label: 'Back print: the heartbeat range', bg: '#151515' },
+      { src: 'lab/pulse/flat.jpg', w: 1400, h: 758, label: 'The artwork, back and front' },
+    ],
+    note: MOCKUP,
+  },
 ];
 
 /** Grouped by line (Bold, Minimal, Batch 01), each in the order it came in. BARREL ends Bold and WAKE starts Minimal, so the
