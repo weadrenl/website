@@ -766,6 +766,15 @@ html[data-motion='off'] .drop-route li > * { opacity: 1; transform: none; }
 .lab-card img { display: block; width: 100%; height: auto; aspect-ratio: 1 / 2; object-fit: contain; object-position: 50% 100%; transition: transform .5s var(--ease); }
 .lab-card:hover img { transform: translateY(-4px); }
 .lab-card .lab-st { position: absolute; top: 0; left: 0; }
+/* A tee's other side on hover (components/Flip.tsx): lab cards and the design pickers, with a mouse only. On touch screens
+   the second picture is display: none, so a phone never downloads it; phones turn tees with Back/Front or in the full view. */
+.flip { position: relative; display: block; }
+.flip > .flip-alt, .flip > .flip-tag { display: none; }
+@media (hover: hover) and (pointer: fine) {
+  .flip > .flip-alt { display: block; position: absolute; inset: 0; opacity: 0; transition: opacity .35s var(--ease), transform .5s var(--ease); }
+  .flip > .flip-tag { display: block; position: absolute; left: 0; bottom: 6px; font: 600 .66rem/1 var(--sans); letter-spacing: .09em; text-transform: uppercase; padding: 5px 7px; background: var(--ink); color: var(--paper); opacity: 0; transition: opacity .35s var(--ease); pointer-events: none; }
+  :is(.lab-card, .picker button):is(:hover, :focus-visible) .flip > :is(.flip-alt, .flip-tag) { opacity: 1; }
+}
 .lab-card-name { display: flex; align-items: center; gap: 8px; font-family: var(--serif); font-size: 1.5rem; line-height: 1.1; letter-spacing: .02em; }
 .lab-card-name i { width: 9px; height: 9px; border-radius: 50%; flex: none; }
 .lab-card-line { font-family: var(--serif); font-style: italic; color: var(--ink-2); font-size: 1rem; line-height: 1.3; font-variation-settings: 'opsz' 24, 'SOFT' 30, 'WONK' 1; }

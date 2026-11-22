@@ -7,6 +7,7 @@ import { Modal } from './Modal';
 import { ArrowIcon, CheckIcon } from './Engrave';
 import { useStore, MAX_UNITS } from './Store';
 import { track } from '@/lib/track';
+import { Flip } from './Flip';
 
 /** Photographs plus a close-up of the print. Swipe on phones, two-up with arrows on desktop. */
 function Gallery({ sel }: { sel: number }) {
@@ -94,7 +95,7 @@ export function Shop({ sel, setSel, onAdded, onOpenBag }: { sel: number; setSel:
           <div className="picker" role="radiogroup" aria-label="Design">
             {cat.products.map((x, i) => (
               <button key={x.id} role="radio" aria-checked={sel === i} className={sel === i ? 'on' : ''} onClick={() => pick(i)}>
-                <img src={img(x.shots[0].cut)} width={512} height={1024} alt="" loading="lazy" decoding="async" />
+                <Flip src={img(x.shots[0].cut)} other={x.shots[1] && img(x.shots[1].cut)} alt="" />
                 <span><b>{x.name}</b><small>{x.colour}</small></span>
               </button>
             ))}

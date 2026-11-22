@@ -5,6 +5,7 @@ import { LAB_RANGES, type LabDesign, type LabRange } from '@/lib/lab';
 import { labTrack } from '@/lib/labtrack';
 import { startTracking } from '@/lib/track';
 import { LabViewer } from './LabViewer';
+import { Flip } from './Flip';
 
 export type ShowItem = LabDesign & { badge: string };
 
@@ -133,10 +134,11 @@ export function LabShowroom({ items }: { items: ShowItem[] }) {
       <div className="lab-cards" ref={strip} onScroll={onScroll}>
         {shown.map((d, i) => {
           const s = d.shots.find((x) => x.label === view) ?? d.shots[0];
+          const o = d.shots.find((x) => x.label !== s.label && VIEWS.includes(x.label));   // shown on hover with a mouse
           return (
             <a key={d.id} href={`#${d.id}`} className="lab-card" onClick={(e) => { e.preventDefault(); setFull({ id: d.id, n: 0 }); labTrack('lab_open', { id: d.id, line: filter }); }}>
               <figure>
-                <img className="cut" src={img(s.src)} width={512} height={1024} alt={`${d.name}, ${s.label.toLowerCase()}, on a person`} loading={i < 3 ? 'eager' : 'lazy'} decoding="async" />
+                <Flip className="cut" src={img(s.src)} other={o && img(o.src)} tag={o?.label} alt={`${d.name}, ${s.label.toLowerCase()}, on a person`} loading={i < 3 ? 'eager' : 'lazy'} />
                 <span className={`lab-st lab-${d.status}`}>{d.badge}</span>
                 {picks.includes(d.id) && (
                   <span className="lab-card-pick" title="Your pick">

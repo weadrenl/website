@@ -5,6 +5,7 @@ import { img } from '@/lib/assets';
 import { track } from '@/lib/track';
 import { useStore } from './Store';
 import { Mark } from './Mark';
+import { Flip } from './Flip';
 import { BusinessInfo, PolicyLinks } from './Business';
 
 type Health = { ok: boolean; public?: boolean; busy?: boolean; line?: number };
@@ -69,7 +70,7 @@ export function TryRoom() {
           <div className="picker" role="radiogroup" aria-label="Tee to try">
             {cat.products.map((x, i) => (
               <button key={x.id} role="radio" aria-checked={sel === i} className={sel === i ? 'on' : ''} onClick={() => pick(i)}>
-                <img src={img(x.shots[0].cut)} width={512} height={1024} alt="" loading="lazy" decoding="async" />
+                <Flip src={img(x.shots[0].cut)} other={x.shots[1] && img(x.shots[1].cut)} alt="" />
                 <span><b>{x.name}</b><small>{x.colour}</small></span>
               </button>
             ))}
