@@ -8,8 +8,8 @@ import { DESIGNS } from './data';
  * add an entry below with status 'test', and it shows up. `show: false` takes a design off the page without deleting it.
  */
 export type LabStatus = 'site' | 'test' | 'idea' | 'guest';
-/** Which line a design belongs to: big full prints, a single line on black, or what is on sale now. */
-export type LabRange = 'bold' | 'minimal' | 'batch01' | 'guest';
+/** Which line a design belongs to: big full prints, a single line on black, what is on sale now, the second batch, or a guest. */
+export type LabRange = 'bold' | 'minimal' | 'batch01' | 'batch02' | 'guest';
 export type LabShot = { label: string; src: string };
 /** A picture beside the story: flat lay, print plate, the design picture. `bg` puts a print made for a dark tee on a tile. */
 export type LabRef = { src: string; w: number; h: number; label: string; bg?: string };
@@ -41,6 +41,8 @@ export const LAB_RANGES: { id: LabRange; name: string; blurb: string }[] = [
   { id: 'bold', name: 'Bold', blurb: 'Big prints, the whole back, colour that shows from across the street.' },
   { id: 'minimal', name: 'Minimal', blurb: 'One line on black. Quiet until someone looks closer.' },
   { id: 'batch01', name: 'Batch 01', blurb: 'RIDGE, GARUD and MARCOS: on sale now.' },
+  // 2026-11-23, the founder: a new batch after the others. The hunter and the hunted, art where the eye goes, dark around it.
+  { id: 'batch02', name: 'Batch 02', blurb: 'The hunter and the hunted. Drawn in full where you look, dark everywhere else.' },
   // Another brand's design, credited, kept as a benchmark to compare ours against (founder's call, 2026-11-22).
   { id: 'guest', name: 'Guest', blurb: 'Friends\u2019 brands, here to compare.' },
 ];
@@ -340,6 +342,54 @@ const tests: LabDesign[] = [
   },
 ];
 
+/**
+ * Batch 02 (2026-11-23), designed by Claude without a GPU (backend/scripts/batch02_art.py): the shapes come from pictures made
+ * on our own GPU with open models (FLUX.2 klein 4B, Z-Image-Turbo; Apache-2.0); the art is drawn in full only where the eye
+ * goes and fades into the tee's black, with the hunter and the hunted top and bottom (the founder's notes, 2026-11-23).
+ * N°04-06 (CORNICE, COLD BLOOD, STRIKE) come next.
+ */
+const batch02: LabDesign[] = [
+  {
+    id: 'stoop', name: 'STOOP', colour: 'Black', swatch: '#1d1d1d', field: 'Open sky',
+    line: 'Fastest thing alive.',
+    story: 'A peregrine falcon folds its wings and drops out of the sky head first, the fastest animal on earth. It is drawn in full only at its head and amber eye; its wings dissolve into the dark as they rise. Far below, across empty black, a small bird it has not reached yet. On your chest, one feather.',
+    print: 'Peregrine falcon diving at a small bird far below; a feather on the chest',
+    status: 'test', show: true, range: 'batch02',
+    shots: [{ label: 'Back', src: 'lab/stoop/back.webp' }, { label: 'Front', src: 'lab/stoop/front.webp' }],
+    refs: [
+      { src: 'lab/stoop/back-print.webp', w: 900, h: 1538, label: 'The back print', bg: '#151515' },
+      { src: 'lab/stoop/wrap.jpg', w: 1400, h: 1172, label: 'Front and back' },
+    ],
+    note: MOCKUP,
+  },
+  {
+    id: 'nighthunt', name: 'NIGHT HUNT', colour: 'Black', swatch: '#1d1d1d', field: 'Night',
+    line: 'One against all.',
+    story: 'They came to hunt it. On your back a black panther steps out of the dark, only its pale eyes and whiskers lit, and close round it, a metre or two off, red eyes watch through the grass. On your front, low behind the grass, more of them: they are right behind you too.',
+    print: 'A big cat\u2019s face in the dark, surrounded by red eyes; red eyes scattered on the front',
+    status: 'test', show: true, range: 'batch02',
+    shots: [{ label: 'Back', src: 'lab/nighthunt/back.webp' }, { label: 'Front', src: 'lab/nighthunt/front.webp' }],
+    refs: [
+      { src: 'lab/nighthunt/back-print.webp', w: 900, h: 1221, label: 'The back print', bg: '#151515' },
+      { src: 'lab/nighthunt/wrap.jpg', w: 1400, h: 1172, label: 'Front and back' },
+    ],
+    note: MOCKUP,
+  },
+  {
+    id: 'below', name: 'BELOW', colour: 'Black', swatch: '#1d1d1d', field: 'Open water',
+    line: 'Look down.',
+    story: 'One waterline runs right round you at chest height. On your chest a surfboard floats on it, two legs hanging into the light. On your back, out of the dark under the same line, a great white drives up through the sunbeams, jaws first, slanting round towards the surfer: the way great whites strike at the surface.',
+    print: 'A waterline round the chest; a surfer above it, a great white striking up from the dark',
+    status: 'test', show: true, range: 'batch02',
+    shots: [{ label: 'Back', src: 'lab/below/back.webp' }, { label: 'Front', src: 'lab/below/front.webp' }],
+    refs: [
+      { src: 'lab/below/back-print.webp', w: 900, h: 1343, label: 'The back print', bg: '#151515' },
+      { src: 'lab/below/wrap.jpg', w: 1400, h: 1172, label: 'Back and front, joined at your right side' },
+    ],
+    note: MOCKUP,
+  },
+];
+
 /** Grouped by line (Bold, Minimal, Batch 01), each in the order it came in. BARREL ends Bold and WAKE starts Minimal, so the
  * sea pair sits side by side under All. */
-export const LAB: LabDesign[] = LAB_RANGES.flatMap((r) => [...tests, ...batch01].filter((d) => d.range === r.id));
+export const LAB: LabDesign[] = LAB_RANGES.flatMap((r) => [...tests, ...batch01, ...batch02].filter((d) => d.range === r.id));
