@@ -427,6 +427,19 @@ const batch02: LabDesign[] = [
     ],
     note: MOCKUP,
   },
+  {
+    id: 'fangs', name: 'FANGS', colour: 'Black', swatch: '#1d1d1d', field: 'Ice',
+    line: 'The mountain bites.',
+    story: 'Ice hangs from the collar in a row of icicles, two of them long and curved in like canines, each about to drip: an upper jaw, not quite closed. Far below, a climber looks up and swings his axe into the ice towards it. Ice blue is the only colour. On your chest, a few short icicles at the collar, one dripping.',
+    print: 'A jaw of icicles hanging from the collar; a climber far below swinging his axe up at it',
+    status: 'test', show: true, range: 'batch02',
+    shots: [{ label: 'Back', src: 'lab/fangs/back.webp' }, { label: 'Front', src: 'lab/fangs/front.webp' }],
+    refs: [
+      { src: 'lab/fangs/back-print.webp', w: 900, h: 1346, label: 'The back print', bg: '#151515' },
+      { src: 'lab/fangs/wrap.jpg', w: 1400, h: 1172, label: 'Front and back, joined over your left shoulder' },
+    ],
+    note: MOCKUP,
+  },
 ];
 
 /** Grouped by line (Bold, Minimal, Batch 01), each in the order it came in. BARREL ends Bold and WAKE starts Minimal, so the
