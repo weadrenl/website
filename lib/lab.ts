@@ -378,8 +378,8 @@ const batch02: LabDesign[] = [
   {
     id: 'below', name: 'BELOW', colour: 'Black', swatch: '#1d1d1d', field: 'Open water',
     line: 'Look down.',
-    story: 'One waterline runs right round you at chest height. On your chest a surfboard floats on it, two legs hanging into the light. On your back, out of the dark under the same line, a great white drives up through the sunbeams, jaws first, slanting round towards the surfer: the way great whites strike at the surface.',
-    print: 'A waterline round the chest; a surfer above it, a great white striking up from the dark',
+    story: 'One waterline runs right round you at chest height. On your chest a surfboard floats on it, two legs hanging into the light. On your back, out of the dark under the same line, a great white drives up through the sunbeams with its jaws thrown open, one eye burning red as it lunges at the surfer.',
+    print: 'A waterline round the chest; a surfer above it, a great white striking up, jaws open, one red eye',
     status: 'test', show: true, range: 'batch02',
     shots: [{ label: 'Back', src: 'lab/below/back.webp' }, { label: 'Front', src: 'lab/below/front.webp' }],
     refs: [
