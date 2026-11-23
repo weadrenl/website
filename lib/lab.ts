@@ -440,6 +440,22 @@ const batch02: LabDesign[] = [
     ],
     note: MOCKUP,
   },
+  {
+    // 2026-11-23, N°10. From the founder's reference (a Pinterest picture of a black muscle car in fog, sent over WhatsApp;
+    // backend/scripts/batch02_art.py 'prowl'). The picture is someone else's and the car is a recognisable model: redraw it
+    // as our own car before it is printed or sold.
+    id: 'prowl', name: 'PROWL', colour: 'Black', swatch: '#1d1d1d', field: 'Night road',
+    line: 'You see the eyes first.',
+    story: 'Out of a bank of fog a black car rolls towards you. It is drawn by nothing but the fog round it: the car is the tee’s own black, only its edges lit, its four headlights burning white, smoke rolling off the back wheel. On your chest, only the headlights, small: it is behind you too.',
+    print: 'A black car cut out of fog, four glowing headlights; the headlights alone on the chest',
+    status: 'test', show: true, range: 'batch02',
+    shots: [{ label: 'Back', src: 'lab/prowl/back.webp' }, { label: 'Front', src: 'lab/prowl/front.webp' }],
+    refs: [
+      { src: 'lab/prowl/back-print.webp', w: 900, h: 1119, label: 'The back print', bg: '#151515' },
+      { src: 'lab/prowl/wrap.jpg', w: 1400, h: 1172, label: 'Back and front' },
+    ],
+    note: MOCKUP,
+  },
 ];
 
 /** Grouped by line (Bold, Minimal, Batch 01), each in the order it came in. BARREL ends Bold and WAKE starts Minimal, so the
