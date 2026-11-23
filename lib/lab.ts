@@ -346,7 +346,7 @@ const tests: LabDesign[] = [
  * Batch 02 (2026-11-23), designed by Claude without a GPU (backend/scripts/batch02_art.py): the shapes come from pictures made
  * on our own GPU with open models (FLUX.2 klein 4B, Z-Image-Turbo; Apache-2.0); the art is drawn in full only where the eye
  * goes and fades into the tee's black, with the hunter and the hunted top and bottom (the founder's notes, 2026-11-23).
- * N°04-06 (CORNICE, COLD BLOOD, STRIKE) come next.
+ * N°04-06 (CORNICE, COLD BLOOD, STRIKE) redone the same way on 2026-11-23.
  */
 const batch02: LabDesign[] = [
   {
@@ -385,6 +385,45 @@ const batch02: LabDesign[] = [
     refs: [
       { src: 'lab/below/back-print.webp', w: 900, h: 1343, label: 'The back print', bg: '#151515' },
       { src: 'lab/below/wrap.jpg', w: 1400, h: 1172, label: 'Back and front, joined at your right side' },
+    ],
+    note: MOCKUP,
+  },
+  {
+    id: 'cornice', name: 'CORNICE', colour: 'Black', swatch: '#1d1d1d', field: 'Big mountain',
+    line: 'Commit.',
+    story: 'High on your back a skier hangs in the air, small, the only colour on the tee, and below the snow bursts off the edge of the peak, the mountain falling away into a long empty drop. On your front, powder drifting over the shoulder.',
+    print: 'A skier in the air above a burst of snow off the peak',
+    status: 'test', show: true, range: 'batch02',
+    shots: [{ label: 'Back', src: 'lab/cornice/back.webp' }, { label: 'Front', src: 'lab/cornice/front.webp' }],
+    refs: [
+      { src: 'lab/cornice/back-print.webp', w: 900, h: 1559, label: 'The back print', bg: '#151515' },
+      { src: 'lab/cornice/wrap.jpg', w: 1400, h: 1172, label: 'Front and back, joined at your left side' },
+    ],
+    note: MOCKUP,
+  },
+  {
+    id: 'coldblood', name: 'COLD BLOOD', colour: 'Black', swatch: '#1d1d1d', field: 'Ice',
+    line: 'Someone is watching.',
+    story: 'At the top of your back a snow leopard crouches on the ledge, looking down. Far below, across empty dark and a few flakes of snow, a climber small on a frozen fall. On your chest, the climber\u2019s ice axe biting the ice.',
+    print: 'A snow leopard above, a climber far below on the ice; the ice axe on the chest',
+    status: 'test', show: true, range: 'batch02',
+    shots: [{ label: 'Back', src: 'lab/coldblood/back.webp' }, { label: 'Front', src: 'lab/coldblood/front.webp' }],
+    refs: [
+      { src: 'lab/coldblood/back-print.webp', w: 900, h: 1392, label: 'The back print', bg: '#151515' },
+      { src: 'lab/coldblood/wrap.jpg', w: 1400, h: 1172, label: 'Back and front, joined at your right side' },
+    ],
+    note: MOCKUP,
+  },
+  {
+    id: 'strike', name: 'STRIKE', colour: 'Black', swatch: '#1d1d1d', field: 'Storm',
+    line: 'Send it anyway.',
+    story: 'Lightning comes over your left shoulder and strikes down your back right behind a rider at the top of a jump in the rain. Cold light is the only colour. On your chest, the end of the bolt where it came over the shoulder.',
+    print: 'Lightning striking down behind a rider in the air; the bolt over the left shoulder',
+    status: 'test', show: true, range: 'batch02',
+    shots: [{ label: 'Back', src: 'lab/strike/back.webp' }, { label: 'Front', src: 'lab/strike/front.webp' }],
+    refs: [
+      { src: 'lab/strike/back-print.webp', w: 900, h: 1540, label: 'The back print', bg: '#151515' },
+      { src: 'lab/strike/wrap.jpg', w: 1400, h: 1172, label: 'Front and back, joined over your left shoulder' },
     ],
     note: MOCKUP,
   },
