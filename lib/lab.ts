@@ -365,12 +365,12 @@ const batch02: LabDesign[] = [
   {
     id: 'nighthunt', name: 'NIGHT HUNT', colour: 'Black', swatch: '#1d1d1d', field: 'Night',
     line: 'One against all.',
-    story: 'They came to hunt it. On your back a black panther steps out of the dark, only its pale eyes and whiskers lit, and close round it, a metre or two off, red eyes watch through the grass. On your front, low behind the grass, more of them: they are right behind you too.',
+    story: 'They came to hunt it. On your back a black panther steps out of the dark, only its pale eyes and whiskers lit, and all round it, a metre or two off, red eyes watch through the grass from every side. On your front, more of them, scattered: they are round you too.',
     print: 'A big cat\u2019s face in the dark, surrounded by red eyes; red eyes scattered on the front',
     status: 'test', show: true, range: 'batch02',
     shots: [{ label: 'Back', src: 'lab/nighthunt/back.webp' }, { label: 'Front', src: 'lab/nighthunt/front.webp' }],
     refs: [
-      { src: 'lab/nighthunt/back-print.webp', w: 900, h: 1221, label: 'The back print', bg: '#151515' },
+      { src: 'lab/nighthunt/back-print.webp', w: 900, h: 1293, label: 'The back print', bg: '#151515' },
       { src: 'lab/nighthunt/wrap.jpg', w: 1400, h: 1172, label: 'Front and back' },
     ],
     note: MOCKUP,
