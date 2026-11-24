@@ -52,6 +52,10 @@ Best upgrade later: your own footage of the finished tees on the road, shot in 4
 - `components/TryRoom.tsx`   `/try`, the trial room's door: asks the live try-on server whether it is open (`TRYON` in `lib/data.ts`)
 - `components/Lab.tsx`       `/lab`, the private design lab: each design under consideration on a person. Entries and status in `lib/lab.ts`,
                              pictures in `public/img/lab/<id>/`. Noindex, disallowed in robots, not linked
+- `public/pitch/`            `/pitch` (`/pitchdeck` and `/deck` redirect there), the pitch deck: a static page copied in by
+                             `../pitch-deck/site.sh` from `pitch-deck/master-deck.html`; edit the deck there, not here. Present
+                             button (one slide, full screen), PDF download, `#5` in the address opens slide 5. Noindex (meta and
+                             X-Robots-Tag in `next.config.mjs`), disallowed in robots, not linked
 - `components/Engrave.tsx`   SVG: contours, ridge edge, compass rose, route line, tee drawing, icons
 - `components/Site.tsx`      shell: smooth scroll, intro, nav, phone menu, buy bar, global reveals
 - `app/layout.tsx`           SEO: metadata, Open Graph, JSON-LD (Organization, WebSite, Product x3 as PreOrder, FAQPage)

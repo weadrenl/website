@@ -1,0 +1,751 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" href="/logo.svg">
+<meta property="og:title" content="ADRENL pitch deck">
+<meta property="og:description" content="Try it on. Live. Before you buy.">
+<meta property="og:image" content="https://www.adrenl.com/pitch/cover.jpg">
+<meta property="og:image:width" content="1280">
+<meta property="og:image:height" content="720">
+<meta name="twitter:card" content="summary_large_image">
+<title>ADRENL Pitch Deck</title>
+<!--
+  Master deck v2 (2026-11-23): problem, pain, solution, demo, what we build, how, why us, where we are, model, team, ask.
+  One idea per slide, big type, few words. 13 slides at 1280x720.
+  Open in Chrome to present: the demo video plays on slide 5; arrow keys or Page Down move a slide at a time.
+  ./build.sh prints the PDF; in the PDF the video becomes a still with a link.
+  Boxes with a dashed border (class "fill") are for the founder to fill in before sending.
+-->
+<style>
+@font-face { font-family: 'Fraunces'; src: url(/pitch/fonts/fraunces.woff2) format('woff2-variations'); font-weight: 100 900; font-style: normal; }
+@font-face { font-family: 'Fraunces'; src: url(/pitch/fonts/fraunces-italic.woff2) format('woff2-variations'); font-weight: 100 900; font-style: italic; }
+@font-face { font-family: 'Schibsted'; src: url(/pitch/fonts/schibsted.woff2) format('woff2-variations'); font-weight: 400 900; font-style: normal;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+@font-face { font-family: 'Schibsted'; src: url(/pitch/fonts/schibsted-ext.woff2) format('woff2-variations'); font-weight: 400 900; font-style: normal;
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF; }
+
+:root {
+  --night: #0d0e10; --night-2: #17181b; --night-3: #222327;
+  --bone: #f1ebe0; --bone-2: rgba(241, 235, 224, .68); --bone-3: rgba(241, 235, 224, .42); --hair: rgba(241, 235, 224, .16);
+  --ember: #d9774f;
+  --paper: #f2eee6; --paper-2: #e9e4d9; --ink: #15130f; --ink-2: #514c44; --ink-3: #8a8378; --line: rgba(21, 19, 15, .16);
+  --serif: 'Fraunces', Georgia, serif; --sans: 'Schibsted', 'Helvetica Neue', Arial, sans-serif;
+  --display: 'opsz' 144, 'SOFT' 0, 'WONK' 0; --display-it: 'opsz' 144, 'SOFT' 30, 'WONK' 1;
+  --z: 1;
+  color-scheme: dark;
+}
+@page { size: 1280px 720px; margin: 0; }
+* { box-sizing: border-box; }
+html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+body { margin: 0; background: #050506; color: var(--bone); font: 400 20px/1.45 var(--sans); -webkit-font-smoothing: antialiased; }
+img, video { display: block; }
+p { margin: 0; }
+b { font-weight: 650; }
+sub { font-size: .62em; line-height: 0; }
+
+.slide { position: relative; width: 1280px; height: 720px; overflow: hidden; background: var(--night); padding: 48px 72px 38px;
+  display: flex; flex-direction: column; break-after: page; page-break-after: always; }
+.light { background: var(--paper); color: var(--ink); }
+@media screen {
+  html { scroll-snap-type: y mandatory; }
+  body { padding-block: 16px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+  .slide { zoom: var(--z); margin: 0 auto; scroll-snap-align: center; }
+  .slide + .slide { margin-top: 16px; }
+}
+@media print { body { background: none; } .screen-only { display: none !important; } }
+@media screen { .print-only { display: none !important; } }
+
+/* Control bar and Present mode (screen only). Present: one slide fills the screen, the bar hides when the mouse rests. */
+.deckbar { position: fixed; z-index: 20; left: 50%; bottom: max(14px, env(safe-area-inset-bottom, 0px)); transform: translateX(-50%);
+  display: flex; align-items: center; gap: 2px; padding: 5px; border-radius: 999px; background: rgba(23, 24, 27, .9);
+  border: 1px solid var(--hair); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); box-shadow: 0 10px 30px rgba(0, 0, 0, .5);
+  font: 600 13px/1 var(--sans); color: var(--bone); transition: opacity .3s, transform .3s; }
+.deckbar button, .deckbar a { all: unset; box-sizing: border-box; cursor: pointer; display: inline-flex; align-items: center; gap: 8px;
+  height: 38px; padding: 0 15px; border-radius: 999px; color: var(--bone); white-space: nowrap; }
+.deckbar button:hover, .deckbar a:hover { background: rgba(241, 235, 224, .1); }
+.deckbar button:focus-visible, .deckbar a:focus-visible { outline: 2px solid var(--ember); outline-offset: 1px; }
+.deckbar .primary { background: var(--bone); color: var(--night); }
+.deckbar .primary:hover { background: #fff; }
+.deckbar svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.deckbar .count { padding: 0 8px; min-width: 64px; justify-content: center; color: var(--bone-2); font-variant-numeric: tabular-nums; }
+.deckbar .nav { padding: 0 11px; }
+.deckbar .in-present { display: none; }
+html.presenting .deckbar .in-present { display: inline-flex; }
+html.presenting .deckbar .in-browse { display: none; }
+html.presenting .deckbar.idle { opacity: 0; transform: translate(-50%, 10px); pointer-events: none; }
+html.presenting.idle-cursor, html.presenting.idle-cursor * { cursor: none; }
+.progress { position: fixed; z-index: 21; left: 0; bottom: 0; height: 3px; width: 0; background: var(--ember); transition: width .25s; display: none; }
+@media screen {
+  html.presenting { scroll-snap-type: none; overflow: hidden; background: #000; }
+  html.presenting body { height: 100vh; height: 100dvh; padding: 0; overflow: hidden; background: #000; display: grid; place-items: center; }
+  html.presenting .slide { display: none; margin: 0; }
+  html.presenting .slide.cur { display: flex; }
+  html.presenting .progress { display: block; }
+}
+.turn { display: none; position: fixed; z-index: 21; left: 0; right: 0; top: max(18px, env(safe-area-inset-top, 0px)); padding: 0 16px; text-align: center;
+  font: 600 12px/1.4 var(--sans); letter-spacing: .12em; text-transform: uppercase; color: var(--bone-3); pointer-events: none; }
+@media screen and (orientation: portrait) and (max-width: 700px) { html.presenting .turn { display: block; } }
+@media (max-width: 560px) { .deckbar .wide { display: none; } .deckbar button, .deckbar a { padding: 0 12px; } }
+
+/* Header and footer */
+.top { position: relative; z-index: 3; display: flex; justify-content: space-between; align-items: center;
+  font: 650 12px/1 var(--sans); letter-spacing: .18em; text-transform: uppercase; color: var(--bone-3); }
+.light .top { color: var(--ink-3); }
+.brand { display: flex; align-items: center; gap: 10px; color: var(--bone); letter-spacing: .32em; }
+.light .brand { color: var(--ink); }
+.brand svg { width: 22px; height: 19px; }
+.foot { position: relative; z-index: 3; margin-top: auto; display: flex; justify-content: space-between; align-items: flex-end; gap: 48px;
+  font: 400 11px/1.5 var(--sans); color: var(--bone-3); }
+.light .foot { color: var(--ink-3); }
+.foot .pg { font-weight: 650; letter-spacing: .14em; }
+
+/* Type */
+h1, h2 { font-family: var(--serif); font-weight: 360; font-variation-settings: var(--display); letter-spacing: -.02em; margin: 0; }
+h1 em, h2 em { font-style: italic; font-variation-settings: var(--display-it); }
+h2 { font-size: 66px; line-height: 1.02; margin-top: 34px; }
+h2 .dim { color: var(--bone-3); }
+.light h2 .dim { color: var(--ink-3); }
+.sub { font-size: 22px; line-height: 1.45; color: var(--bone-2); margin-top: 18px; max-width: 760px; }
+.light .sub { color: var(--ink-2); }
+.num { font-family: var(--serif); font-variation-settings: var(--display); font-weight: 330; letter-spacing: -.035em; line-height: .95; }
+.rs { font-family: var(--sans); font-weight: 500; font-size: .74em; margin-right: .03em; letter-spacing: 0; }
+.label { font: 650 12px/1.3 var(--sans); letter-spacing: .16em; text-transform: uppercase; color: var(--bone-3); }
+.light .label { color: var(--ink-3); }
+.ember { color: var(--ember); }
+.fill { display: inline-block; border: 1.5px dashed var(--ember); color: var(--ember); border-radius: 4px; padding: 0 9px; font-weight: 600; }
+.ico { width: 28px; height: 28px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+
+.film { position: absolute; inset: 0; background-size: cover; background-position: center; z-index: 0; }
+.film::after { content: ""; position: absolute; inset: 0; }
+
+/* 01 Cover */
+.cover .film { background-image: url(/pitch/img/film-garud.jpg); background-position: 50% 62%; }
+.cover .film::after { background: linear-gradient(90deg, rgba(13,14,16,.92) 0%, rgba(13,14,16,.66) 42%, rgba(13,14,16,.08) 78%),
+  linear-gradient(0deg, rgba(13,14,16,.8) 0%, rgba(13,14,16,0) 32%); }
+.cover-body { position: relative; z-index: 2; margin-top: 96px; }
+.word { display: flex; align-items: center; gap: 18px; font: 650 24px/1 var(--sans); letter-spacing: .44em; }
+.word svg { width: 54px; height: 47px; }
+.cover h1 { font-size: 104px; line-height: .98; margin-top: 44px; }
+.cover h1 em { color: var(--bone-2); }
+.cover .sub { font-size: 24px; margin-top: 30px; color: var(--bone); }
+.cover .foot { font-size: 13px; color: var(--bone-2); letter-spacing: .04em; }
+
+/* 02 Problem */
+.problem h2 { font-size: 88px; line-height: .98; margin-top: 44px; }
+.trio { display: grid; grid-template-columns: repeat(3, 1fr); gap: 56px; margin-top: 64px; }
+.trio .num { font-size: 92px; color: var(--bone); }
+.trio .num.e { color: var(--ember); }
+.trio p { font-size: 20px; line-height: 1.4; color: var(--bone-2); margin-top: 16px; max-width: 300px; }
+
+/* 03 Pain */
+.pains { display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px; margin-top: 52px; }
+.pain { background: var(--night-2); border-radius: 6px; padding: 30px 30px 32px; }
+.pain .ico { width: 40px; height: 40px; color: var(--ember); stroke-width: 1.4; }
+.pain h3 { font: 700 26px/1.2 var(--sans); margin: 22px 0 0; }
+.pain p { font-size: 19px; line-height: 1.45; color: var(--bone-2); margin-top: 10px; }
+.pain .num { font-size: 52px; margin-top: 22px; }
+.bridge { font-family: var(--serif); font-style: italic; font-variation-settings: var(--display-it); font-size: 34px; line-height: 1.2; margin-top: 40px; color: var(--bone); }
+.bridge span { color: var(--bone-3); }
+
+/* 04 Solution */
+.solgrid { display: grid; grid-template-columns: 430px 1fr; gap: 40px; flex: 1; align-items: center; }
+.solgrid h2 { margin-top: 0; font-size: 60px; }
+.steps { margin-top: 34px; }
+.steps div { display: grid; grid-template-columns: 44px 1fr; align-items: baseline; padding: 14px 0; border-top: 1px solid var(--hair); font-size: 21px; }
+.steps .n { font-family: var(--serif); font-style: italic; font-variation-settings: var(--display-it); font-size: 28px; color: var(--ember); }
+.laptop { position: relative; }
+.screen { position: relative; background: #000; border: 10px solid #26272b; border-bottom-width: 14px; border-radius: 14px 14px 4px 4px; aspect-ratio: 640 / 368; overflow: hidden; }
+.screen > img { width: 100%; height: 100%; object-fit: cover; }
+.pip { position: absolute; right: 14px; bottom: 14px; width: 26%; border: 2px solid rgba(241,235,224,.8); border-radius: 4px; overflow: hidden; box-shadow: 0 4px 18px rgba(0,0,0,.5); }
+.pip img { width: 100%; }
+.pip span, .live-tag { position: absolute; font: 700 10px/1 var(--sans); letter-spacing: .14em; text-transform: uppercase; }
+.pip span { left: 6px; top: 6px; color: #fff; text-shadow: 0 1px 3px #000; }
+.live-tag { left: 14px; top: 14px; background: var(--ember); color: #fff; padding: 6px 8px; border-radius: 3px; }
+.base { height: 16px; margin: 0 -22px; background: linear-gradient(#3a3b40, #1c1d20); border-radius: 0 0 16px 16px; }
+
+/* 05 Demo */
+.demo h2 { font-size: 50px; margin-top: 20px; }
+.player { margin-top: 18px; position: relative; }
+.player video, .player img { width: 100%; aspect-ratio: 1288 / 368; border-radius: 4px; background: #000; }
+.halves { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px; }
+.halves span { font: 700 12px/1 var(--sans); letter-spacing: .16em; text-transform: uppercase; color: var(--bone-3); }
+.halves span.on { color: var(--ember); }
+.dfacts { display: flex; gap: 0; margin-top: 18px; border-top: 1px solid var(--hair); }
+.dfacts div { flex: 1; padding: 16px 22px 0 0; }
+.dfacts div + div { padding-left: 22px; border-left: 1px solid var(--hair); }
+.dfacts .num { font-size: 38px; }
+.dfacts p { font-size: 15px; color: var(--bone-2); margin-top: 6px; }
+.watch { margin-top: 12px; margin-bottom: 8px; font-size: 17px; color: var(--bone-2); }
+
+.demogrid { display: grid; grid-template-columns: 800px 1fr; gap: 40px; margin-top: 22px; }
+.clips2 { display: grid; gap: 14px; }
+.clip video, .clip img { width: 100%; aspect-ratio: 1288 / 368; border-radius: 4px; background: #000; }
+.clip .halves { margin-bottom: 7px; }
+.cap { font-size: 14px; color: var(--bone-2); margin-top: 7px; letter-spacing: .01em; }
+.cap b { color: var(--bone); letter-spacing: .12em; }
+.demo .demogrid h2 { margin-top: 0; font-size: 50px; line-height: 1.02; }
+.dfact { border-top: 1px solid var(--hair); padding: 14px 0 0; margin-top: 20px; }
+.dfact .num { font-size: 42px; }
+.dfact p { font-size: 16px; color: var(--bone-2); margin-top: 6px; }
+.dside .watch { margin-top: 22px; }
+
+.media { position: relative; aspect-ratio: 1288 / 368; max-width: 100%; border-radius: 4px; overflow: hidden; background: #000; }
+.clip .media img, .media video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; aspect-ratio: auto; }
+.media video { opacity: 0; transition: opacity .5s; }
+.media.has-video video { opacity: 1; }
+.vstate { position: absolute; right: 8px; bottom: 8px; font: 650 10px/1 var(--sans); letter-spacing: .12em; text-transform: uppercase;
+  background: rgba(13, 14, 16, .72); color: var(--bone-2); padding: 6px 8px; border-radius: 3px; }
+@media (prefers-reduced-motion: reduce) { .media video { transition: none; } }
+
+/* 06 Two things */
+.two { display: grid; grid-template-columns: 1fr 1fr; gap: 0; margin-top: 30px; flex: 1; }
+.two > div { display: flex; flex-direction: column; align-items: center; text-align: center; padding: 0 30px; }
+.two > div + div { border-left: 1px solid var(--line); }
+.two h3 { font-family: var(--serif); font-variation-settings: var(--display); font-weight: 400; font-size: 40px; line-height: 1; margin: 0; }
+.two p { font-size: 19px; color: var(--ink-2); margin-top: 12px; }
+.trio-tees { display: flex; align-items: flex-end; justify-content: center; height: 290px; margin-top: 22px; }
+.trio-tees img { height: 290px; margin: 0 4px; -webkit-mask-image: linear-gradient(180deg, #000 70%, transparent 97%); mask-image: linear-gradient(180deg, #000 70%, transparent 97%); }
+.mini-screen { width: 440px; margin-top: 40px; background: #000; border: 8px solid #26272b; border-radius: 10px; aspect-ratio: 640 / 368; overflow: hidden; position: relative; }
+.mini-screen img { width: 100%; height: 100%; object-fit: cover; }
+.mini-screen .live-tag { left: 10px; top: 10px; }
+.glue { margin-top: 18px; text-align: center; font-family: var(--serif); font-style: italic; font-variation-settings: var(--display-it); font-size: 28px; color: var(--ink); }
+
+/* 07 Tees */
+.tees h2 { margin-top: 26px; }
+.rack { display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; margin-top: 12px; }
+.rack figure { margin: 0; text-align: center; }
+.rack img { width: 100%; height: 392px; object-fit: contain; object-position: bottom; -webkit-mask-image: linear-gradient(180deg, #000 74%, transparent 98%); mask-image: linear-gradient(180deg, #000 74%, transparent 98%); }
+.rack figcaption { font: 650 12px/1 var(--sans); letter-spacing: .2em; text-transform: uppercase; margin-top: -10px; position: relative; }
+.chips { display: flex; justify-content: center; gap: 12px; margin-top: 20px; }
+.chips > span { font-size: 16px; padding: 8px 16px; border: 1px solid var(--line); border-radius: 99px; color: var(--ink-2); }
+
+/* 08 How */
+.lanes { margin-top: 44px; display: grid; gap: 34px; }
+.lane { display: grid; grid-template-columns: 170px 1fr; gap: 24px; align-items: start; }
+.lane .name { font-family: var(--serif); font-variation-settings: var(--display); font-size: 32px; line-height: 1.05; padding-top: 14px; }
+.nodes { display: grid; grid-template-columns: repeat(4, 1fr); position: relative; }
+.nodes::before { content: ""; position: absolute; left: 36px; right: calc(25% - 36px); top: 36px; border-top: 1.5px dashed var(--bone-3); }
+.node { position: relative; padding-right: 18px; }
+.node .ring { width: 72px; height: 72px; border-radius: 50%; background: var(--night-3); display: grid; place-items: center; color: var(--ember); position: relative; }
+.node .ring .ico { width: 32px; height: 32px; stroke-width: 1.5; }
+.node h4 { font: 700 19px/1.25 var(--sans); margin: 14px 0 0; }
+.node p { font-size: 15px; color: var(--bone-2); margin-top: 4px; line-height: 1.4; }
+.lane .tag { grid-column: 2; font-size: 16px; color: var(--bone-2); margin-top: -6px; }
+.lane .tag b { color: var(--bone); }
+
+/* 09 Why us */
+.matrix { margin-top: 40px; display: grid; grid-template-columns: 300px repeat(4, 1fr); align-items: stretch; }
+.matrix > div { padding: 18px 12px; border-bottom: 1px solid var(--hair); text-align: center; display: flex; align-items: center; justify-content: center; }
+.matrix > div.h { align-items: flex-end; }
+.matrix .h { font: 650 13px/1.35 var(--sans); letter-spacing: .1em; text-transform: uppercase; color: var(--bone-3); border-bottom-color: var(--bone-3); padding-bottom: 14px; }
+.matrix .rowname { text-align: left; font-size: 20px; font-weight: 600; padding-left: 0; flex-direction: column; align-items: flex-start; }
+.matrix .rowname small { display: block; font-size: 14px; font-weight: 400; color: var(--bone-3); margin-top: 2px; }
+.matrix .us { background: var(--night-2); }
+.matrix .rowname.us { padding-left: 18px; border-left: 3px solid var(--ember); }
+.dot { display: inline-block; width: 18px; height: 18px; border-radius: 50%; background: var(--ember); vertical-align: middle; }
+.dot.no { background: none; border: 1.5px solid var(--bone-3); }
+.soon { font: 700 11px/1 var(--sans); letter-spacing: .14em; text-transform: uppercase; color: var(--ember); border: 1.5px solid var(--ember); padding: 5px 8px; border-radius: 99px; }
+.costline { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; margin-top: 30px; }
+.costline div { background: var(--night-2); border-radius: 6px; padding: 18px 22px; display: flex; align-items: baseline; gap: 16px; }
+.costline .num { font-size: 44px; }
+.costline p { font-size: 16px; color: var(--bone-2); }
+
+/* 10 Where we are */
+.tiles { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; margin-top: 50px; }
+.tile { background: var(--night-2); border-radius: 6px; padding: 24px 22px 26px; }
+.tile .ico { width: 26px; height: 26px; color: var(--ember); stroke-width: 2.2; }
+.tile h3 { font: 700 22px/1.2 var(--sans); margin: 16px 0 0; }
+.tile p { font-size: 16px; line-height: 1.4; color: var(--bone-2); margin-top: 8px; }
+.tile .num { font-size: 56px; margin-top: 18px; }
+.nextrow { margin-top: 40px; display: grid; grid-template-columns: 150px repeat(3, 1fr); gap: 18px; align-items: stretch; }
+.nextrow .label { align-self: center; color: var(--ember); }
+.nextrow div.t { border: 1.5px dashed var(--bone-3); border-radius: 6px; padding: 16px 20px; font-size: 17px; color: var(--bone-2); }
+
+/* 11 Model */
+.flow { display: grid; grid-template-columns: 1fr 60px 1fr 60px 1fr; align-items: stretch; margin-top: 56px; }
+.stage { background: var(--night-2); border-radius: 6px; padding: 28px 28px 30px; }
+.stage.now { background: var(--bone); color: var(--ink); }
+.stage .label { margin-bottom: 18px; display: block; }
+.stage.now .label { color: var(--ember); }
+.stage h3 { font-family: var(--serif); font-variation-settings: var(--display); font-weight: 400; font-size: 34px; line-height: 1.08; margin: 0; }
+.stage p { font-size: 17px; margin-top: 14px; color: var(--bone-2); line-height: 1.45; }
+.stage.now p { color: var(--ink-2); }
+.flow .arr { display: grid; place-items: center; color: var(--bone-3); }
+.flow .arr svg { width: 26px; height: 14px; }
+
+.clips { display: grid; grid-template-columns: 1.3fr 1fr 1fr; gap: 28px; align-items: end; margin-top: 46px; border-top: 1px solid var(--hair); padding-top: 26px; }
+.clips-h { font-family: var(--serif); font-style: italic; font-variation-settings: var(--display-it); font-size: 32px; line-height: 1.15; }
+.clips .num { font-size: 60px; }
+.clips div p { font-size: 16px; color: var(--bone-2); margin-top: 8px; }
+
+/* 12 Team */
+.people { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; margin-top: 56px; }
+.person { display: grid; grid-template-columns: 190px 1fr; gap: 34px; align-items: center; background: var(--night-2); border-radius: 6px; padding: 40px 36px; }
+.face { width: 190px; height: 190px; border-radius: 50%; background: var(--night-3); display: grid; place-items: center; color: var(--bone-3); overflow: hidden; }
+.face .ico { width: 120px; height: 120px; stroke-width: .9; margin-top: 34px; }
+.face img { width: 100%; height: 100%; object-fit: cover; }
+.person h3 { font: 700 26px/1.2 var(--sans); margin: 0; }
+.person .role { font: 650 12px/1.4 var(--sans); letter-spacing: .14em; text-transform: uppercase; color: var(--bone-3); margin-top: 10px; }
+.person p { font-size: 17px; color: var(--bone-2); margin-top: 12px; }
+.built { margin-top: 40px; font-size: 22px; color: var(--bone-2); }
+.built b { color: var(--bone); }
+
+/* 13 Ask */
+.ask .film { background-image: url(/pitch/img/film-marcos.jpg); }
+.ask .film::after { background: linear-gradient(90deg, rgba(13,14,16,.95) 0%, rgba(13,14,16,.86) 58%, rgba(13,14,16,.55) 100%); }
+.ask h2 { position: relative; z-index: 2; font-size: 72px; }
+.asks { position: relative; z-index: 2; display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 44px; }
+.asks div { border-top: 2px solid var(--ember); padding-top: 18px; }
+.asks .ico { width: 34px; height: 34px; color: var(--ember); stroke-width: 1.5; }
+.asks h3 { font: 700 23px/1.25 var(--sans); margin: 14px 0 0; }
+.asks p { font-size: 17px; line-height: 1.45; color: var(--bone-2); margin-top: 8px; }
+.raise { position: relative; z-index: 2; margin-top: 36px; font-size: 22px; display: flex; gap: 14px; align-items: center; }
+.contact { position: relative; z-index: 2; margin-top: auto; display: flex; gap: 26px; align-items: center; font-size: 18px; color: var(--bone); }
+
+/* Print only: the demo as stills, and a QR code to the video (a PDF cannot play video) */
+.pstrip { display: grid; gap: 18px; align-content: start; }
+.prow .cap { margin: 0 0 8px; }
+.ptiles { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.ptiles img { width: 100%; aspect-ratio: 640 / 368; border-radius: 4px; }
+.pnote { font-size: 13px; line-height: 1.45; color: var(--bone-3); }
+.qr { display: flex; gap: 16px; align-items: center; margin-top: 22px; }
+.qr img { width: 128px; height: 128px; background: var(--bone); padding: 8px; border-radius: 6px; flex: none; }
+.qr p { font-size: 14px; line-height: 1.45; color: var(--bone-2); }
+.qr p b { color: var(--bone); font-size: 17px; }
+.qr p a { color: var(--ember); font-size: 11.5px; word-break: break-all; }
+@media print { .dside .dfact { margin-top: 12px; padding-top: 10px; } .dside .dfact .num { font-size: 34px; } }
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="mark" viewBox="72 30 640 560">
+    <path d="M389.5 95.5 L524.5 434.5 L693 576.5 L455 483 L525.5 437.5 L390.5 315.5 L253.5 437 L325.5 483.5 L86 576.5 L253.5 435.5 Z" fill="currentColor" opacity="0.42"/>
+    <path d="M389 42 L694.5 577.5 L525 434.5 L390 95 L253 435.5 L83.5 576.5 Z" fill="currentColor"/>
+    <path d="M387.5 317 L326.5 482.5 L254 439.5 Z" fill="currentColor"/>
+    <path d="M391 317 L525 438 L452 480.5 Z" fill="currentColor"/>
+  </symbol>
+  <symbol id="arr" viewBox="0 0 26 14"><path d="M0 7h24M18 1l6 6-6 6" fill="none" stroke="currentColor" stroke-width="1.6"/></symbol>
+  <!-- Line icons, 24x24, drawn for this deck -->
+  <symbol id="i-shopper" viewBox="0 0 24 24"><circle cx="9" cy="7" r="3.2"/><path d="M3 20v-1.5A5.5 5.5 0 0 1 8.5 13h1A5.5 5.5 0 0 1 15 18.5V20"/><circle cx="18" cy="15.5" r="3.5"/><path d="M18 13.8v1.9l1.2.9"/></symbol>
+  <symbol id="i-return" viewBox="0 0 24 24"><path d="M2 7h11v9H2z"/><path d="M13 10h4l4 3.5V16h-8"/><circle cx="6" cy="18" r="1.8"/><circle cx="17" cy="18" r="1.8"/><path d="M9.5 4H5.5M7 2.5L5.5 4 7 5.5"/></symbol>
+  <symbol id="i-leaf" viewBox="0 0 24 24"><path d="M5 19C5 10.5 10.5 5 20 4c-.6 9.5-6 15-15 15z"/><path d="M5 19l8-8"/></symbol>
+  <symbol id="i-camera" viewBox="0 0 24 24"><path d="M3 8.5h3.5L8.5 5.5h7l2 3H21V19H3z"/><circle cx="12" cy="13.5" r="3.6"/></symbol>
+  <symbol id="i-body" viewBox="0 0 24 24"><path d="M4 8V4h4M16 4h4v4M20 16v4h-4M8 20H4v-4"/><circle cx="12" cy="8.5" r="2.3"/><path d="M8 17v-1.5a4 4 0 0 1 8 0V17"/></symbol>
+  <symbol id="i-spark" viewBox="0 0 24 24"><path d="M11 3l1.9 5.6L18.5 10.5l-5.6 1.9L11 18l-1.9-5.6L3.5 10.5l5.6-1.9z"/><path d="M18.5 15.5l.8 2.2 2.2.8-2.2.8-.8 2.2-.8-2.2-2.2-.8 2.2-.8z"/></symbol>
+  <symbol id="i-screen" viewBox="0 0 24 24"><rect x="2.5" y="4" width="19" height="12.5" rx="1.2"/><path d="M8 20h8M12 16.5V20"/><path d="M10 7.8l4.5 2.4-4.5 2.4z"/></symbol>
+  <symbol id="i-shirt" viewBox="0 0 24 24"><path d="M8.5 3.5L3 6.5l2.2 4.6 2.8-1.2V20.5h8V9.9l2.8 1.2L21 6.5l-5.5-3c-.6 1.6-1.9 2.6-3.5 2.6s-2.9-1-3.5-2.6z"/></symbol>
+  <symbol id="i-needle" viewBox="0 0 24 24"><path d="M20 4L7 17"/><path d="M17.5 3.5l3 3"/><path d="M7 17c-2 0-3.5 1-3.5 2.5S5 21 6.5 20s.5-3 .5-3"/><path d="M11 13c2 1 4 0 5-2"/></symbol>
+  <symbol id="i-box" viewBox="0 0 24 24"><path d="M3 7.5L12 3l9 4.5-9 4.5z"/><path d="M3 7.5v9L12 21l9-4.5v-9M12 12v9"/></symbol>
+  <symbol id="i-truck" viewBox="0 0 24 24"><path d="M2 6h11v10H2z"/><path d="M13 9h4l4 4v3h-8"/><circle cx="6" cy="18" r="2"/><circle cx="17" cy="18" r="2"/></symbol>
+  <symbol id="i-portrait" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4.2"/><path d="M3.5 23v-1.5a8.5 8.5 0 0 1 17 0V23"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="M4.5 12.5l5 5L19.5 7"/></symbol>
+  <symbol id="i-badge" viewBox="0 0 24 24"><circle cx="12" cy="9" r="5.5"/><path d="M8.5 13.5L7 21l5-2.5 5 2.5-1.5-7.5"/><path d="M9.8 9l1.5 1.5 3-3"/></symbol>
+  <symbol id="i-pilot" viewBox="0 0 24 24"><path d="M3 20V10M9 20V5M15 20v-7M21 20V8"/><path d="M2 20h20"/></symbol>
+  <symbol id="i-factory" viewBox="0 0 24 24"><path d="M2.5 20.5V11l5.5 3.5V11l5.5 3.5V7h4l.5-3.5h2l.5 3.5v13.5z"/><path d="M6 17.5h2M11 17.5h2"/></symbol>
+</svg>
+
+<!-- 01 Cover -->
+<section class="slide cover">
+  <div class="film"></div>
+  <div class="cover-body">
+    <div class="word"><svg><use href="#mark"/></svg>ADRENL</div>
+    <h1>Try it on. Live.<br><em>Before you buy.</em></h1>
+    <p class="sub">A streetwear brand with its own AI trial room.</p>
+  </div>
+  <div class="foot"><span>ADRENL LLP &nbsp;·&nbsp; Bhilai, India &nbsp;·&nbsp; adrenl.com</span><span>Pitch deck &nbsp;·&nbsp; November 2026</span></div>
+</section>
+
+<!-- 02 Problem -->
+<section class="slide problem">
+  <div class="top"><span class="brand"><svg><use href="#mark"/></svg>ADRENL</span><span>The problem</span></div>
+  <h2>Buying clothes online<br><em>is still a guess.</em></h2>
+  <div class="trio">
+    <div><div class="num">47%</div><p>of Indian households still buy clothes mainly in stores, to try them first</p></div>
+    <div><div class="num">1 in 4</div><p>rupees of an online tee brand’s sales come back</p></div>
+    <div><div class="num e">40%+</div><p>of apparel returns are about the size</p></div>
+  </div>
+  <div class="foot"><span>LocalCircles survey, 11,632 responses · Bewakoof FY25 filed accounts (returns ₹67 Cr of ₹264 Cr gross) · Return Prime, via Apparel Resources</span><span class="pg">02</span></div>
+</section>
+
+<!-- 03 Pain -->
+<section class="slide">
+  <div class="top"><span class="brand"><svg><use href="#mark"/></svg>ADRENL</span><span>Why it hurts</span></div>
+  <h2>Every wrong size is <em>paid for three times.</em></h2>
+  <div class="pains">
+    <div class="pain"><svg class="ico"><use href="#i-shopper"/></svg><h3>The shopper</h3><p>Waits for the tee, sends it back, waits again. Trust is gone.</p></div>
+    <div class="pain"><svg class="ico"><use href="#i-return"/></svg><h3>The brand</h3><p>Ships one sale three times, and earns nothing extra.</p><div class="num"><span class="rs">₹</span>355</div></div>
+    <div class="pain"><svg class="ico"><use href="#i-leaf"/></svg><h3>The planet</h3><p>Three trips to the door instead of one.</p><div class="num">1.5 kg <span style="font-size:.5em">CO<sub>2</sub>e</span></div></div>
+  </div>
+  <p class="bridge">Stores fix this with a trial room. <span>Online has none.</span></p>
+  <div class="foot"><span>Per size exchange of one tee: our estimate from Indian courier rate cards and Delhivery’s published emission factor (BRSR FY25). Delivery only.</span><span class="pg">03</span></div>
+</section>
+
+<!-- 04 Solution -->
+<section class="slide">
+  <div class="top"><span class="brand"><svg><use href="#mark"/></svg>ADRENL</span><span>The solution</span></div>
+  <div class="solgrid">
+    <div>
+      <h2>A trial room, <em>inside the website.</em></h2>
+      <div class="steps">
+        <div><span class="n">1</span><span>Open the tee’s page</span></div>
+        <div><span class="n">2</span><span>Stand in front of your camera</span></div>
+        <div><span class="n">3</span><span>See yourself wearing it, moving, about 3 seconds later</span></div>
+      </div>
+    </div>
+    <div class="laptop">
+      <div class="screen">
+        <img src="/pitch/img/sol-ridge-tryon.jpg" alt="The shopper on screen wearing the black RIDGE tee">
+        <span class="live-tag">Live try-on</span>
+        <div class="pip"><img src="/pitch/img/sol-ridge-camera.jpg" alt="The camera view: the shopper in a striped shirt"><span>Camera</span></div>
+      </div>
+      <div class="base"></div>
+    </div>
+  </div>
+  <div class="foot"><span>A real session, 1 November 2026: a striped shirt on camera, the black RIDGE tee on screen. No app, no download: any phone or laptop browser.</span><span class="pg">04</span></div>
+</section>
+
+<!-- 05 Demo -->
+<section class="slide demo">
+  <div class="top"><span class="brand"><svg><use href="#mark"/></svg>ADRENL</span><span>Live demo</span></div>
+  <div class="demogrid">
+    <div class="clips2 screen-only">
+      <div class="clip">
+        <div class="halves"><span>Camera</span><span class="on">What the shopper sees</span></div>
+        <div class="media" data-video="/pitch/video/demo-ridge-live.mp4">
+          <img class="print-only" src="/pitch/img/demo-ridge-poster.jpg" alt="A striped shirt on camera; the black RIDGE tee with its mountain print on screen">
+          <img class="flip screen-only" src="/pitch/img/flip/ridge-1.jpg" data-frames="/pitch/img/flip/ridge-1.jpg /pitch/img/flip/ridge-2.jpg /pitch/img/flip/ridge-3.jpg /pitch/img/flip/ridge-4.jpg" alt="A striped shirt on camera; the black RIDGE tee with its mountain print on screen">
+          <span class="vstate screen-only">Pictures · video loading</span>
+        </div>
+        <p class="cap"><b>RIDGE</b> over a striped shirt &nbsp;·&nbsp; 1 Nov &nbsp;·&nbsp; 4.7 s behind &nbsp;·&nbsp; 0 pauses</p>
+      </div>
+      <div class="clip">
+        <div class="halves"><span>Camera</span><span class="on">What the shopper sees</span></div>
+        <div class="media" data-video="/pitch/video/demo-marcos-1123.mp4">
+          <img class="print-only" src="/pitch/img/demo-marcos-1123-poster.jpg" alt="A brown tee on camera; the navy MARCOS tee with its compass print on screen">
+          <img class="flip screen-only" src="/pitch/img/flip/marcos1123-1.jpg" data-frames="/pitch/img/flip/marcos1123-1.jpg /pitch/img/flip/marcos1123-2.jpg /pitch/img/flip/marcos1123-3.jpg /pitch/img/flip/marcos1123-4.jpg" alt="A brown tee on camera; the navy MARCOS tee with its compass print on screen">
+          <span class="vstate screen-only">Pictures · video loading</span>
+        </div>
+        <p class="cap"><b>MARCOS</b> over a brown tee &nbsp;·&nbsp; 23 Nov &nbsp;·&nbsp; 3.36 s behind &nbsp;·&nbsp; 0 pauses</p>
+      </div>
+    </div>
+    <div class="pstrip print-only">
+      <div class="prow">
+        <p class="cap"><b>RIDGE</b> over a striped shirt &nbsp;·&nbsp; 1 Nov &nbsp;·&nbsp; 4.7 s behind &nbsp;·&nbsp; 0 pauses</p>
+        <div class="ptiles"><img src="/pitch/img/strip/ridge-a.jpg" alt=""><img src="/pitch/img/strip/ridge-b.jpg" alt=""><img src="/pitch/img/strip/ridge-c.jpg" alt=""></div>
+      </div>
+      <div class="prow">
+        <p class="cap"><b>MARCOS</b> over a brown tee &nbsp;·&nbsp; 23 Nov &nbsp;·&nbsp; 3.36 s behind &nbsp;·&nbsp; 0 pauses</p>
+        <div class="ptiles"><img src="/pitch/img/strip/marcos-a.jpg" alt=""><img src="/pitch/img/strip/marcos-b.jpg" alt=""><img src="/pitch/img/strip/marcos-c.jpg" alt=""></div>
+      </div>
+      <p class="pnote">What the shopper sees, with their camera in the corner, as on our live page: front, moving, back.</p>
+    </div>
+    <div class="dside">
+      <h2>Real sessions. <em>Not a mock-up.</em></h2>
+      <div class="dfact"><div class="num">12 fps</div><p>live video, front and back</p></div>
+      <div class="dfact"><div class="num">0</div><p>pauses in either session</p></div>
+      <div class="dfact"><div class="num">1 GPU</div><p>runs the whole try-on</p></div>
+      <div class="qr print-only"><a href="https://drive.google.com/file/d/1uhXleiaDIkfLhjqUmEid0w5Im0tB0F9e/view"><img src="/pitch/img/qr-demo.svg" alt="QR code to the 40-second demo video"></a><p><b>Scan to watch</b><br>both sessions, 40 seconds<br><a href="https://drive.google.com/file/d/1uhXleiaDIkfLhjqUmEid0w5Im0tB0F9e/view">drive.google.com/file/d/1uhXleiaDIkfLhjqUmEid0w5Im0tB0F9e</a></p></div>
+    </div>
+  </div>
+  <div class="foot"><span>Recorded as they ran. Camera and try-on are shown in step; on the shopper’s screen the try-on plays a few seconds behind.</span><span class="pg">05</span></div>
+</section>
+
+<!-- 06 What we are building -->
+<section class="slide light">
+  <div class="top"><span class="brand"><svg><use href="#mark"/></svg>ADRENL</span><span>What we are building</span></div>
+  <h2>Two things. <em>One company.</em></h2>
+  <div class="two">
+    <div>
+      <h3>The tees</h3>
+      <p>Streetwear for people who go up.</p>
+      <div class="trio-tees">
+        <img src="/pitch/img/ridge-front-model.jpg" alt="">
+        <img src="/pitch/img/garud-back-model.jpg" alt="">
+        <img src="/pitch/img/marcos-front-model.jpg" alt="">
+      </div>
+    </div>
+    <div>
+      <h3>The trial room</h3>
+      <p>Live AI try-on, on our own site.</p>
+      <div class="mini-screen"><img src="/pitch/img/sol-tryon-1123.jpg" alt=""><span class="live-tag">Live</span></div>
+    </div>
+  </div>
+  <p class="glue">The brand gives the tech real buyers. The tech gives the brand its edge.</p>
+  <div class="foot"><span>Tee pictures are design renders.</span><span class="pg">06</span></div>
+</section>
+
+<!-- 07 The tees -->
+<section class="slide light tees">
+  <div class="top"><span class="brand"><svg><use href="#mark"/></svg>ADRENL</span><span>The tees</span></div>
+  <h2>Tees that <em>carry the rush.</em></h2>
+  <div class="rack">
+    <figure><img src="/pitch/img/tees/freefall.jpg" alt=""><figcaption>Freefall</figcaption></figure>
+    <figure><img src="/pitch/img/tees/below.jpg" alt=""><figcaption>Below</figcaption></figure>
+    <figure><img src="/pitch/img/tees/powder.jpg" alt=""><figcaption>Powder</figcaption></figure>
+    <figure><img src="/pitch/img/tees/apex.jpg" alt=""><figcaption>Apex</figcaption></figure>
+    <figure><img src="/pitch/img/tees/barrel.jpg" alt=""><figcaption>Barrel</figcaption></figure>
+    <figure><img src="/pitch/img/tees/feral.jpg" alt=""><figcaption>Feral</figcaption></figure>
+  </div>
+  <div class="chips"><span><span class="rs">₹</span>799–999</span><span>Made in India</span><span>Land, air and sea</span><span>A new drop every month or two</span></div>
+  <div class="foot"><span>Designs for our next drops, shown to site visitors in our design lab. Design renders.</span><span class="pg">07</span></div>
+</section>
+
+<!-- 08 How we build it -->
+<section class="slide">
+  <div class="top"><span class="brand"><svg><use href="#mark"/></svg>ADRENL</span><span>How we build it</span></div>
+  <h2>Our own tech. <em>Our own making.</em></h2>
+  <div class="lanes">
+    <div class="lane">
+      <div class="name">Trial room</div>
+      <div class="nodes">
+        <div class="node"><div class="ring"><svg class="ico"><use href="#i-camera"/></svg></div><h4>Film</h4><p>the shopper’s browser</p></div>
+        <div class="node"><div class="ring"><svg class="ico"><use href="#i-body"/></svg></div><h4>Find</h4><p>the body and the old shirt</p></div>
+        <div class="node"><div class="ring"><svg class="ico"><use href="#i-spark"/></svg></div><h4>Redraw</h4><p>only the shirt, with AI</p></div>
+        <div class="node"><div class="ring"><svg class="ico"><use href="#i-screen"/></svg></div><h4>Stream back</h4><p>about 3 s later</p></div>
+      </div>
+      <p class="tag"><b>Built by us on open-source AI.</b> No paid API. The shopper’s video stays on our server in India.</p>
+    </div>
+    <div class="lane">
+      <div class="name">Tees</div>
+      <div class="nodes">
+        <div class="node"><div class="ring"><svg class="ico"><use href="#i-shirt"/></svg></div><h4>Source</h4><p>blank tees</p></div>
+        <div class="node"><div class="ring"><svg class="ico"><use href="#i-needle"/></svg></div><h4>Finish</h4><p>embroider, emboss, print</p></div>
+        <div class="node"><div class="ring"><svg class="ico"><use href="#i-box"/></svg></div><h4>Press and pack</h4><p>in-house</p></div>
+        <div class="node"><div class="ring"><svg class="ico"><use href="#i-truck"/></svg></div><h4>Ship</h4><p>across India</p></div>
+      </div>
+      <p class="tag"><b>Next, with funding:</b> our own unit, from fabric to finished tee.</p>
+    </div>
+  </div>
+  <div class="foot"><span>Try-on models: Wan 2.1 VACE, Self-Forcing, MediaPipe (Apache-2.0). Server: one NVIDIA L40S, AWS Mumbai.</span><span class="pg">08</span></div>
+</section>
+
+<!-- 09 Why us -->
+<section class="slide">
+  <div class="top"><span class="brand"><svg><use href="#mark"/></svg>ADRENL</span><span>Why us</span></div>
+  <h2>Live. Our own. <em>Next: size-true.</em></h2>
+  <div class="matrix">
+    <div class="h" style="justify-content:flex-start;padding-left:0">Try-on</div><div class="h">Moves with you</div><div class="h">Front and back</div><div class="h">Video stays with the shop</div><div class="h">Shows how each size fits</div>
+    <div class="rowname">Photo try-on<small>free in Google Search; shop apps</small></div><div><span class="dot no"></span></div><div><span class="dot no"></span></div><div><span class="dot no"></span></div><div><span class="dot no"></span></div>
+    <div class="rowname">Paid live video API<small>sold from abroad</small></div><div><span class="dot"></span></div><div><span class="dot"></span></div><div><span class="dot no"></span></div><div><span class="dot no"></span></div>
+    <div class="rowname us">ADRENL</div><div class="us"><span class="dot"></span></div><div class="us"><span class="dot"></span></div><div class="us"><span class="dot"></span></div><div class="us"><span class="soon">Building</span></div>
+  </div>
+  <div class="costline">
+    <div><span class="num"><span class="rs">₹</span>6,700</span><p>an hour of use, on a paid live API</p></div>
+    <div><span class="num ember"><span class="rs">₹</span>209</span><p>an hour of our own GPU</p></div>
+  </div>
+  <div class="foot"><span>Paid API at its published $0.02 a second; our GPU is AWS g6e.xlarge at $2.235 an hour, one shopper at a time; ₹93.5 to the dollar. Size-true: S, M and L drawn from each size’s real measurements.</span><span class="pg">09</span></div>
+</section>
+
+<!-- 10 Where we are -->
+<section class="slide">
+  <div class="top"><span class="brand"><svg><use href="#mark"/></svg>ADRENL</span><span>Where we are</span></div>
+  <h2>Seven weeks in.</h2>
+  <div class="tiles">
+    <div class="tile"><svg class="ico"><use href="#i-check"/></svg><h3>Company</h3><div class="num">3</div><p>registrations: LLP, GST, Udyam (MSME)</p></div>
+    <div class="tile"><svg class="ico"><use href="#i-check"/></svg><h3>Shop</h3><div class="num">Live</div><p>adrenl.com, with our own checkout</p></div>
+    <div class="tile"><svg class="ico"><use href="#i-check"/></svg><h3>Live try-on</h3><div class="num">3.4 s</div><p>behind the camera, working in a real browser</p></div>
+    <div class="tile"><svg class="ico"><use href="#i-check"/></svg><h3>Tees</h3><div class="num">20</div><p>designs in testing; 3 on the site</p></div>
+  </div>
+  <div class="nextrow">
+    <span class="label">Next 90 days</span>
+    <div class="t">First batch in hand, shot on real people</div>
+    <div class="t">Try-on tested on 30+ people</div>
+    <div class="t">Pilot with real shoppers: measure exchanges</div>
+  </div>
+  <div class="foot"><span>LLP incorporated 6 October 2026. 3.4 s behind the camera at 12 fps, measured in a real browser on 1 November 2026.</span><span class="pg">10</span></div>
+</section>
+
+<!-- 11 Business model -->
+<section class="slide">
+  <div class="top"><span class="brand"><svg><use href="#mark"/></svg>ADRENL</span><span>Business model</span></div>
+  <h2>We sell tees. <em>The trial room sells them better.</em></h2>
+  <div class="flow">
+    <div class="stage now"><span class="label">Now</span><h3>Our tees, on our own site</h3><p><span class="rs">₹</span>799–999 each, sold across India. The try-on runs on drop days.</p></div>
+    <div class="arr"><svg><use href="#arr"/></svg></div>
+    <div class="stage"><span class="label">Next</span><h3>More drops, more pieces</h3><p>A new drop every month or two, then hoodies and joggers.</p></div>
+    <div class="arr"><svg><use href="#arr"/></svg></div>
+    <div class="stage"><span class="label">Later</span><h3>The trial room, for other brands</h3><p>Licensed to Indian clothing brands, once our pilot proves it.</p></div>
+  </div>
+  <div class="clips">
+    <p class="clips-h">Every saved try-on is an ad the shopper shares.</p>
+    <div><span class="num ember"><span class="rs">₹</span>11–45</span><p>a shareable try-on clip, on our GPU</p></div>
+    <div><span class="num"><span class="rs">₹</span>1,500+</span><p>a creator video, at Indian rates</p></div>
+  </div>
+  <div class="foot"><span>Clip: one GPU hour shared by 5–20 sessions. Creator video: Indian UGC price lists, as reported by Boss Wallah.</span><span class="pg">11</span></div>
+</section>
+
+<!-- 12 Team -->
+<section class="slide">
+  <div class="top"><span class="brand"><svg><use href="#mark"/></svg>ADRENL</span><span>Team</span></div>
+  <h2>The team.</h2>
+  <div class="people">
+    <div class="person"><div class="face"><svg class="ico"><use href="#i-portrait"/></svg></div><div><h3>Anushka Pandey</h3><div class="role">Co-founder</div><p>Business, brand and operations. Pursuing an MBA.</p></div></div>
+    <div class="person"><div class="face"><svg class="ico"><use href="#i-portrait"/></svg></div><div><h3>Akshay Pandey</h3><div class="role">Co-founder</div><p>Product, design and the live try-on.</p></div></div>
+  </div>
+  <p class="built"><b>From Bhilai, Chhattisgarh.</b> The tees’ art and finishing, and the live try-on, are built in-house.</p>
+  <div class="foot"><span></span><span class="pg">12</span></div>
+</section>
+
+<!-- 13 Ask -->
+<section class="slide ask">
+  <div class="film"></div>
+  <div class="top"><span class="brand"><svg><use href="#mark"/></svg>ADRENL</span><span>The ask</span></div>
+  <h2>Help us put a trial room<br><em>in every shopper’s hand.</em></h2>
+  <div class="asks">
+    <div><svg class="ico"><use href="#i-badge"/></svg><h3>DPIIT recognition</h3><p>For the live try-on, our innovation.</p></div>
+    <div><svg class="ico"><use href="#i-pilot"/></svg><h3>A pilot grant</h3><p>Real shoppers on drop days. We measure their exchanges against those who did not try.</p></div>
+    <div><svg class="ico"><use href="#i-factory"/></svg><h3>Our own unit</h3><p>From fabric to finished tee, so every size is exact.</p></div>
+  </div>
+  <div class="contact"><span>adrenl.com</span><span class="label" style="color:var(--bone-2)">Bhilai, Chhattisgarh</span><span style="margin-left:auto" class="label">13</span></div>
+</section>
+
+<nav class="deckbar screen-only" aria-label="Deck controls">
+  <button class="primary in-browse" data-act="present" title="Present full screen (P)"><svg viewBox="0 0 24 24"><path d="M7 4.5v15l12-7.5z" fill="currentColor" stroke="none"/></svg>Present</button>
+  <button class="nav in-present" data-go="-1" aria-label="Previous slide" title="Previous (←)"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button>
+  <span class="count" aria-live="polite">1 / 13</span>
+  <button class="nav in-present" data-go="1" aria-label="Next slide" title="Next (→)"><svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></button>
+  <button class="in-present" data-act="exit" title="Leave (Esc)"><svg viewBox="0 0 24 24"><path d="M9 4v5H4M15 4v5h5M9 20v-5H4M15 20v-5h5"/></svg><span class="wide">Exit</span></button>
+  <a class="in-browse pdf" href="/pitch/ADRENL-pitch-deck.pdf" download="ADRENL-pitch-deck.pdf" title="Download the deck as a PDF"><svg viewBox="0 0 24 24"><path d="M12 4v11M7 10.5l5 5 5-5M5 20h14"/></svg>PDF</a>
+</nav>
+<div class="progress screen-only"></div>
+<p class="turn screen-only">Turn your phone sideways</p>
+
+<script>
+  // Demo slide: stills first, so it works on a weak line; each full video loads after every picture on the page
+  // has arrived, and takes over once it is playing. Without a connection the stills keep cycling.
+  document.querySelectorAll('.media').forEach(m => {
+    const img = m.querySelector('.flip'), state = m.querySelector('.vstate'), frames = img.dataset.frames.split(' ');
+    frames.forEach(f => { new Image().src = f; });
+    const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    let k = 0;
+    const tick = still ? 0 : setInterval(() => { k = (k + 1) % frames.length; img.src = frames[k]; }, 1300);
+    const start = () => {
+      const v = document.createElement('video');
+      v.muted = true; v.loop = true; v.playsInline = true; v.preload = 'auto';
+      v.setAttribute('muted', ''); v.setAttribute('playsinline', '');
+      v.addEventListener('playing', () => { clearInterval(tick); m.classList.add('has-video'); state.hidden = true; }, { once: true });
+      v.addEventListener('error', () => { state.textContent = 'Pictures only · the video needs a connection'; });
+      v.src = m.dataset.video;
+      m.appendChild(v);
+      v.play().catch(() => {});
+    };
+    if (document.readyState === 'complete') start(); else addEventListener('load', start, { once: true });
+  });
+  // Two ways to show the deck. Browse: every slide stacked, scaled to the window. Present (the button, or P): one slide at a
+  // time, full screen where the browser allows it. Keys: arrows, Page Up/Down (what a clicker sends), space, Home, End,
+  // Esc to leave. Tap or click the right part of the slide for the next one, the left part to go back; swipe on a phone.
+  // The address keeps the slide number (#5), so a link can open on the demo. Print is unaffected.
+  const root = document.documentElement, slides = [...document.querySelectorAll('.slide')];
+  const bar = document.querySelector('.deckbar'), count = bar.querySelector('.count'), progress = document.querySelector('.progress');
+  let cur = 0, presenting = false;
+  // The size comes from the layout viewport (clientWidth), not innerWidth: on a phone's first load the slides are still
+  // 1280 px wide, the phone zooms out to show them, and innerWidth then reports that zoomed-out width.
+  function fit() {
+    const g = presenting ? 0 : 32, w = root.clientWidth || innerWidth, h = root.clientHeight || innerHeight;
+    root.style.setProperty('--z', Math.max(.1, Math.min((w - g) / 1280, (h - g) / 720)));
+  }
+  function mark(i) {
+    cur = Math.max(0, Math.min(slides.length - 1, i));
+    count.textContent = (cur + 1) + ' / ' + slides.length;
+    progress.style.width = ((cur + 1) / slides.length * 100) + '%';
+    try { history.replaceState(null, '', location.pathname + location.search + '#' + (cur + 1)); } catch (e) {}
+  }
+  function go(i) {
+    mark(i);
+    if (presenting) {
+      slides.forEach((s, k) => s.classList.toggle('cur', k === cur));
+      // Only the slide on screen plays its video.
+      slides.forEach((s, k) => s.querySelectorAll('video').forEach(v => { if (k === cur) v.play().catch(() => {}); else v.pause(); }));
+    } else {
+      slides[cur].scrollIntoView({ block: 'center' });
+    }
+  }
+  function inView() {
+    const mid = innerHeight / 2;
+    const i = slides.findIndex(s => { const r = s.getBoundingClientRect(); return r.top <= mid && r.bottom >= mid; });
+    return i < 0 ? cur : i;
+  }
+  function present(on) {
+    if (on === presenting) return;
+    presenting = on;
+    root.classList.toggle('presenting', on);
+    if (on) {
+      const i = inView();
+      fit(); go(i); wake();
+      const fs = root.requestFullscreen || root.webkitRequestFullscreen;
+      if (fs && !(document.fullscreenElement || document.webkitFullscreenElement)) {
+        try {
+          const p = fs.call(root);
+          if (p && p.then) p.then(() => { if (screen.orientation && screen.orientation.lock) screen.orientation.lock('landscape').catch(() => {}); }).catch(() => {});
+        } catch (e) {}
+      }
+    } else {
+      slides.forEach(s => s.classList.remove('cur'));
+      root.classList.remove('idle-cursor'); bar.classList.remove('idle');
+      if (document.fullscreenElement || document.webkitFullscreenElement) (document.exitFullscreen || document.webkitExitFullscreen).call(document);
+      fit();
+      slides[cur].scrollIntoView({ block: 'center' });
+      slides.forEach(s => s.querySelectorAll('video').forEach(v => v.play().catch(() => {})));
+    }
+  }
+  const leftFull = () => { if (presenting && !(document.fullscreenElement || document.webkitFullscreenElement)) present(false); };
+  addEventListener('fullscreenchange', () => { fit(); leftFull(); });
+  addEventListener('webkitfullscreenchange', () => { fit(); leftFull(); });
+  addEventListener('resize', fit);
+  // Keys
+  addEventListener('keydown', e => {
+    if (e.altKey || e.ctrlKey || e.metaKey) return;
+    if (e.key === 'p' || e.key === 'P') { e.preventDefault(); present(!presenting); return; }
+    if (e.key === 'Escape' && presenting) { present(false); return; }
+    const step = { ArrowRight: 1, ArrowDown: 1, PageDown: 1, ' ': 1, Enter: 1, ArrowLeft: -1, ArrowUp: -1, PageUp: -1, Backspace: -1 }[e.key];
+    if (e.key === 'Home' || e.key === 'End') { e.preventDefault(); go(e.key === 'Home' ? 0 : slides.length - 1); return; }
+    if (!step || (e.key === 'Enter' && e.target.closest && e.target.closest('button, a'))) return;
+    e.preventDefault();
+    go((presenting ? cur : inView()) + step);
+  });
+  // The bar's buttons
+  bar.addEventListener('click', e => {
+    const b = e.target.closest('[data-act], [data-go]');
+    if (!b) return;
+    if (b.dataset.go) go(cur + +b.dataset.go);
+    else if (b.dataset.act === 'present') present(true);
+    else if (b.dataset.act === 'exit') present(false);
+  });
+  // Present mode: click or tap the slide, or swipe
+  let tx = null, ty = 0, swiped = false;
+  addEventListener('touchstart', e => { if (presenting && e.touches.length === 1) { tx = e.touches[0].clientX; ty = e.touches[0].clientY; swiped = false; } }, { passive: true });
+  addEventListener('touchend', e => {
+    if (!presenting || tx === null) return;
+    const dx = e.changedTouches[0].clientX - tx, dy = e.changedTouches[0].clientY - ty;
+    if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy)) { swiped = true; go(cur + (dx < 0 ? 1 : -1)); }
+    tx = null;
+  });
+  addEventListener('click', e => {
+    if (!presenting || swiped || e.target.closest('.deckbar, a, button')) { swiped = false; return; }
+    go(cur + (e.clientX > innerWidth * .35 ? 1 : -1));
+  });
+  // Present mode: the bar and the cursor hide after 2.5 s without a move
+  let idleT = 0;
+  function wake() {
+    bar.classList.remove('idle'); root.classList.remove('idle-cursor');
+    clearTimeout(idleT);
+    if (presenting) idleT = setTimeout(() => { if (presenting && !bar.matches(':hover, :focus-within')) { bar.classList.add('idle'); root.classList.add('idle-cursor'); } }, 2500);
+  }
+  addEventListener('mousemove', wake, { passive: true });
+  addEventListener('touchstart', () => { if (presenting && bar.classList.contains('idle')) wake(); }, { passive: true });
+  // Browse mode: keep the count and the address in step with the scroll
+  let st = 0;
+  addEventListener('scroll', () => { if (presenting) return; clearTimeout(st); st = setTimeout(() => { if (inView() !== cur) mark(inView()); }, 120); }, { passive: true });
+  // Open on the slide in the address (#5), if any, and follow it when it is typed in
+  addEventListener('hashchange', () => { const n = parseInt(location.hash.slice(1), 10); if (n >= 1 && n <= slides.length && n - 1 !== cur) go(n - 1); });
+  fit();
+  const start = parseInt(location.hash.slice(1), 10);
+  if (start >= 1 && start <= slides.length) go(start - 1);
+  else { mark(0); try { history.replaceState(null, '', location.pathname + location.search); } catch (e) {} }
+</script>
+</body>
+</html>
