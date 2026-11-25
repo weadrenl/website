@@ -332,6 +332,21 @@ const tests: LabDesign[] = [
     note: MOCKUP,
   },
   {
+    // 2026-11-25. Drawn here, no GPU (backend/scripts/hem_graphic.py): a print that rises from the hem (the founder's brief,
+    // after a sprayed-flames reference), in terrain, which code draws truthfully.
+    id: 'ascent', name: 'ASCENT', colour: 'Black', swatch: '#1d1d1d', field: 'Altitude',
+    line: 'First light is earned.',
+    story: 'Ridges climb up from your hem, one behind the other, each paler in the haze. The highest catches the first light of the day, snow in its gullies, and one climber stands on top of it with his axe in the air: the moment all of it was for. On the front, only the lowest ridges, at the hem.',
+    print: 'Mountain ridges rising from the hem in mist; the summit in first light, a climber on top',
+    status: 'test', show: true, range: 'minimal',
+    shots: [{ label: 'Back', src: 'lab/ascent/back.webp' }, { label: 'Front', src: 'lab/ascent/front.webp' }],
+    refs: [
+      { src: 'lab/ascent/back-print.webp', w: 900, h: 1006, label: 'The back print', bg: '#151515' },
+      { src: 'lab/ascent/wrap.jpg', w: 1400, h: 1172, label: 'Back and front' },
+    ],
+    note: MOCKUP,
+  },
+  {
     // 2026-11-22. Not ADRENL's: Dead Bear's bear tee, a friend's brand, shown credited as a benchmark (founder's call). Their
     // print lifted from their product photo (backend/designs/_refs/) and placed on our model, so it is compared like ours.
     id: 'deadbear', name: 'BEAR', colour: 'Charcoal', swatch: '#2b2a28', field: 'Guest \u00b7 Dead Bear',
