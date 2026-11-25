@@ -268,6 +268,21 @@ const tests: LabDesign[] = [
     note: MOCKUP,
   },
   {
+    // 2026-11-25. The founder's design (backend/designs/slipstream), lifted onto the model (lab_mockup.py 'slipstream'). Named
+    // by Claude: the swoosh reads as the air a racer leaves behind. Before BARREL, so BARREL and WAKE stay side by side.
+    id: 'slipstream', name: 'SLIPSTREAM', colour: 'Black', swatch: '#1d1d1d', field: 'Speed',
+    line: 'Sport. Train. Race. Repeat.',
+    story: 'One brushstroke of white, fast enough to bend the air. On the front it rises from the hem across your body to the shoulder; on the back it loops into a big S round a lime star, framed like a frame of race footage, ADRENL across the top, sport, train, race, repeat in the corner.',
+    print: 'A white brush swoosh and a lime star; on the back an S-curve, corner frames and type',
+    status: 'test', show: true, range: 'bold',
+    shots: [{ label: 'Back', src: 'lab/slipstream/back.webp' }, { label: 'Front', src: 'lab/slipstream/front.webp' }],
+    refs: [
+      { src: 'lab/slipstream/back-print.webp', w: 784, h: 980, label: 'The back print', bg: '#151515' },
+      { src: 'lab/slipstream/flat.jpg', w: 1133, h: 746, label: 'The design, front and back' },
+    ],
+    note: MOCKUP,
+  },
+  {
     // 2026-11-21. Working name: a surfer in the barrel of a wave, the wave wrapping round the left sleeve. WAKE's sea, bolder.
     id: 'barrel', name: 'BARREL', colour: 'Black', swatch: '#1d1d1d', field: 'Surf',
     line: 'Ride it out.',
