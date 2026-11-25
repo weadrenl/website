@@ -56,6 +56,8 @@ Best upgrade later: your own footage of the finished tees on the road, shot in 4
                              `../pitch-deck/site.sh` from `pitch-deck/master-deck.html`; edit the deck there, not here. Present
                              button (one slide, full screen), PDF download, `#5` in the address opens slide 5. Noindex (meta and
                              X-Robots-Tag in `next.config.mjs`), disallowed in robots, not linked
+                             `/pitch/video` (`/pitchvideo` and `/video` redirect there) plays `public/pitch/ADRENL-pitch-video.mp4`, the
+                             104-second explainer from `pitch-deck/explainer/`
 - `components/Engrave.tsx`   SVG: contours, ridge edge, compass rose, route line, tee drawing, icons
 - `components/Site.tsx`      shell: smooth scroll, intro, nav, phone menu, buy bar, global reveals
 - `app/layout.tsx`           SEO: metadata, Open Graph, JSON-LD (Organization, WebSite, Product x3 as PreOrder, FAQPage)
