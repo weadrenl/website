@@ -283,6 +283,21 @@ const tests: LabDesign[] = [
     note: MOCKUP,
   },
   {
+    // 2026-11-25. Drawn here, no GPU (backend/scripts/hem_flames.py), after the founder's reference: stylised flames sprayed
+    // up from the hem ("the modern glacier design from the flames, like that one"), in ice teal. Before BARREL.
+    id: 'glacier', name: 'GLACIER', colour: 'Black', swatch: '#1d1d1d', field: 'Ice',
+    line: 'Cold fire.',
+    story: 'Flames climb up from your hem all the way round, but they burn cold: glacier teal with a pale ice edge, black hollows inside them like the dark at the heart of a crevasse. Taller on the back, low on the front. Sprayed, so it stays soft on the cotton.',
+    print: 'Ice-teal flames rising from the hem, back and front, sprayed',
+    status: 'test', show: true, range: 'bold',
+    shots: [{ label: 'Back', src: 'lab/glacier/back.webp' }, { label: 'Front', src: 'lab/glacier/front.webp' }],
+    refs: [
+      { src: 'lab/glacier/back-print.webp', w: 900, h: 720, label: 'The back print', bg: '#151515' },
+      { src: 'lab/glacier/wrap.jpg', w: 1400, h: 1172, label: 'Back and front' },
+    ],
+    note: MOCKUP,
+  },
+  {
     // 2026-11-21. Working name: a surfer in the barrel of a wave, the wave wrapping round the left sleeve. WAKE's sea, bolder.
     id: 'barrel', name: 'BARREL', colour: 'Black', swatch: '#1d1d1d', field: 'Surf',
     line: 'Ride it out.',
