@@ -19,8 +19,8 @@ export const BUSINESS = {
   district: 'Durg',
   state: 'Chhattisgarh',
   pin: '490020',
-  phone: '+91 70249 96969',
-  tel: '+917024996969',
+  phone: '600-009-5353',
+  tel: '+916000095353',
 };
 /**
  * The trial room: the live video try-on, served from the GPU server at `url` (backend/, `deploy/aws.sh`). It is open only
